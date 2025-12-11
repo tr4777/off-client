@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>OFF / Tangent – Tiny Client v0.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: #0b0c10;
+        color: #f5f5f5;
+      }
+
+      body {
+        margin: 0;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0 0 8px 0;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) 1fr;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .card {
+        background: #14161f;
+        border-radius: 12px;
+        padding: 12px 14px;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        border: 1px solid #202431;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .card-header small {
+        opacity: 0.7;
+        font-size: 11px;
+      }
+
+      button {
+        background: #2563eb;
+        border: none;
+        border-radius: 999px;
+        padding: 6px 14px;
+        color: #f9fafb;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      button.secondary {
+        background: #374151;
+      }
+
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      label {
+        font-size: 12px;
+        margin-bottom: 4px;
+        display: block;
+        opacity: 0.85;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 8px;
+        border: 1px solid #374151;
+        padding: 6px 8px;
+        font-size: 13px;
+        background: #020617;
+        color: #e5e7eb;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+
+      .field {
+        margin-bottom: 8px;
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .row > * {
+        flex: 1;
+      }
+
+      pre {
+        margin: 0;
+        padding: 8px;
+        background: #020617;
+        border-radius: 8px;
+        font-size: 11px;
+        max-height: 380px;
+        overflow: auto;
+        border: 1px solid #111827;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: #111827;
+        border: 1px solid #1f2937;
+      }
+
+      .pill-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #22c55e;
+      }
+
+      .status {
+        font-size: 11px;
+        opacity: 0.9;
+      }
+
+      .log {
+        font-size: 11px;
+        opacity: 0.85;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>OFF / Tangent – Tiny Client</h1>
+    <p class="log" id="log-line">
+      Ready. Pointing at <code>https://off-backend.onrender.com</code>.
+    </p>
+
+    <div class="layout">
+      <!-- LEFT: Controls -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Quick actions</h3>
+            <small>Debug utilities + seeded overview</small>
+          </div>
+          <span class="pill">
+            <span class="pill-dot"></span>
+            prototype
+          </span>
+        </div>
+
+        <div class="field">
+          <button id="btn-seed">Seed happy-path scene</button>
+        </div>
+
+        <div class="row">
+          <button class="secondary" id="btn-guest">
+            Load seeded guest overview
+          </button>
+          <button class="secondary" id="btn-conc">
+            Load seeded concierge overview
+          </button>
+        </div>
+
+        <hr style="margin: 12px 0; border-color: #1f2937" />
+
+        <div class="field">
+          <label for="guest-id-input">Guest id (for manual tests)</label>
+          <input
+            id="guest-id-input"
+            type="text"
+            value="guest_seed"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field">
+          <label for="conc-id-input">Concierge id (for manual tests)</label>
+          <input
+            id="conc-id-input"
+            type="text"
+            value="conc_seed"
+            autocomplete="off"
+          />
+        </div>
+
+        <hr style="margin: 12px 0; border-color: #1f2937" />
+
+        <h3>Messages in first vibe</h3>
+        <p class="status" id="vibe-status">
+          No vibe selected yet. Load an overview to pick the first vibe.
+        </p>
+
+        <div class="field">
+          <label for="msg-role">From role</label>
+          <select id="msg-role">
+            <option value="guest">guest</option>
+            <option value="concierge">concierge</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="msg-from-id">From id</label>
+          <input
+            id="msg-from-id"
+            type="text"
+            value="guest_seed"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="field">
+          <label for="msg-text">Message text</label>
+          <textarea
+            id="msg-text"
+            placeholder="Type a quick message to send into the first vibe..."
+          ></textarea>
+        </div>
+
+        <button id="btn-send-msg" disabled>Send message to vibe</button>
+      </div>
+
+      <!-- RIGHT: JSON views -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Responses</h3>
+            <small>Last API responses (pretty-printed JSON)</small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Last response</label>
+          <pre id="response-json">{}</pre>
+        </div>
+
+        <div class="field">
+          <label>Messages for current vibe</label>
+          <pre id="messages-json">[]</pre>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "https://off-backend.onrender.com";
+
+      const logLine = document.getElementById("log-line");
+      const responsePre = document.getElementById("response-json");
+      const messagesPre = document.getElementById("messages-json");
+      const vibeStatus = document.getElementById("vibe-status");
+
+      const btnSeed = document.getElementById("btn-seed");
+      const btnGuest = document.getElementById("btn-guest");
+      const btnConc = document.getElementById("btn-conc");
+      const btnSendMsg = document.getElementById("btn-send-msg");
+
+      const guestIdInput = document.getElementById("guest-id-input");
+      const concIdInput = document.getElementById("conc-id-input");
+      const msgRoleSelect = document.getElementById("msg-role");
+      const msgFromIdInput = document.getElementById("msg-from-id");
+      const msgTextInput = document.getElementById("msg-text");
+
+      let currentVibeId = null;
+
+      function setLog(text) {
+        const ts = new Date().toISOString();
+        logLine.textContent = `[${ts}] ${text}`;
+      }
+
+      function setResponse(obj) {
+        responsePre.textContent = JSON.stringify(obj, null, 2);
+      }
+
+      function setMessages(obj) {
+        messagesPre.textContent = JSON.stringify(obj, null, 2);
+      }
+
+      async function callApi(path, options = {}) {
+        const url = `${API_BASE}${path}`;
+        const finalOptions = {
+          method: options.method || "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        };
+        if (options.body) {
+          finalOptions.body = JSON.stringify(options.body);
+        }
+
+        setLog(`Request: ${finalOptions.method} ${url}`);
+
+        const res = await fetch(url, finalOptions);
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          data = { raw: text };
+        }
+
+        setResponse(data);
+        return { status: res.status, data };
+      }
+
+      async function refreshMessagesForVibe(vibeId) {
+        if (!vibeId) {
+          setMessages([]);
+          vibeStatus.textContent = "No vibe selected.";
+          return;
+        }
+
+        const { status, data } = await callApi(
+          `/messages?vibe_id=${encodeURIComponent(vibeId)}`
+        );
+        if (status === 200) {
+          setMessages(data);
+          vibeStatus.textContent = `Vibe ${vibeId} – messages loaded.`;
+        } else {
+          vibeStatus.textContent = `Failed to load messages for vibe ${vibeId}.`;
+        }
+      }
+
+      btnSeed.addEventListener("click", async () => {
+        btnSeed.disabled = true;
+        try {
+          const { status, data } = await callApi("/debug/seed", {
+            method: "POST",
+          });
+          if (status === 200 && data.ids && data.ids.vibe_id) {
+            currentVibeId = data.ids.vibe_id;
+            vibeStatus.textContent = `Seeded vibe ${currentVibeId}. You can now load overviews or send messages.`;
+            btnSendMsg.disabled = false;
+          }
+        } catch (err) {
+          setResponse({ error: "SEED_FAILED", message: String(err) });
+        } finally {
+          btnSeed.disabled = false;
+        }
+      });
+
+      btnGuest.addEventListener("click", async () => {
+        const guestId = guestIdInput.value.trim() || "guest_seed";
+        const { status, data } = await callApi(
+          `/guests/${encodeURIComponent(guestId)}/overview`
+        );
+        if (status === 200 && data.vibes && data.vibes.length > 0) {
+          currentVibeId = data.vibes[0].id;
+          vibeStatus.textContent = `Guest overview loaded. Using first vibe: ${currentVibeId}`;
+          btnSendMsg.disabled = false;
+          await refreshMessagesForVibe(currentVibeId);
+        } else {
+          vibeStatus.textContent =
+            "Guest overview loaded, but no vibes found for this guest.";
+          setMessages([]);
+        }
+      });
+
+      btnConc.addEventListener("click", async () => {
+        const concId = concIdInput.value.trim() || "conc_seed";
+        const { status, data } = await callApi(
+          `/concierges/${encodeURIComponent(concId)}/overview`
+        );
+        if (status === 200 && data.vibes && data.vibes.length > 0) {
+          currentVibeId = data.vibes[0].id;
+          vibeStatus.textContent = `Concierge overview loaded. Using first vibe: ${currentVibeId}`;
+          btnSendMsg.disabled = false;
+          await refreshMessagesForVibe(currentVibeId);
+        } else {
+          vibeStatus.textContent =
+            "Concierge overview loaded, but no vibes found for this concierge.";
+          setMessages([]);
+        }
+      });
+
+      btnSendMsg.addEventListener("click", async () => {
+        if (!currentVibeId) {
+          alert("No vibe selected yet. Seed or load an overview first.");
+          return;
+        }
+        const text = msgTextInput.value.trim();
+        if (!text) {
+          alert("Please enter a message first.");
+          return;
+        }
+
+        btnSendMsg.disabled = true;
+        try {
+          const body = {
+            vibe_id: currentVibeId,
+            from_role: msgRoleSelect.value,
+            from_id: msgFromIdInput.value.trim() || "guest_seed",
+            text,
+          };
+
+          const { status } = await callApi("/messages", {
+            method: "POST",
+            body,
+          });
+
+          if (status === 201) {
+            msgTextInput.value = "";
+            await refreshMessagesForVibe(currentVibeId);
+          }
+        } catch (err) {
+          setResponse({ error: "SEND_MESSAGE_FAILED", message: String(err) });
+        } finally {
+          btnSendMsg.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

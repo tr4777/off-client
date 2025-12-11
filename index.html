@@ -1,435 +1,1052 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>OFF / Tangent – Tiny Client v0.1</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      :root {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        background: #0b0c10;
-        color: #f5f5f5;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>OFF · Micro-experience Console (v0.45 demo)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: #050608;
+      color: #f5f5f5;
+    }
 
-      body {
-        margin: 0;
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #26293a 0, #050608 55%);
+      min-height: 100vh;
+    }
 
-      h1,
-      h2,
-      h3 {
-        margin: 0 0 8px 0;
-      }
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
 
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      font-size: 1.4rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .tagline {
+      opacity: 0.72;
+      font-size: 0.9rem;
+    }
+
+    .version {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 2fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
       .layout {
-        display: grid;
-        grid-template-columns: minmax(260px, 320px) 1fr;
-        gap: 16px;
-        align-items: flex-start;
+        grid-template-columns: minmax(0, 1fr);
       }
+    }
 
-      .card {
-        background: #14161f;
-        border-radius: 12px;
-        padding: 12px 14px;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
-        border: 1px solid #202431;
-      }
+    section {
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(5, 6, 8, 0.88);
+      padding: 16px 16px 18px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
 
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-      }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-      .card-header small {
-        opacity: 0.7;
-        font-size: 11px;
-      }
+    h3 {
+      margin: 16px 0 8px;
+      font-size: 0.95rem;
+    }
 
-      button {
-        background: #2563eb;
-        border: none;
-        border-radius: 999px;
-        padding: 6px 14px;
-        color: #f9fafb;
-        font-size: 13px;
-        cursor: pointer;
-      }
+    .pill {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0.8;
+    }
 
-      button.secondary {
-        background: #374151;
-      }
+    .pill-guest {
+      border-color: #aad6ff;
+      color: #aad6ff;
+    }
 
-      button:disabled {
-        opacity: 0.6;
-        cursor: default;
-      }
+    .pill-concierge {
+      border-color: #ffd78a;
+      color: #ffd78a;
+    }
 
-      label {
-        font-size: 12px;
-        margin-bottom: 4px;
-        display: block;
-        opacity: 0.85;
-      }
+    .pill-debug {
+      border-color: #ff9ca5;
+      color: #ff9ca5;
+    }
 
-      input,
-      select,
-      textarea {
-        width: 100%;
-        box-sizing: border-box;
-        border-radius: 8px;
-        border: 1px solid #374151;
-        padding: 6px 8px;
-        font-size: 13px;
-        background: #020617;
-        color: #e5e7eb;
-      }
+    p {
+      margin: 4px 0 8px;
+      font-size: 0.86rem;
+      opacity: 0.82;
+    }
 
-      textarea {
-        resize: vertical;
-        min-height: 60px;
-      }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin: 8px 0 4px;
+      opacity: 0.9;
+    }
 
-      .field {
-        margin-bottom: 8px;
-      }
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(7, 10, 15, 0.95);
+      color: #f5f5f5;
+      padding: 7px 9px;
+      font-size: 0.86rem;
+      outline: none;
+    }
 
-      .row {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #aad6ff;
+      box-shadow: 0 0 0 1px rgba(170, 214, 255, 0.4);
+    }
 
-      .row > * {
-        flex: 1;
-      }
+    textarea {
+      resize: vertical;
+      min-height: 52px;
+      max-height: 160px;
+    }
 
-      pre {
-        margin: 0;
-        padding: 8px;
-        background: #020617;
-        border-radius: 8px;
-        font-size: 11px;
-        max-height: 380px;
-        overflow: auto;
-        border: 1px solid #111827;
-      }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
 
-      .pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 2px 8px;
-        border-radius: 999px;
-        font-size: 11px;
-        background: #111827;
-        border: 1px solid #1f2937;
-      }
+    .row > * {
+      flex: 1;
+      min-width: 0;
+    }
 
-      .pill-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 999px;
-        background: #22c55e;
-      }
+    .row-tight {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
 
-      .status {
-        font-size: 11px;
-        opacity: 0.9;
-      }
+    button {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.04);
+      color: #f5f5f5;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
 
-      .log {
-        font-size: 11px;
-        opacity: 0.85;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>OFF / Tangent – Tiny Client</h1>
-    <p class="log" id="log-line">
-      Ready. Pointing at <code>https://off-backend.onrender.com</code>.
-    </p>
+    button.primary {
+      background: linear-gradient(135deg, #aad6ff, #6cb7ff);
+      color: #050608;
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    button.destructive {
+      border-color: #ff9ca5;
+      color: #ff9ca5;
+    }
+
+    button.small {
+      padding: 4px 10px;
+      font-size: 0.78rem;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+
+    .mode-toggle label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      opacity: 0.8;
+    }
+
+    .badge-status-pending {
+      border-color: #ffd78a;
+      color: #ffd78a;
+    }
+
+    .badge-status-offered {
+      border-color: #aad6ff;
+      color: #aad6ff;
+    }
+
+    .badge-status-matched {
+      border-color: #9dffb0;
+      color: #9dffb0;
+    }
+
+    .badge-status-completed {
+      border-color: #9dffb0;
+      color: #9dffb0;
+    }
+
+    .badge-status-canceled {
+      border-color: #ff9ca5;
+      color: #ff9ca5;
+    }
+
+    .signal-list,
+    .offer-list,
+    .vibe-list,
+    .message-list {
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 260px;
+      overflow: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(9, 11, 18, 0.8);
+      padding: 6px;
+      font-size: 0.8rem;
+    }
+
+    .signal-item,
+    .offer-item,
+    .vibe-item,
+    .message-item {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.01);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .item-id {
+      font-family: ui-monospace, Menlo, Monaco, "SF Mono", monospace;
+      font-size: 0.72rem;
+      opacity: 0.82;
+      word-break: break-all;
+    }
+
+    .item-intent {
+      font-size: 0.8rem;
+      opacity: 0.96;
+    }
+
+    .item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      font-size: 0.72rem;
+      opacity: 0.8;
+    }
+
+    .tiny-label {
+      opacity: 0.7;
+      font-size: 0.72rem;
+    }
+
+    .inline-form {
+      margin-top: 6px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-top: 6px;
+    }
+
+    .inline-form textarea {
+      font-size: 0.78rem;
+    }
+
+    .status-bar {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      min-height: 18px;
+    }
+
+    .status-bar span {
+      opacity: 0.86;
+    }
+
+    .status-success {
+      color: #9dffb0;
+    }
+
+    .status-error {
+      color: #ff9ca5;
+    }
+
+    .json-output {
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(5, 7, 10, 0.95);
+      padding: 8px;
+      max-height: 260px;
+      overflow: auto;
+      font-family: ui-monospace, Menlo, Monaco, "SF Mono", monospace;
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .subtle {
+      opacity: 0.7;
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <div class="brand">OFF</div>
+        <div class="tagline">Micro-experience console · prototype</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="version">Frontend v0.45 · Backend v0.448 (in-memory)</div>
+        <div class="mode-toggle">
+          <span class="tiny-label">Mode:</span>
+          <label>
+            <input type="radio" name="mode" value="guest" checked />
+            Guest
+          </label>
+          <label>
+            <input type="radio" name="mode" value="concierge" />
+            Concierge
+          </label>
+        </div>
+      </div>
+    </header>
 
     <div class="layout">
-      <!-- LEFT: Controls -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h3>Quick actions</h3>
-            <small>Debug utilities + seeded overview</small>
+      <!-- LEFT COLUMN: Guest + Concierge Panels -->
+      <div class="stack">
+        <!-- Guest Panel -->
+        <section id="guest-panel">
+          <h2>
+            Guest workspace
+            <span class="pill pill-guest">Guest</span>
+          </h2>
+          <p>Create a signal and see your recent vibes in one place.</p>
+
+          <h3>1. Send a signal</h3>
+          <form id="guest-signal-form">
+            <label for="guest-id-input">Guest ID</label>
+            <input
+              id="guest-id-input"
+              type="text"
+              value="guest_abc"
+              autocomplete="off"
+            />
+
+            <label for="intent-input">What do you feel like doing?</label>
+            <textarea
+              id="intent-input"
+              placeholder="e.g., sunrise coffee by the Hudson"
+            ></textarea>
+
+            <label for="location-input">Rough location (optional)</label>
+            <input
+              id="location-input"
+              type="text"
+              placeholder="Upper West Side, NYC"
+              autocomplete="off"
+            />
+
+            <div
+              class="row"
+              style="margin-top: 10px; align-items: center; justify-content: space-between;"
+            >
+              <div class="subtle">
+                OFF will turn this into a simple, offline micro-experience.
+              </div>
+              <div style="text-align: right;">
+                <button type="submit" class="primary" id="send-signal-btn">
+                  Send signal
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <h3 style="margin-top: 16px;">2. Your recent signals & vibes</h3>
+          <div class="row-tight" style="justify-content: space-between;">
+            <div class="subtle">
+              Loads signals for this guest and any related vibes/offers.
+            </div>
+            <button class="small" id="refresh-guest-overview-btn">
+              Refresh guest overview
+            </button>
           </div>
-          <span class="pill">
-            <span class="pill-dot"></span>
-            prototype
-          </span>
-        </div>
+          <ul id="guest-signals-list" class="signal-list"></ul>
+        </section>
 
-        <div class="field">
-          <button id="btn-seed">Seed happy-path scene</button>
-        </div>
+        <!-- Concierge Panel -->
+        <section id="concierge-panel" style="margin-top: 12px; display: none;">
+          <h2>
+            Concierge workspace
+            <span class="pill pill-concierge">Concierge</span>
+          </h2>
+          <p>See pending signals and respond with offers.</p>
 
-        <div class="row">
-          <button class="secondary" id="btn-guest">
-            Load seeded guest overview
-          </button>
-          <button class="secondary" id="btn-conc">
-            Load seeded concierge overview
-          </button>
-        </div>
+          <h3>1. Load pending signals</h3>
+          <div class="row-tight" style="margin-bottom: 6px;">
+            <div class="row">
+              <div>
+                <label for="concierge-id-input">Your concierge ID</label>
+                <input
+                  id="concierge-id-input"
+                  type="text"
+                  value="conc_demo"
+                  autocomplete="off"
+                />
+              </div>
+              <div style="align-self: flex-end; text-align: right;">
+                <button id="load-pending-btn" class="primary small">
+                  Load pending signals
+                </button>
+              </div>
+            </div>
+          </div>
+          <ul id="pending-signals-list" class="signal-list"></ul>
 
-        <hr style="margin: 12px 0; border-color: #1f2937" />
-
-        <div class="field">
-          <label for="guest-id-input">Guest id (for manual tests)</label>
-          <input
-            id="guest-id-input"
-            type="text"
-            value="guest_seed"
-            autocomplete="off"
-          />
-        </div>
-
-        <div class="field">
-          <label for="conc-id-input">Concierge id (for manual tests)</label>
-          <input
-            id="conc-id-input"
-            type="text"
-            value="conc_seed"
-            autocomplete="off"
-          />
-        </div>
-
-        <hr style="margin: 12px 0; border-color: #1f2937" />
-
-        <h3>Messages in first vibe</h3>
-        <p class="status" id="vibe-status">
-          No vibe selected yet. Load an overview to pick the first vibe.
-        </p>
-
-        <div class="field">
-          <label for="msg-role">From role</label>
-          <select id="msg-role">
-            <option value="guest">guest</option>
-            <option value="concierge">concierge</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="msg-from-id">From id</label>
-          <input
-            id="msg-from-id"
-            type="text"
-            value="guest_seed"
-            autocomplete="off"
-          />
-        </div>
-
-        <div class="field">
-          <label for="msg-text">Message text</label>
-          <textarea
-            id="msg-text"
-            placeholder="Type a quick message to send into the first vibe..."
-          ></textarea>
-        </div>
-
-        <button id="btn-send-msg" disabled>Send message to vibe</button>
+          <h3 style="margin-top: 16px;">2. Your latest vibe</h3>
+          <div class="row-tight" style="justify-content: space-between;">
+            <div class="subtle">
+              For a quick snapshot of what you’re currently matched on.
+            </div>
+            <button class="small" id="refresh-concierge-overview-btn">
+              Refresh concierge overview
+            </button>
+          </div>
+          <ul id="concierge-vibes-list" class="vibe-list"></ul>
+        </section>
       </div>
 
-      <!-- RIGHT: JSON views -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h3>Responses</h3>
-            <small>Last API responses (pretty-printed JSON)</small>
+      <!-- RIGHT COLUMN: Activity + Debug -->
+      <div class="stack">
+        <!-- Activity / JSON Panel -->
+        <section>
+          <h2>
+            Activity & responses
+            <span class="pill">Console</span>
+          </h2>
+          <p>
+            See the raw JSON responses from the OFF backend as you click
+            around.
+          </p>
+
+          <div id="status-bar" class="status-bar">
+            <span class="subtle">Idle. Waiting for your first action.</span>
           </div>
-        </div>
 
-        <div class="field">
-          <label>Last response</label>
-          <pre id="response-json">{}</pre>
-        </div>
+          <pre id="json-output" class="json-output">
+{ "hint": "Send a signal, create an offer, or use the debug tools to see the live payloads here." }</pre>
+        </section>
 
-        <div class="field">
-          <label>Messages for current vibe</label>
-          <pre id="messages-json">[]</pre>
-        </div>
+        <!-- Debug Panel -->
+        <section style="margin-top: 12px;">
+          <h2>
+            Debug tools
+            <span class="pill pill-debug">Debug</span>
+          </h2>
+          <p class="subtle">
+            Safe in-memory utilities for development. These are not
+            production-grade — just a sandbox to see the system breathe.
+          </p>
+
+          <div class="row" style="margin-top: 6px;">
+            <button id="debug-health-btn" class="small">
+              Health check
+            </button>
+            <button id="debug-store-btn" class="small">
+              Inspect store
+            </button>
+            <button id="debug-seed-btn" class="small">
+              Seed happy-path scene
+            </button>
+            <button id="debug-reset-btn" class="small destructive">
+              Reset memory
+            </button>
+          </div>
+
+          <div class="subtle" style="margin-top: 6px;">
+            Backend:
+            <code>https://off-backend.onrender.com</code>
+          </div>
+        </section>
       </div>
     </div>
+  </div>
 
-    <script>
-      const API_BASE = "https://off-backend.onrender.com";
+  <script>
+    // --- CONFIG ---
+    const BASE_URL = "https://off-backend.onrender.com";
 
-      const logLine = document.getElementById("log-line");
-      const responsePre = document.getElementById("response-json");
-      const messagesPre = document.getElementById("messages-json");
-      const vibeStatus = document.getElementById("vibe-status");
+    // --- DOM HELPERS ---
+    const $ = (id) => document.getElementById(id);
 
-      const btnSeed = document.getElementById("btn-seed");
-      const btnGuest = document.getElementById("btn-guest");
-      const btnConc = document.getElementById("btn-conc");
-      const btnSendMsg = document.getElementById("btn-send-msg");
+    function setStatus(message, type = "info") {
+      const bar = $("status-bar");
+      const span = document.createElement("span");
+      span.textContent = message;
+      span.className =
+        type === "success"
+          ? "status-success"
+          : type === "error"
+          ? "status-error"
+          : "subtle";
+      bar.innerHTML = "";
+      bar.appendChild(span);
+    }
 
-      const guestIdInput = document.getElementById("guest-id-input");
-      const concIdInput = document.getElementById("conc-id-input");
-      const msgRoleSelect = document.getElementById("msg-role");
-      const msgFromIdInput = document.getElementById("msg-from-id");
-      const msgTextInput = document.getElementById("msg-text");
+    function setJsonOutput(obj) {
+      $("json-output").textContent = JSON.stringify(obj, null, 2);
+    }
 
-      let currentVibeId = null;
-
-      function setLog(text) {
-        const ts = new Date().toISOString();
-        logLine.textContent = `[${ts}] ${text}`;
-      }
-
-      function setResponse(obj) {
-        responsePre.textContent = JSON.stringify(obj, null, 2);
-      }
-
-      function setMessages(obj) {
-        messagesPre.textContent = JSON.stringify(obj, null, 2);
-      }
-
-      async function callApi(path, options = {}) {
-        const url = `${API_BASE}${path}`;
-        const finalOptions = {
-          method: options.method || "GET",
+    async function fetchJson(path, options = {}) {
+      const url = `${BASE_URL}${path}`;
+      try {
+        const res = await fetch(url, {
           headers: {
             "Content-Type": "application/json",
-            ...(options.headers || {}),
           },
+          ...options,
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          throw { status: res.status, data };
+        }
+
+        return data;
+      } catch (err) {
+        console.error("fetchJson error", err);
+        throw err;
+      }
+    }
+
+    // --- MODE TOGGLE ---
+    function initModeToggle() {
+      const radios = document.querySelectorAll('input[name="mode"]');
+      const guestPanel = $("guest-panel");
+      const conciergePanel = $("concierge-panel");
+
+      radios.forEach((radio) => {
+        radio.addEventListener("change", () => {
+          if (radio.checked && radio.value === "guest") {
+            guestPanel.style.display = "";
+            conciergePanel.style.display = "none";
+            setStatus("Switched to Guest workspace.", "info");
+          } else if (radio.checked && radio.value === "concierge") {
+            guestPanel.style.display = "none";
+            conciergePanel.style.display = "";
+            setStatus("Switched to Concierge workspace.", "info");
+          }
+        });
+      });
+    }
+
+    // --- RENDER HELPERS ---
+
+    function renderSignals(listEl, signals) {
+      listEl.innerHTML = "";
+      if (!signals || signals.length === 0) {
+        const li = document.createElement("li");
+        li.className = "signal-item";
+        li.innerHTML =
+          '<span class="subtle">No signals found for this view yet.</span>';
+        listEl.appendChild(li);
+        return;
+      }
+
+      signals.forEach((s) => {
+        const li = document.createElement("li");
+        li.className = "signal-item";
+
+        const header = document.createElement("div");
+        header.className = "item-header";
+
+        const intent = document.createElement("div");
+        intent.className = "item-intent";
+        intent.textContent = s.intent || "(no intent)";
+
+        const badge = document.createElement("span");
+        const statusClass = `badge-status-${(s.status || "pending")
+          .toLowerCase()
+          .replace(/[^a-z]/g, "")}`;
+        badge.className = `badge ${statusClass}`;
+        badge.textContent = s.status || "pending";
+
+        header.appendChild(intent);
+        header.appendChild(badge);
+
+        const meta = document.createElement("div");
+        meta.className = "item-meta";
+        meta.innerHTML = `
+          <span class="item-id">${s.id}</span>
+          <span>guest: ${s.guest_id}</span>
+          ${
+            s.location
+              ? `<span>location: ${s.location}</span>`
+              : `<span class="subtle">no location</span>`
+          }
+        `;
+
+        li.appendChild(header);
+        li.appendChild(meta);
+        listEl.appendChild(li);
+      });
+    }
+
+    function renderVibes(listEl, vibes) {
+      listEl.innerHTML = "";
+      if (!vibes || vibes.length === 0) {
+        const li = document.createElement("li");
+        li.className = "vibe-item";
+        li.innerHTML =
+          '<span class="subtle">No vibes yet. Accept an offer to create one.</span>';
+        listEl.appendChild(li);
+        return;
+      }
+
+      vibes.forEach((v) => {
+        const li = document.createElement("li");
+        li.className = "vibe-item";
+
+        const header = document.createElement("div");
+        header.className = "item-header";
+
+        const label = document.createElement("div");
+        label.textContent = `Vibe between ${v.guest_id} & ${v.concierge_id}`;
+
+        const badge = document.createElement("span");
+        const statusClass = `badge-status-${(v.status || "active")
+          .toLowerCase()
+          .replace(/[^a-z]/g, "")}`;
+        badge.className = `badge ${statusClass}`;
+        badge.textContent = v.status || "active";
+
+        header.appendChild(label);
+        header.appendChild(badge);
+
+        const meta = document.createElement("div");
+        meta.className = "item-meta";
+        meta.innerHTML = `
+          <span class="item-id">${v.id}</span>
+          <span>signal: ${v.signal_id}</span>
+          <span>offer: ${v.offer_id}</span>
+        `;
+
+        li.appendChild(header);
+        li.appendChild(meta);
+        listEl.appendChild(li);
+      });
+    }
+
+    function renderPendingSignalsForConcierge(signals, conciergeId) {
+      const listEl = $("pending-signals-list");
+      listEl.innerHTML = "";
+
+      if (!signals || signals.length === 0) {
+        const li = document.createElement("li");
+        li.className = "signal-item";
+        li.innerHTML =
+          '<span class="subtle">No pending signals at the moment.</span>';
+        listEl.appendChild(li);
+        return;
+      }
+
+      signals.forEach((s) => {
+        const li = document.createElement("li");
+        li.className = "signal-item";
+
+        const header = document.createElement("div");
+        header.className = "item-header";
+
+        const intent = document.createElement("div");
+        intent.className = "item-intent";
+        intent.textContent = s.intent || "(no intent)";
+
+        const badge = document.createElement("span");
+        badge.className = "badge badge-status-pending";
+        badge.textContent = s.status || "pending";
+
+        header.appendChild(intent);
+        header.appendChild(badge);
+
+        const meta = document.createElement("div");
+        meta.className = "item-meta";
+        meta.innerHTML = `
+          <span class="item-id">${s.id}</span>
+          <span>guest: ${s.guest_id}</span>
+          ${
+            s.location
+              ? `<span>location: ${s.location}</span>`
+              : `<span class="subtle">no location</span>`
+          }
+        `;
+
+        const form = document.createElement("div");
+        form.className = "inline-form";
+
+        const messageInput = document.createElement("textarea");
+        messageInput.placeholder =
+          "e.g., I can meet you at 7:45pm near Riverside Park.";
+        messageInput.rows = 2;
+
+        const priceInput = document.createElement("input");
+        priceInput.type = "number";
+        priceInput.placeholder = "Price (optional)";
+        priceInput.step = "1";
+
+        const actions = document.createElement("div");
+        actions.className = "row-tight";
+        actions.style.marginTop = "4px";
+
+        const btn = document.createElement("button");
+        btn.textContent = "Send offer for this signal";
+        btn.className = "small";
+        btn.addEventListener("click", async () => {
+          const msg = messageInput.value.trim();
+          const priceValue = priceInput.value.trim();
+          const price =
+            priceValue === "" || isNaN(Number(priceValue))
+              ? null
+              : Number(priceValue);
+
+          if (!msg) {
+            setStatus("Please enter a short message for your offer.", "error");
+            return;
+          }
+
+          btn.disabled = true;
+          setStatus("Creating offer…", "info");
+
+          try {
+            const payload = {
+              signal_id: s.id,
+              concierge_id: conciergeId,
+              message: msg,
+            };
+            if (price !== null) payload.price = price;
+
+            const res = await fetchJson("/offers", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+
+            setStatus("Offer created successfully.", "success");
+            setJsonOutput(res);
+          } catch (err) {
+            const details = err.data || err || {};
+            setStatus(
+              `Error creating offer: ${
+                details.message || details.error || "unknown error"
+              }`,
+              "error"
+            );
+            setJsonOutput(details);
+          } finally {
+            btn.disabled = false;
+          }
+        });
+
+        actions.appendChild(btn);
+
+        form.appendChild(messageInput);
+        form.appendChild(priceInput);
+        form.appendChild(actions);
+
+        li.appendChild(header);
+        li.appendChild(meta);
+        li.appendChild(form);
+        listEl.appendChild(li);
+      });
+    }
+
+    // --- GUEST FLOW ---
+
+    async function handleGuestSignalSubmit(event) {
+      event.preventDefault();
+      const guestId = $("guest-id-input").value.trim() || "guest_anon";
+      const intent = $("intent-input").value.trim();
+      const location = $("location-input").value.trim() || null;
+
+      if (!intent) {
+        setStatus("Please describe what you want to do.", "error");
+        return;
+      }
+
+      $("send-signal-btn").disabled = true;
+      setStatus("Sending signal…", "info");
+
+      try {
+        const payload = {
+          guest_id: guestId,
+          intent,
         };
-        if (options.body) {
-          finalOptions.body = JSON.stringify(options.body);
-        }
+        if (location) payload.location = location;
 
-        setLog(`Request: ${finalOptions.method} ${url}`);
+        const res = await fetchJson("/signals", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
 
-        const res = await fetch(url, finalOptions);
-        const text = await res.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          data = { raw: text };
-        }
-
-        setResponse(data);
-        return { status: res.status, data };
+        setStatus("Signal created successfully.", "success");
+        setJsonOutput(res);
+        await refreshGuestOverview();
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus(
+          `Error creating signal: ${
+            details.message || details.error || "unknown error"
+          }`,
+          "error"
+        );
+        setJsonOutput(details);
+      } finally {
+        $("send-signal-btn").disabled = false;
       }
+    }
 
-      async function refreshMessagesForVibe(vibeId) {
-        if (!vibeId) {
-          setMessages([]);
-          vibeStatus.textContent = "No vibe selected.";
-          return;
-        }
+    async function refreshGuestOverview() {
+      const guestId = $("guest-id-input").value.trim() || "guest_abc";
+      setStatus(`Loading overview for ${guestId}…`, "info");
 
-        const { status, data } = await callApi(
-          `/messages?vibe_id=${encodeURIComponent(vibeId)}`
+      try {
+        const res = await fetchJson(`/guests/${encodeURIComponent(guestId)}/overview`);
+        setStatus(`Guest overview loaded for ${guestId}.`, "success");
+        setJsonOutput(res);
+        renderSignals($("guest-signals-list"), res.signals || []);
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus(
+          `Error loading guest overview: ${
+            details.message || details.error || "unknown error"
+          }`,
+          "error"
         );
-        if (status === 200) {
-          setMessages(data);
-          vibeStatus.textContent = `Vibe ${vibeId} – messages loaded.`;
-        } else {
-          vibeStatus.textContent = `Failed to load messages for vibe ${vibeId}.`;
-        }
+        setJsonOutput(details);
       }
+    }
 
-      btnSeed.addEventListener("click", async () => {
-        btnSeed.disabled = true;
-        try {
-          const { status, data } = await callApi("/debug/seed", {
-            method: "POST",
-          });
-          if (status === 200 && data.ids && data.ids.vibe_id) {
-            currentVibeId = data.ids.vibe_id;
-            vibeStatus.textContent = `Seeded vibe ${currentVibeId}. You can now load overviews or send messages.`;
-            btnSendMsg.disabled = false;
-          }
-        } catch (err) {
-          setResponse({ error: "SEED_FAILED", message: String(err) });
-        } finally {
-          btnSeed.disabled = false;
-        }
-      });
+    // --- CONCIERGE FLOW ---
 
-      btnGuest.addEventListener("click", async () => {
-        const guestId = guestIdInput.value.trim() || "guest_seed";
-        const { status, data } = await callApi(
-          `/guests/${encodeURIComponent(guestId)}/overview`
+    async function loadPendingSignalsForConcierge() {
+      const conciergeId = $("concierge-id-input").value.trim() || "conc_demo";
+      $("load-pending-btn").disabled = true;
+      setStatus("Loading pending signals…", "info");
+
+      try {
+        const res = await fetchJson("/signals?status=pending&limit=50&offset=0");
+        setStatus(
+          `Loaded ${res.count ?? (res.items || []).length} pending signals.`,
+          "success"
         );
-        if (status === 200 && data.vibes && data.vibes.length > 0) {
-          currentVibeId = data.vibes[0].id;
-          vibeStatus.textContent = `Guest overview loaded. Using first vibe: ${currentVibeId}`;
-          btnSendMsg.disabled = false;
-          await refreshMessagesForVibe(currentVibeId);
-        } else {
-          vibeStatus.textContent =
-            "Guest overview loaded, but no vibes found for this guest.";
-          setMessages([]);
-        }
-      });
-
-      btnConc.addEventListener("click", async () => {
-        const concId = concIdInput.value.trim() || "conc_seed";
-        const { status, data } = await callApi(
-          `/concierges/${encodeURIComponent(concId)}/overview`
+        setJsonOutput(res);
+        renderPendingSignalsForConcierge(res.items || [], conciergeId);
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus(
+          `Error loading pending signals: ${
+            details.message || details.error || "unknown error"
+          }`,
+          "error"
         );
-        if (status === 200 && data.vibes && data.vibes.length > 0) {
-          currentVibeId = data.vibes[0].id;
-          vibeStatus.textContent = `Concierge overview loaded. Using first vibe: ${currentVibeId}`;
-          btnSendMsg.disabled = false;
-          await refreshMessagesForVibe(currentVibeId);
-        } else {
-          vibeStatus.textContent =
-            "Concierge overview loaded, but no vibes found for this concierge.";
-          setMessages([]);
-        }
-      });
+        setJsonOutput(details);
+      } finally {
+        $("load-pending-btn").disabled = false;
+      }
+    }
 
-      btnSendMsg.addEventListener("click", async () => {
-        if (!currentVibeId) {
-          alert("No vibe selected yet. Seed or load an overview first.");
-          return;
-        }
-        const text = msgTextInput.value.trim();
-        if (!text) {
-          alert("Please enter a message first.");
-          return;
-        }
+    async function refreshConciergeOverview() {
+      const conciergeId = $("concierge-id-input").value.trim() || "conc_demo";
+      setStatus(`Loading overview for concierge ${conciergeId}…`, "info");
 
-        btnSendMsg.disabled = true;
-        try {
-          const body = {
-            vibe_id: currentVibeId,
-            from_role: msgRoleSelect.value,
-            from_id: msgFromIdInput.value.trim() || "guest_seed",
-            text,
-          };
+      try {
+        const res = await fetchJson(
+          `/concierges/${encodeURIComponent(conciergeId)}/overview`
+        );
+        setStatus(
+          `Concierge overview loaded for ${conciergeId}.`,
+          "success"
+        );
+        setJsonOutput(res);
+        renderVibes($("concierge-vibes-list"), res.vibes || []);
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus(
+          `Error loading concierge overview: ${
+            details.message || details.error || "unknown error"
+          }`,
+          "error"
+        );
+        setJsonOutput(details);
+      }
+    }
 
-          const { status } = await callApi("/messages", {
-            method: "POST",
-            body,
-          });
+    // --- DEBUG FLOW ---
 
-          if (status === 201) {
-            msgTextInput.value = "";
-            await refreshMessagesForVibe(currentVibeId);
-          }
-        } catch (err) {
-          setResponse({ error: "SEND_MESSAGE_FAILED", message: String(err) });
-        } finally {
-          btnSendMsg.disabled = false;
-        }
-      });
-    </script>
-  </body>
+    async function debugHealth() {
+      setStatus("Checking health…", "info");
+      try {
+        const res = await fetchJson("/health");
+        setStatus("Backend health is OK.", "success");
+        setJsonOutput(res);
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus("Health check failed.", "error");
+        setJsonOutput(details);
+      }
+    }
+
+    async function debugStore() {
+      setStatus("Loading debug store…", "info");
+      try {
+        const res = await fetchJson("/debug/store");
+        setStatus("Debug store loaded.", "success");
+        setJsonOutput(res);
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus("Error loading debug store.", "error");
+        setJsonOutput(details);
+      }
+    }
+
+    async function debugSeed() {
+      setStatus("Seeding happy-path scene…", "info");
+      try {
+        const res = await fetchJson("/debug/seed", { method: "POST" });
+        setStatus("Seeded happy-path scene.", "success");
+        setJsonOutput(res);
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus("Error seeding scene.", "error");
+        setJsonOutput(details);
+      }
+    }
+
+    async function debugReset() {
+      if (!confirm("Reset in-memory store? This clears all signals/offers/vibes.")) {
+        return;
+      }
+      setStatus("Resetting in-memory store…", "info");
+      try {
+        const res = await fetchJson("/debug/reset", { method: "POST" });
+        setStatus("In-memory store reset.", "success");
+        setJsonOutput(res);
+        $("guest-signals-list").innerHTML = "";
+        $("pending-signals-list").innerHTML = "";
+        $("concierge-vibes-list").innerHTML = "";
+      } catch (err) {
+        const details = err.data || err || {};
+        setStatus("Error resetting store.", "error");
+        setJsonOutput(details);
+      }
+    }
+
+    // --- INIT ---
+
+    function init() {
+      initModeToggle();
+
+      $("guest-signal-form").addEventListener("submit", handleGuestSignalSubmit);
+      $("refresh-guest-overview-btn").addEventListener(
+        "click",
+        refreshGuestOverview
+      );
+      $("load-pending-btn").addEventListener(
+        "click",
+        loadPendingSignalsForConcierge
+      );
+      $("refresh-concierge-overview-btn").addEventListener(
+        "click",
+        refreshConciergeOverview
+      );
+
+      $("debug-health-btn").addEventListener("click", debugHealth);
+      $("debug-store-btn").addEventListener("click", debugStore);
+      $("debug-seed-btn").addEventListener("click", debugSeed);
+      $("debug-reset-btn").addEventListener("click", debugReset);
+
+      // Light-touch auto-check on load
+      debugHealth();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
 </html>

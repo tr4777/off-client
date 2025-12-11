@@ -2,368 +2,406 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>OFF · Micro-experience Console (v0.45 demo)</title>
+  <title>OFF · Micro-experience console</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Segoe UI", sans-serif;
-      background: #050608;
-      color: #f5f5f5;
+      --bg: #05060a;
+      --bg-elevated: #10121a;
+      --bg-elevated-softer: #151826;
+      --border-subtle: #262b3d;
+      --accent: #4f8dff;
+      --accent-soft: rgba(79, 141, 255, 0.16);
+      --accent-strong: #7db2ff;
+      --danger: #ff5c7a;
+      --text: #f5f7ff;
+      --text-soft: #a8b0cc;
+      --pill-bg: #1b1f30;
+      --pill-border: #323852;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.45);
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Inter", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      padding: 0;
-      background: radial-gradient(circle at top, #26293a 0, #050608 55%);
+      padding: 16px;
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #12182a 0, #05060a 55%);
+      color: var(--text);
       min-height: 100vh;
     }
 
     .page {
-      max-width: 1080px;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 24px 16px 40px;
     }
 
     header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
+      gap: 8px 16px;
       align-items: baseline;
-      gap: 12px;
       margin-bottom: 16px;
     }
 
-    .brand {
-      font-size: 1.4rem;
-      letter-spacing: 0.14em;
+    header h1 {
+      font-size: 26px;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      font-weight: 600;
+      margin: 0;
     }
 
-    .tagline {
-      opacity: 0.72;
-      font-size: 0.9rem;
+    header h1 span {
+      font-weight: 500;
+      font-size: 14px;
+      text-transform: none;
+      color: var(--text-soft);
+      display: block;
+      margin-top: 4px;
     }
 
-    .version {
-      font-size: 0.8rem;
-      opacity: 0.7;
+    .meta {
+      text-align: right;
+      font-size: 13px;
+      color: var(--text-soft);
     }
 
-    .layout {
+    .meta strong {
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    .mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+      justify-content: flex-end;
+      font-size: 13px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--pill-border);
+      background: var(--pill-bg);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2dd58c;
+      box-shadow: 0 0 10px rgba(45, 213, 140, 0.8);
+    }
+
+    .mode-pill {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      background: #070815;
+      border: 1px solid var(--pill-border);
+    }
+
+    .mode-pill button {
+      border: none;
+      background: transparent;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      color: var(--text-soft);
+      cursor: pointer;
+    }
+
+    .mode-pill button.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+    }
+
+    main {
       display: grid;
-      grid-template-columns: minmax(0, 2.1fr) minmax(0, 2fr);
-      gap: 16px;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 18px;
     }
 
-    @media (max-width: 900px) {
-      .layout {
+    @media (max-width: 880px) {
+      main {
         grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    section {
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(5, 6, 8, 0.88);
-      padding: 16px 16px 18px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    .panel {
+      background: radial-gradient(circle at top left, #20263b 0, #10121a 48%, #05060a 100%);
+      border-radius: 22px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 16px 14px;
+      position: relative;
+      overflow: hidden;
     }
 
-    h2 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      font-weight: 600;
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(79, 141, 255, 0.16), transparent 55%);
+      opacity: 0.65;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .panel-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel-header {
       display: flex;
-      align-items: center;
+      justify-content: space-between;
+      align-items: baseline;
       gap: 8px;
+      margin-bottom: 10px;
     }
 
-    h3 {
-      margin: 16px 0 8px;
-      font-size: 0.95rem;
-    }
-
-    .pill {
-      font-size: 0.75rem;
+    .panel-title {
+      font-size: 14px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      border-radius: 999px;
-      padding: 3px 8px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      opacity: 0.8;
+      color: var(--text-soft);
     }
 
-    .pill-guest {
-      border-color: #aad6ff;
-      color: #aad6ff;
-    }
-
-    .pill-concierge {
-      border-color: #ffd78a;
-      color: #ffd78a;
-    }
-
-    .pill-debug {
-      border-color: #ff9ca5;
-      color: #ff9ca5;
-    }
-
-    p {
-      margin: 4px 0 8px;
-      font-size: 0.86rem;
-      opacity: 0.82;
-    }
-
-    label {
-      display: block;
-      font-size: 0.8rem;
-      margin: 8px 0 4px;
-      opacity: 0.9;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    textarea,
-    select {
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(7, 10, 15, 0.95);
-      color: #f5f5f5;
-      padding: 7px 9px;
-      font-size: 0.86rem;
-      outline: none;
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    textarea:focus,
-    select:focus {
-      border-color: #aad6ff;
-      box-shadow: 0 0 0 1px rgba(170, 214, 255, 0.4);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 52px;
-      max-height: 160px;
-    }
-
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .row > * {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .row-tight {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    button {
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.04);
-      color: #f5f5f5;
-      padding: 6px 14px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-
-    button.primary {
-      background: linear-gradient(135deg, #aad6ff, #6cb7ff);
-      color: #050608;
-      border-color: transparent;
-      font-weight: 600;
-    }
-
-    button.destructive {
-      border-color: #ff9ca5;
-      color: #ff9ca5;
-    }
-
-    button.small {
-      padding: 4px 10px;
-      font-size: 0.78rem;
-    }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: default;
-    }
-
-    .mode-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.82rem;
-    }
-
-    .mode-toggle label {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin: 0;
-      cursor: pointer;
+    .panel-title span {
+      font-weight: 500;
+      color: var(--text);
     }
 
     .badge {
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 0.7rem;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      opacity: 0.8;
+      border: 1px solid var(--pill-border);
+      background: rgba(4, 7, 20, 0.9);
+      color: var(--text-soft);
     }
 
-    .badge-status-pending {
-      border-color: #ffd78a;
-      color: #ffd78a;
+    .badge.badge-guest {
+      border-color: var(--accent-soft);
     }
 
-    .badge-status-offered {
-      border-color: #aad6ff;
-      color: #aad6ff;
+    .badge.badge-concierge {
+      border-color: rgba(45, 213, 140, 0.4);
     }
 
-    .badge-status-matched {
-      border-color: #9dffb0;
-      color: #9dffb0;
+    .section-label {
+      margin: 10px 0 4px;
+      font-size: 13px;
+      font-weight: 500;
     }
 
-    .badge-status-completed {
-      border-color: #9dffb0;
-      color: #9dffb0;
+    .section-help {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-bottom: 8px;
     }
 
-    .badge-status-canceled {
-      border-color: #ff9ca5;
-      color: #ff9ca5;
-    }
-
-    .signal-list,
-    .offer-list,
-    .vibe-list,
-    .message-list {
-      margin: 8px 0 0;
-      padding: 0;
-      list-style: none;
+    .field {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      max-height: 260px;
-      overflow: auto;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(9, 11, 18, 0.8);
-      padding: 6px;
-      font-size: 0.8rem;
+      gap: 5px;
+      margin-bottom: 10px;
     }
 
-    .signal-item,
-    .offer-item,
-    .vibe-item,
-    .message-item {
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(255, 255, 255, 0.01);
+    .field label {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .field-row {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .item-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      align-items: baseline;
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #2c3247;
+      background: rgba(6, 8, 20, 0.9);
+      color: var(--text);
+      font-size: 13px;
+      padding: 7px 9px;
+      outline: none;
     }
 
-    .item-id {
-      font-family: ui-monospace, Menlo, Monaco, "SF Mono", monospace;
-      font-size: 0.72rem;
-      opacity: 0.82;
-      word-break: break-all;
+    textarea {
+      min-height: 62px;
+      resize: vertical;
     }
 
-    .item-intent {
-      font-size: 0.8rem;
-      opacity: 0.96;
+    input::placeholder,
+    textarea::placeholder {
+      color: #636b8c;
     }
 
-    .item-meta {
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent-strong);
+      box-shadow: 0 0 0 1px rgba(79, 141, 255, 0.6);
+    }
+
+    .pill-button {
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .pill-primary {
+      background: linear-gradient(135deg, var(--accent), #8f9bff);
+      color: #fff;
+      box-shadow: 0 8px 25px rgba(49, 104, 225, 0.7);
+    }
+
+    .pill-primary:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .pill-ghost {
+      background: rgba(12, 14, 30, 0.9);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-soft);
+    }
+
+    .pill-ghost:hover {
+      border-color: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .button-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 4px 8px;
-      font-size: 0.72rem;
-      opacity: 0.8;
-    }
-
-    .tiny-label {
-      opacity: 0.7;
-      font-size: 0.72rem;
-    }
-
-    .inline-form {
+      gap: 8px;
       margin-top: 6px;
-      border-top: 1px dashed rgba(255, 255, 255, 0.08);
-      padding-top: 6px;
+      margin-bottom: 6px;
     }
 
-    .inline-form textarea {
-      font-size: 0.78rem;
+    .status-line {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-top: 4px;
+      min-height: 16px;
     }
 
-    .status-bar {
-      margin-top: 10px;
-      font-size: 0.8rem;
-      min-height: 18px;
+    .status-line.ok {
+      color: #55d69b;
     }
 
-    .status-bar span {
-      opacity: 0.86;
+    .status-line.err {
+      color: var(--danger);
     }
 
-    .status-success {
-      color: #9dffb0;
-    }
-
-    .status-error {
-      color: #ff9ca5;
-    }
-
-    .json-output {
-      margin-top: 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(5, 7, 10, 0.95);
+    .console-box {
+      margin-top: 8px;
+      border-radius: 12px;
+      background: var(--bg-elevated-softer);
+      border: 1px solid var(--border-subtle);
       padding: 8px;
-      max-height: 260px;
+      font-size: 12px;
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+      color: #d7ddff;
+      max-height: 280px;
       overflow: auto;
-      font-family: ui-monospace, Menlo, Monaco, "SF Mono", monospace;
-      font-size: 0.78rem;
-      white-space: pre-wrap;
-      word-break: break-word;
+      white-space: pre;
     }
 
-    .subtle {
-      opacity: 0.7;
-      font-size: 0.78rem;
+    .console-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .tagline {
+      font-size: 11px;
+      color: var(--text-soft);
+      margin-top: 6px;
+    }
+
+    .tagline strong {
+      color: var(--accent-strong);
+    }
+
+    .health-pill {
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--pill-border);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(6, 10, 26, 0.9);
+    }
+
+    .health-pill.ok {
+      border-color: rgba(45, 213, 140, 0.6);
+      color: #60e0a1;
+    }
+
+    .health-pill.err {
+      border-color: rgba(255, 92, 122, 0.9);
+      color: var(--danger);
+    }
+
+    .health-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .console-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .console-subtitle {
+      font-size: 12px;
+      color: var(--text-soft);
     }
   </style>
 </head>
@@ -371,721 +409,452 @@
   <div class="page">
     <header>
       <div>
-        <div class="brand">OFF</div>
-        <div class="tagline">Micro-experience console · prototype</div>
+        <h1>
+          OFF
+          <span>Micro-experience console · prototype</span>
+        </h1>
       </div>
-      <div style="text-align: right;">
-        <div class="version">Frontend v0.45 · Backend v0.448 (in-memory)</div>
+      <div class="meta">
+        <div>Frontend <strong>v0.45</strong> · Backend <strong>v0.448</strong> (in-memory)</div>
         <div class="mode-toggle">
-          <span class="tiny-label">Mode:</span>
-          <label>
-            <input type="radio" name="mode" value="guest" checked />
-            Guest
-          </label>
-          <label>
-            <input type="radio" name="mode" value="concierge" />
-            Concierge
-          </label>
+          <span>Mode</span>
+          <div class="mode-pill">
+            <button id="mode-guest" class="active" type="button">Guest</button>
+            <button id="mode-concierge" type="button">Concierge</button>
+          </div>
+          <span class="chip">
+            <span class="chip-dot"></span>
+            Ready ·
+            <span style="color: var(--accent-strong)">https://off-backend.onrender.com</span>
+          </span>
         </div>
       </div>
     </header>
 
-    <div class="layout">
-      <!-- LEFT COLUMN: Guest + Concierge Panels -->
-      <div class="stack">
-        <!-- Guest Panel -->
-        <section id="guest-panel">
-          <h2>
-            Guest workspace
-            <span class="pill pill-guest">Guest</span>
-          </h2>
-          <p>Create a signal and see your recent vibes in one place.</p>
-
-          <h3>1. Send a signal</h3>
-          <form id="guest-signal-form">
-            <label for="guest-id-input">Guest ID</label>
-            <input
-              id="guest-id-input"
-              type="text"
-              value="guest_abc"
-              autocomplete="off"
-            />
-
-            <label for="intent-input">What do you feel like doing?</label>
-            <textarea
-              id="intent-input"
-              placeholder="e.g., sunrise coffee by the Hudson"
-            ></textarea>
-
-            <label for="location-input">Rough location (optional)</label>
-            <input
-              id="location-input"
-              type="text"
-              placeholder="Upper West Side, NYC"
-              autocomplete="off"
-            />
-
-            <div
-              class="row"
-              style="margin-top: 10px; align-items: center; justify-content: space-between;"
-            >
-              <div class="subtle">
-                OFF will turn this into a simple, offline micro-experience.
-              </div>
-              <div style="text-align: right;">
-                <button type="submit" class="primary" id="send-signal-btn">
-                  Send signal
-                </button>
-              </div>
+    <main>
+      <!-- Left column: guest / concierge workspace -->
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="panel-header">
+            <div class="panel-title">
+              Guest workspace <span>console</span>
             </div>
-          </form>
-
-          <h3 style="margin-top: 16px;">2. Your recent signals & vibes</h3>
-          <div class="row-tight" style="justify-content: space-between;">
-            <div class="subtle">
-              Loads signals for this guest and any related vibes/offers.
-            </div>
-            <button class="small" id="refresh-guest-overview-btn">
-              Refresh guest overview
-            </button>
+            <span class="badge badge-guest">guest</span>
           </div>
-          <ul id="guest-signals-list" class="signal-list"></ul>
-        </section>
 
-        <!-- Concierge Panel -->
-        <section id="concierge-panel" style="margin-top: 12px; display: none;">
-          <h2>
-            Concierge workspace
-            <span class="pill pill-concierge">Concierge</span>
-          </h2>
-          <p>See pending signals and respond with offers.</p>
+          <div id="guest-workspace">
+            <div class="section-label">1. Send a signal</div>
+            <div class="section-help">
+              Create a signal and we’ll show how it flows into offers and vibes.
+            </div>
 
-          <h3>1. Load pending signals</h3>
-          <div class="row-tight" style="margin-bottom: 6px;">
-            <div class="row">
-              <div>
-                <label for="concierge-id-input">Your concierge ID</label>
+            <div class="field">
+              <label for="guest-id-input">Guest ID</label>
+              <input id="guest-id-input" type="text" value="guest_abc" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label for="intent-input">What do you feel like doing?</label>
+              <input
+                id="intent-input"
+                type="text"
+                placeholder="e.g., sunrise coffee by the Hudson"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="field">
+              <label for="location-input">Rough location (optional)</label>
+              <input
+                id="location-input"
+                type="text"
+                value="Upper West Side, NYC"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="section-help">
+              OFF will eventually turn this into a simple, offline micro-experience.
+            </div>
+
+            <div class="button-row">
+              <button id="send-signal-btn" class="pill-button pill-primary" type="button">
+                Send signal
+              </button>
+            </div>
+
+            <hr style="border:none;border-top:1px solid #262b3d;margin:10px 0 8px" />
+
+            <div class="section-label">2. Your recent signals & vibes</div>
+            <div class="section-help">
+              Load a quick overview for this guest, including signals, offers and vibes.
+            </div>
+
+            <div class="button-row">
+              <button id="refresh-guest-overview-btn" class="pill-button pill-ghost" type="button">
+                Refresh guest overview
+              </button>
+            </div>
+
+            <div id="guest-overview-status" class="status-line"></div>
+          </div>
+
+          <!-- concierge workspace (same panel, swapped by mode) -->
+          <div id="concierge-workspace" style="display:none">
+            <div class="panel-header" style="margin-top:-4px;margin-bottom:10px">
+              <div class="panel-title">
+                Concierge workspace <span>console</span>
+              </div>
+              <span class="badge badge-concierge">concierge</span>
+            </div>
+
+            <div class="field">
+              <label for="concierge-id-input">Concierge ID</label>
+              <input id="concierge-id-input" type="text" value="conc_demo" autocomplete="off" />
+            </div>
+
+            <div class="section-label">1. See pending signals</div>
+            <div class="section-help">
+              Pull a feed of pending guest signals. Later this becomes your matching inbox.
+            </div>
+
+            <div class="button-row">
+              <button id="list-pending-btn" class="pill-button pill-ghost" type="button">
+                List pending signals
+              </button>
+            </div>
+
+            <div class="section-label">2. Make an offer</div>
+            <div class="section-help">
+              Create a prototype offer on a signal to simulate a micro-experience.
+            </div>
+
+            <div class="field">
+              <label for="offer-signal-id-input">Signal ID</label>
+              <input
+                id="offer-signal-id-input"
+                type="text"
+                placeholder="Paste a signal id from the console"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="field-row">
+              <div class="field" style="flex:1 1 120px; min-width:120px">
+                <label for="offer-price-input">Price (optional)</label>
                 <input
-                  id="concierge-id-input"
+                  id="offer-price-input"
                   type="text"
-                  value="conc_demo"
+                  placeholder="e.g., 20"
                   autocomplete="off"
                 />
               </div>
-              <div style="align-self: flex-end; text-align: right;">
-                <button id="load-pending-btn" class="primary small">
-                  Load pending signals
-                </button>
+            </div>
+
+            <div class="field">
+              <label for="offer-message-input">Offer message</label>
+              <textarea
+                id="offer-message-input"
+                placeholder="e.g., I can host you at 7:15am near Riverside Park."
+              ></textarea>
+            </div>
+
+            <div class="button-row">
+              <button id="create-offer-btn" class="pill-button pill-primary" type="button">
+                Create offer
+              </button>
+            </div>
+
+            <div id="concierge-status" class="status-line"></div>
+          </div>
+
+          <p class="tagline">
+            <strong>Today</strong> this is a debug console. <br />
+            <span style="opacity:0.85">Soon it becomes a real OFF guest & concierge surface.</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- Right column: activity / responses -->
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="panel-header">
+            <div class="panel-title">
+              Activity & responses <span>console</span>
+            </div>
+            <div class="console-header-row">
+              <div class="console-subtitle">
+                See raw JSON responses from the OFF backend as you click around.
               </div>
             </div>
           </div>
-          <ul id="pending-signals-list" class="signal-list"></ul>
 
-          <h3 style="margin-top: 16px;">2. Your latest vibe</h3>
-          <div class="row-tight" style="justify-content: space-between;">
-            <div class="subtle">
-              For a quick snapshot of what you’re currently matched on.
+          <div class="console-header-row">
+            <div class="console-label">Backend health</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div id="health-pill" class="health-pill err">
+                <span class="health-dot"></span>
+                <span id="health-text">Health check pending…</span>
+              </div>
+              <button id="retry-health-btn" class="pill-button pill-ghost" type="button">
+                Retry health check
+              </button>
             </div>
-            <button class="small" id="refresh-concierge-overview-btn">
-              Refresh concierge overview
-            </button>
-          </div>
-          <ul id="concierge-vibes-list" class="vibe-list"></ul>
-        </section>
-      </div>
-
-      <!-- RIGHT COLUMN: Activity + Debug -->
-      <div class="stack">
-        <!-- Activity / JSON Panel -->
-        <section>
-          <h2>
-            Activity & responses
-            <span class="pill">Console</span>
-          </h2>
-          <p>
-            See the raw JSON responses from the OFF backend as you click
-            around.
-          </p>
-
-          <div id="status-bar" class="status-bar">
-            <span class="subtle">Idle. Waiting for your first action.</span>
           </div>
 
-          <pre id="json-output" class="json-output">
-{ "hint": "Send a signal, create an offer, or use the debug tools to see the live payloads here." }</pre>
-        </section>
+          <div class="status-line" id="health-detail"></div>
 
-        <!-- Debug Panel -->
-        <section style="margin-top: 12px;">
-          <h2>
-            Debug tools
-            <span class="pill pill-debug">Debug</span>
-          </h2>
-          <p class="subtle">
-            Safe in-memory utilities for development. These are not
-            production-grade — just a sandbox to see the system breathe.
-          </p>
-
-          <div class="row" style="margin-top: 6px;">
-            <button id="debug-health-btn" class="small">
-              Health check
-            </button>
-            <button id="debug-store-btn" class="small">
-              Inspect store
-            </button>
-            <button id="debug-seed-btn" class="small">
-              Seed happy-path scene
-            </button>
-            <button id="debug-reset-btn" class="small destructive">
-              Reset memory
-            </button>
+          <div style="margin-top:10px">
+            <div class="console-label">Last response</div>
+            <div id="last-response-meta" class="status-line"></div>
+            <div id="last-response-box" class="console-box">{}</div>
           </div>
 
-          <div class="subtle" style="margin-top: 6px;">
-            Backend:
-            <code>https://off-backend.onrender.com</code>
+          <div style="margin-top:10px">
+            <div class="console-label">Messages / details (for current vibe or overview)</div>
+            <div id="secondary-response-box" class="console-box">[]</div>
           </div>
-        </section>
-      </div>
-    </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
-    // --- CONFIG ---
-    const BASE_URL = "https://off-backend.onrender.com";
+    const API_BASE = "https://off-backend.onrender.com";
 
-    // --- DOM HELPERS ---
-    const $ = (id) => document.getElementById(id);
+    const els = {
+      modeGuest: document.getElementById("mode-guest"),
+      modeConcierge: document.getElementById("mode-concierge"),
+      guestWorkspace: document.getElementById("guest-workspace"),
+      conciergeWorkspace: document.getElementById("concierge-workspace"),
 
-    function setStatus(message, type = "info") {
-      const bar = $("status-bar");
-      const span = document.createElement("span");
-      span.textContent = message;
-      span.className =
-        type === "success"
-          ? "status-success"
-          : type === "error"
-          ? "status-error"
-          : "subtle";
-      bar.innerHTML = "";
-      bar.appendChild(span);
+      guestId: document.getElementById("guest-id-input"),
+      intent: document.getElementById("intent-input"),
+      location: document.getElementById("location-input"),
+
+      sendSignalBtn: document.getElementById("send-signal-btn"),
+      refreshGuestOverviewBtn: document.getElementById("refresh-guest-overview-btn"),
+      guestOverviewStatus: document.getElementById("guest-overview-status"),
+
+      conciergeId: document.getElementById("concierge-id-input"),
+      listPendingBtn: document.getElementById("list-pending-btn"),
+      offerSignalId: document.getElementById("offer-signal-id-input"),
+      offerPrice: document.getElementById("offer-price-input"),
+      offerMessage: document.getElementById("offer-message-input"),
+      createOfferBtn: document.getElementById("create-offer-btn"),
+      conciergeStatus: document.getElementById("concierge-status"),
+
+      healthPill: document.getElementById("health-pill"),
+      healthText: document.getElementById("health-text"),
+      healthDetail: document.getElementById("health-detail"),
+      retryHealthBtn: document.getElementById("retry-health-btn"),
+
+      lastResponseBox: document.getElementById("last-response-box"),
+      lastResponseMeta: document.getElementById("last-response-meta"),
+      secondaryResponseBox: document.getElementById("secondary-response-box")
+    };
+
+    function setMode(mode) {
+      const isGuest = mode === "guest";
+      els.modeGuest.classList.toggle("active", isGuest);
+      els.modeConcierge.classList.toggle("active", !isGuest);
+      els.guestWorkspace.style.display = isGuest ? "block" : "none";
+      els.conciergeWorkspace.style.display = isGuest ? "none" : "block";
     }
 
-    function setJsonOutput(obj) {
-      $("json-output").textContent = JSON.stringify(obj, null, 2);
+    function pretty(obj) {
+      try {
+        return JSON.stringify(obj, null, 2);
+      } catch {
+        return String(obj);
+      }
     }
 
-    async function fetchJson(path, options = {}) {
-      const url = `${BASE_URL}${path}`;
+    function setLastResponse(data, meta) {
+      els.lastResponseBox.textContent = pretty(data ?? {});
+      els.lastResponseMeta.textContent = meta || "";
+    }
+
+    function setSecondary(data) {
+      els.secondaryResponseBox.textContent = pretty(data ?? {});
+    }
+
+    function setHealthStatus(ok, payload) {
+      els.healthPill.classList.toggle("ok", ok);
+      els.healthPill.classList.toggle("err", !ok);
+      els.healthText.textContent = ok ? "Backend healthy" : "Health check failed";
+      els.healthDetail.textContent = ok
+        ? `uptime ${Math.round(payload.uptime ?? 0)}s · ${payload.timestamp ?? ""}`
+        : payload ? String(payload) : "";
+    }
+
+    async function checkHealth() {
+      const url = `${API_BASE}/health`;
+      els.healthText.textContent = "Checking…";
+      els.healthDetail.textContent = `GET ${url}`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        setHealthStatus(true, data);
+        setLastResponse(data, `GET ${url}`);
+      } catch (err) {
+        const errObj = { error: "HEALTH_FAILED", message: String(err) };
+        setHealthStatus(false, err);
+        setLastResponse(errObj, `GET ${url} (failed)`);
+      }
+    }
+
+    async function sendSignal() {
+      const guest_id = els.guestId.value.trim();
+      const intent = els.intent.value.trim();
+      const location = els.location.value.trim();
+
+      if (!guest_id || !intent) {
+        alert("Please enter both guest id and intent.");
+        return;
+      }
+
+      const body = { guest_id, intent };
+      if (location) body.location = location;
+
+      const url = `${API_BASE}/signals`;
+      els.sendSignalBtn.disabled = true;
+      els.sendSignalBtn.textContent = "Sending…";
+
       try {
         const res = await fetch(url, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          ...options,
-        });
-
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-          throw { status: res.status, data };
-        }
-
-        return data;
-      } catch (err) {
-        console.error("fetchJson error", err);
-        throw err;
-      }
-    }
-
-    // --- MODE TOGGLE ---
-    function initModeToggle() {
-      const radios = document.querySelectorAll('input[name="mode"]');
-      const guestPanel = $("guest-panel");
-      const conciergePanel = $("concierge-panel");
-
-      radios.forEach((radio) => {
-        radio.addEventListener("change", () => {
-          if (radio.checked && radio.value === "guest") {
-            guestPanel.style.display = "";
-            conciergePanel.style.display = "none";
-            setStatus("Switched to Guest workspace.", "info");
-          } else if (radio.checked && radio.value === "concierge") {
-            guestPanel.style.display = "none";
-            conciergePanel.style.display = "";
-            setStatus("Switched to Concierge workspace.", "info");
-          }
-        });
-      });
-    }
-
-    // --- RENDER HELPERS ---
-
-    function renderSignals(listEl, signals) {
-      listEl.innerHTML = "";
-      if (!signals || signals.length === 0) {
-        const li = document.createElement("li");
-        li.className = "signal-item";
-        li.innerHTML =
-          '<span class="subtle">No signals found for this view yet.</span>';
-        listEl.appendChild(li);
-        return;
-      }
-
-      signals.forEach((s) => {
-        const li = document.createElement("li");
-        li.className = "signal-item";
-
-        const header = document.createElement("div");
-        header.className = "item-header";
-
-        const intent = document.createElement("div");
-        intent.className = "item-intent";
-        intent.textContent = s.intent || "(no intent)";
-
-        const badge = document.createElement("span");
-        const statusClass = `badge-status-${(s.status || "pending")
-          .toLowerCase()
-          .replace(/[^a-z]/g, "")}`;
-        badge.className = `badge ${statusClass}`;
-        badge.textContent = s.status || "pending";
-
-        header.appendChild(intent);
-        header.appendChild(badge);
-
-        const meta = document.createElement("div");
-        meta.className = "item-meta";
-        meta.innerHTML = `
-          <span class="item-id">${s.id}</span>
-          <span>guest: ${s.guest_id}</span>
-          ${
-            s.location
-              ? `<span>location: ${s.location}</span>`
-              : `<span class="subtle">no location</span>`
-          }
-        `;
-
-        // NEW: inline actions for this signal (demo matches)
-        const actions = document.createElement("div");
-        actions.className = "row-tight";
-        actions.style.marginTop = "4px";
-
-        const matchBtn = document.createElement("button");
-        matchBtn.className = "small";
-        matchBtn.textContent = "View demo matches";
-
-        matchBtn.addEventListener("click", async () => {
-          matchBtn.disabled = true;
-          setStatus("Loading demo matches…", "info");
-          try {
-            const res = await fetchJson(
-              `/matches/demo?signal_id=${encodeURIComponent(s.id)}`
-            );
-            setStatus(
-              `Loaded ${res.count ?? (res.items || []).length} demo matches.`,
-              "success"
-            );
-            setJsonOutput(res);
-          } catch (err) {
-            const details = err.data || err || {};
-            setStatus(
-              `Error loading demo matches: ${
-                details.message || details.error || "unknown error"
-              }`,
-              "error"
-            );
-            setJsonOutput(details);
-          } finally {
-            matchBtn.disabled = false;
-          }
-        });
-
-        actions.appendChild(matchBtn);
-
-        li.appendChild(header);
-        li.appendChild(meta);
-        li.appendChild(actions);
-
-        listEl.appendChild(li);
-      });
-    }
-
-    function renderVibes(listEl, vibes) {
-      listEl.innerHTML = "";
-      if (!vibes || vibes.length === 0) {
-        const li = document.createElement("li");
-        li.className = "vibe-item";
-        li.innerHTML =
-          '<span class="subtle">No vibes yet. Accept an offer to create one.</span>';
-        listEl.appendChild(li);
-        return;
-      }
-
-      vibes.forEach((v) => {
-        const li = document.createElement("li");
-        li.className = "vibe-item";
-
-        const header = document.createElement("div");
-        header.className = "item-header";
-
-        const label = document.createElement("div");
-        label.textContent = `Vibe between ${v.guest_id} & ${v.concierge_id}`;
-
-        const badge = document.createElement("span");
-        const statusClass = `badge-status-${(v.status || "active")
-          .toLowerCase()
-          .replace(/[^a-z]/g, "")}`;
-        badge.className = `badge ${statusClass}`;
-        badge.textContent = v.status || "active";
-
-        header.appendChild(label);
-        header.appendChild(badge);
-
-        const meta = document.createElement("div");
-        meta.className = "item-meta";
-        meta.innerHTML = `
-          <span class="item-id">${v.id}</span>
-          <span>signal: ${v.signal_id}</span>
-          <span>offer: ${v.offer_id}</span>
-        `;
-
-        li.appendChild(header);
-        li.appendChild(meta);
-        listEl.appendChild(li);
-      });
-    }
-
-    function renderPendingSignalsForConcierge(signals, conciergeId) {
-      const listEl = $("pending-signals-list");
-      listEl.innerHTML = "";
-
-      if (!signals || signals.length === 0) {
-        const li = document.createElement("li");
-        li.className = "signal-item";
-        li.innerHTML =
-          '<span class="subtle">No pending signals at the moment.</span>';
-        listEl.appendChild(li);
-        return;
-      }
-
-      signals.forEach((s) => {
-        const li = document.createElement("li");
-        li.className = "signal-item";
-
-        const header = document.createElement("div");
-        header.className = "item-header";
-
-        const intent = document.createElement("div");
-        intent.className = "item-intent";
-        intent.textContent = s.intent || "(no intent)";
-
-        const badge = document.createElement("span");
-        badge.className = "badge badge-status-pending";
-        badge.textContent = s.status || "pending";
-
-        header.appendChild(intent);
-        header.appendChild(badge);
-
-        const meta = document.createElement("div");
-        meta.className = "item-meta";
-        meta.innerHTML = `
-          <span class="item-id">${s.id}</span>
-          <span>guest: ${s.guest_id}</span>
-          ${
-            s.location
-              ? `<span>location: ${s.location}</span>`
-              : `<span class="subtle">no location</span>`
-          }
-        `;
-
-        const form = document.createElement("div");
-        form.className = "inline-form";
-
-        const messageInput = document.createElement("textarea");
-        messageInput.placeholder =
-          "e.g., I can meet you at 7:45pm near Riverside Park.";
-        messageInput.rows = 2;
-
-        const priceInput = document.createElement("input");
-        priceInput.type = "number";
-        priceInput.placeholder = "Price (optional)";
-        priceInput.step = "1";
-
-        const actions = document.createElement("div");
-        actions.className = "row-tight";
-        actions.style.marginTop = "4px";
-
-        const btn = document.createElement("button");
-        btn.textContent = "Send offer for this signal";
-        btn.className = "small";
-        btn.addEventListener("click", async () => {
-          const msg = messageInput.value.trim();
-          const priceValue = priceInput.value.trim();
-          const price =
-            priceValue === "" || isNaN(Number(priceValue))
-              ? null
-              : Number(priceValue);
-
-          if (!msg) {
-            setStatus("Please enter a short message for your offer.", "error");
-            return;
-          }
-
-          btn.disabled = true;
-          setStatus("Creating offer…", "info");
-
-          try {
-            const payload = {
-              signal_id: s.id,
-              concierge_id: conciergeId,
-              message: msg,
-            };
-            if (price !== null) payload.price = price;
-
-            const res = await fetchJson("/offers", {
-              method: "POST",
-              body: JSON.stringify(payload),
-            });
-
-            setStatus("Offer created successfully.", "success");
-            setJsonOutput(res);
-          } catch (err) {
-            const details = err.data || err || {};
-            setStatus(
-              `Error creating offer: ${
-                details.message || details.error || "unknown error"
-              }`,
-              "error"
-            );
-            setJsonOutput(details);
-          } finally {
-            btn.disabled = false;
-          }
-        });
-
-        actions.appendChild(btn);
-
-        form.appendChild(messageInput);
-        form.appendChild(priceInput);
-        form.appendChild(actions);
-
-        li.appendChild(header);
-        li.appendChild(meta);
-        li.appendChild(form);
-        listEl.appendChild(li);
-      });
-    }
-
-    // --- GUEST FLOW ---
-
-    async function handleGuestSignalSubmit(event) {
-      event.preventDefault();
-      const guestId = $("guest-id-input").value.trim() || "guest_anon";
-      const intent = $("intent-input").value.trim();
-      const location = $("location-input").value.trim() || null;
-
-      if (!intent) {
-        setStatus("Please describe what you want to do.", "error");
-        return;
-      }
-
-      $("send-signal-btn").disabled = true;
-      setStatus("Sending signal…", "info");
-
-      try {
-        const payload = {
-          guest_id: guestId,
-          intent,
-        };
-        if (location) payload.location = location;
-
-        const res = await fetchJson("/signals", {
           method: "POST",
-          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
         });
-
-        setStatus("Signal created successfully.", "success");
-        setJsonOutput(res);
-        await refreshGuestOverview();
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw data;
+        }
+        setLastResponse(data, `POST ${url}`);
+        els.guestOverviewStatus.textContent = "Signal created. Loading guest overview…";
+        els.guestOverviewStatus.className = "status-line ok";
+        await loadGuestOverview(guest_id);
       } catch (err) {
-        const details = err.data || err || {};
-        setStatus(
-          `Error creating signal: ${
-            details.message || details.error || "unknown error"
-          }`,
-          "error"
-        );
-        setJsonOutput(details);
+        setLastResponse(err, `POST ${url} (failed)`);
+        els.guestOverviewStatus.textContent = "Failed to create signal.";
+        els.guestOverviewStatus.className = "status-line err";
       } finally {
-        $("send-signal-btn").disabled = false;
+        els.sendSignalBtn.disabled = false;
+        els.sendSignalBtn.textContent = "Send signal";
       }
     }
 
-    async function refreshGuestOverview() {
-      const guestId = $("guest-id-input").value.trim() || "guest_abc";
-      setStatus(`Loading overview for ${guestId}…`, "info");
-
-      try {
-        const res = await fetchJson(`/guests/${encodeURIComponent(guestId)}/overview`);
-        setStatus(`Guest overview loaded for ${guestId}.`, "success");
-        setJsonOutput(res);
-        renderSignals($("guest-signals-list"), res.signals || []);
-      } catch (err) {
-        const details = err.data || err || {};
-        setStatus(
-          `Error loading guest overview: ${
-            details.message || details.error || "unknown error"
-          }`,
-          "error"
-        );
-        setJsonOutput(details);
-      }
-    }
-
-    // --- CONCIERGE FLOW ---
-
-    async function loadPendingSignalsForConcierge() {
-      const conciergeId = $("concierge-id-input").value.trim() || "conc_demo";
-      $("load-pending-btn").disabled = true;
-      setStatus("Loading pending signals…", "info");
-
-      try {
-        const res = await fetchJson("/signals?status=pending&limit=50&offset=0");
-        setStatus(
-          `Loaded ${res.count ?? (res.items || []).length} pending signals.`,
-          "success"
-        );
-        setJsonOutput(res);
-        renderPendingSignalsForConcierge(res.items || [], conciergeId);
-      } catch (err) {
-        const details = err.data || err || {};
-        setStatus(
-          `Error loading pending signals: ${
-            details.message || details.error || "unknown error"
-          }`,
-          "error"
-        );
-        setJsonOutput(details);
-      } finally {
-        $("load-pending-btn").disabled = false;
-      }
-    }
-
-    async function refreshConciergeOverview() {
-      const conciergeId = $("concierge-id-input").value.trim() || "conc_demo";
-      setStatus(`Loading overview for concierge ${conciergeId}…`, "info");
-
-      try {
-        const res = await fetchJson(
-          `/concierges/${encodeURIComponent(conciergeId)}/overview`
-        );
-        setStatus(
-          `Concierge overview loaded for ${conciergeId}.`,
-          "success"
-        );
-        setJsonOutput(res);
-        renderVibes($("concierge-vibes-list"), res.vibes || []);
-      } catch (err) {
-        const details = err.data || err || {};
-        setStatus(
-          `Error loading concierge overview: ${
-            details.message || details.error || "unknown error"
-          }`,
-          "error"
-        );
-        setJsonOutput(details);
-      }
-    }
-
-    // --- DEBUG FLOW ---
-
-    async function debugHealth() {
-      setStatus("Checking health…", "info");
-      try {
-        const res = await fetchJson("/health");
-        setStatus("Backend health is OK.", "success");
-        setJsonOutput(res);
-      } catch (err) {
-        const details = err.data || err || {};
-        setStatus("Health check failed.", "error");
-        setJsonOutput(details);
-      }
-    }
-
-    async function debugStore() {
-      setStatus("Loading debug store…", "info");
-      try {
-        const res = await fetchJson("/debug/store");
-        setStatus("Debug store loaded.", "success");
-        setJsonOutput(res);
-      } catch (err) {
-        const details = err.data || err || {};
-        setStatus("Error loading debug store.", "error");
-        setJsonOutput(details);
-      }
-    }
-
-    async function debugSeed() {
-      setStatus("Seeding happy-path scene…", "info");
-      try {
-        const res = await fetchJson("/debug/seed", { method: "POST" });
-        setStatus("Seeded happy-path scene.", "success");
-        setJsonOutput(res);
-      } catch (err) {
-        const details = err.data || err || {};
-        setStatus("Error seeding scene.", "error");
-        setJsonOutput(details);
-      }
-    }
-
-    async function debugReset() {
-      if (!confirm("Reset in-memory store? This clears all signals/offers/vibes.")) {
+    async function loadGuestOverview(guestId) {
+      const id = guestId || els.guestId.value.trim();
+      if (!id) {
+        alert("Enter a guest id first.");
         return;
       }
-      setStatus("Resetting in-memory store…", "info");
+      const url = `${API_BASE}/guests/${encodeURIComponent(id)}/overview`;
+      els.guestOverviewStatus.textContent = "Loading overview…";
+      els.guestOverviewStatus.className = "status-line";
+
       try {
-        const res = await fetchJson("/debug/reset", { method: "POST" });
-        setStatus("In-memory store reset.", "success");
-        setJsonOutput(res);
-        $("guest-signals-list").innerHTML = "";
-        $("pending-signals-list").innerHTML = "";
-        $("concierge-vibes-list").innerHTML = "";
+        const res = await fetch(url);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw data;
+        setLastResponse(data, `GET ${url}`);
+        setSecondary(data.messages || []);
+        els.guestOverviewStatus.textContent = `Loaded overview for ${id}. Signals: ${
+          data.summary?.signal_count ?? 0
+        }, vibes: ${data.summary?.vibe_count ?? 0}`;
+        els.guestOverviewStatus.className = "status-line ok";
       } catch (err) {
-        const details = err.data || err || {};
-        setStatus("Error resetting store.", "error");
-        setJsonOutput(details);
+        setLastResponse(err, `GET ${url} (failed)`);
+        els.guestOverviewStatus.textContent = "Failed to load guest overview.";
+        els.guestOverviewStatus.className = "status-line err";
       }
     }
 
-    // --- INIT ---
-
-    function init() {
-      initModeToggle();
-
-      $("guest-signal-form").addEventListener("submit", handleGuestSignalSubmit);
-      $("refresh-guest-overview-btn").addEventListener(
-        "click",
-        refreshGuestOverview
-      );
-      $("load-pending-btn").addEventListener(
-        "click",
-        loadPendingSignalsForConcierge
-      );
-      $("refresh-concierge-overview-btn").addEventListener(
-        "click",
-        refreshConciergeOverview
-      );
-
-      $("debug-health-btn").addEventListener("click", debugHealth);
-      $("debug-store-btn").addEventListener("click", debugStore);
-      $("debug-seed-btn").addEventListener("click", debugSeed);
-      $("debug-reset-btn").addEventListener("click", debugReset);
-
-      // Light-touch auto-check on load
-      debugHealth();
+    async function listPendingSignals() {
+      const url = `${API_BASE}/signals?status=pending`;
+      els.conciergeStatus.textContent = "Loading pending signals…";
+      els.conciergeStatus.className = "status-line";
+      try {
+        const res = await fetch(url);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw data;
+        setLastResponse(data, `GET ${url}`);
+        setSecondary(data.items || []);
+        els.conciergeStatus.textContent = `Found ${data.count ?? 0} pending signals.`;
+        els.conciergeStatus.className = "status-line ok";
+      } catch (err) {
+        setLastResponse(err, `GET ${url} (failed)`);
+        els.conciergeStatus.textContent = "Failed to load pending signals.";
+        els.conciergeStatus.className = "status-line err";
+      }
     }
 
-    document.addEventListener("DOMContentLoaded", init);
+    async function createOffer() {
+      const concierge_id = els.conciergeId.value.trim();
+      const signal_id = els.offerSignalId.value.trim();
+      const message = els.offerMessage.value.trim();
+      const priceRaw = els.offerPrice.value.trim();
+
+      if (!concierge_id || !signal_id || !message) {
+        alert("Please provide concierge id, signal id and an offer message.");
+        return;
+      }
+
+      const body = { concierge_id, signal_id, message };
+      if (priceRaw) {
+        const num = Number(priceRaw);
+        if (!Number.isNaN(num)) body.price = num;
+      }
+
+      const url = `${API_BASE}/offers`;
+      els.createOfferBtn.disabled = true;
+      els.createOfferBtn.textContent = "Creating…";
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw data;
+        setLastResponse(data, `POST ${url}`);
+        els.conciergeStatus.textContent = "Offer created.";
+        els.conciergeStatus.className = "status-line ok";
+      } catch (err) {
+        setLastResponse(err, `POST ${url} (failed)`);
+        els.conciergeStatus.textContent = "Failed to create offer.";
+        els.conciergeStatus.className = "status-line err";
+      } finally {
+        els.createOfferBtn.disabled = false;
+        els.createOfferBtn.textContent = "Create offer";
+      }
+    }
+
+    // Wire events
+    els.modeGuest.addEventListener("click", () => setMode("guest"));
+    els.modeConcierge.addEventListener("click", () => setMode("concierge"));
+
+    els.sendSignalBtn.addEventListener("click", sendSignal);
+    els.refreshGuestOverviewBtn.addEventListener("click", () =>
+      loadGuestOverview(els.guestId.value.trim())
+    );
+
+    els.listPendingBtn.addEventListener("click", listPendingSignals);
+    els.createOfferBtn.addEventListener("click", createOffer);
+
+    els.retryHealthBtn.addEventListener("click", checkHealth);
+
+    // Initial health check on load
+    window.addEventListener("load", () => {
+      setMode("guest");
+      checkHealth();
+    });
   </script>
 </body>
 </html>

@@ -284,7 +284,7 @@
       background: rgba(255, 255, 255, 0.01);
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
     }
 
     .item-header {
@@ -665,8 +665,47 @@
           }
         `;
 
+        // NEW: inline actions for this signal (demo matches)
+        const actions = document.createElement("div");
+        actions.className = "row-tight";
+        actions.style.marginTop = "4px";
+
+        const matchBtn = document.createElement("button");
+        matchBtn.className = "small";
+        matchBtn.textContent = "View demo matches";
+
+        matchBtn.addEventListener("click", async () => {
+          matchBtn.disabled = true;
+          setStatus("Loading demo matches…", "info");
+          try {
+            const res = await fetchJson(
+              `/matches/demo?signal_id=${encodeURIComponent(s.id)}`
+            );
+            setStatus(
+              `Loaded ${res.count ?? (res.items || []).length} demo matches.`,
+              "success"
+            );
+            setJsonOutput(res);
+          } catch (err) {
+            const details = err.data || err || {};
+            setStatus(
+              `Error loading demo matches: ${
+                details.message || details.error || "unknown error"
+              }`,
+              "error"
+            );
+            setJsonOutput(details);
+          } finally {
+            matchBtn.disabled = false;
+          }
+        });
+
+        actions.appendChild(matchBtn);
+
         li.appendChild(header);
         li.appendChild(meta);
+        li.appendChild(actions);
+
         listEl.appendChild(li);
       });
     }

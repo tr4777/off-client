@@ -403,6 +403,18 @@
       font-size: 12px;
       color: var(--text-soft);
     }
+
+    .hint-text {
+      font-size: 11px;
+      color: var(--text-soft);
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .hint-text code {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
   </style>
 </head>
 <body>
@@ -411,11 +423,11 @@
       <div>
         <h1>
           OFF
-          <span>Micro-experience console · prototype</span>
+          <span>Micro-experience console · prototype v0.450</span>
         </h1>
       </div>
       <div class="meta">
-        <div>Frontend <strong>v0.45</strong> · Backend <strong>v0.448</strong> (in-memory)</div>
+        <div>Frontend <strong>v0.450</strong> · Backend <strong>v0.450</strong> (in-memory)</div>
         <div class="mode-toggle">
           <span>Mode</span>
           <div class="mode-pill">
@@ -445,7 +457,7 @@
           <div id="guest-workspace">
             <div class="section-label">1. Send a signal</div>
             <div class="section-help">
-              Create a signal and we’ll show how it flows into offers and vibes.
+              Create a signal and we’ll show how it flows into offers, matches and vibes.
             </div>
 
             <div class="field">
@@ -485,9 +497,9 @@
 
             <hr style="border:none;border-top:1px solid #262b3d;margin:10px 0 8px" />
 
-            <div class="section-label">2. Your recent signals & vibes</div>
+            <div class="section-label">2. Your recent signals, offers & vibes</div>
             <div class="section-help">
-              Load a quick overview for this guest, including signals, offers and vibes.
+              Load a quick overview for this guest, including signals, offers, vibes and messages.
             </div>
 
             <div class="button-row">
@@ -566,11 +578,20 @@
             </div>
 
             <div id="concierge-status" class="status-line"></div>
+
+            <p class="hint-text">
+              Matching flows live on the API today:
+              use <code>POST /matches/accept</code> or <code>/matches/reject</code> in Hoppscotch,
+              then refresh the guest or concierge overview to see the updated state.
+            </p>
           </div>
 
           <p class="tagline">
             <strong>Today</strong> this is a debug console. <br />
-            <span style="opacity:0.85">Soon it becomes a real OFF guest & concierge surface.</span>
+            <span style="opacity:0.85">
+              Soon it becomes the real OFF surface for guests & concierges:
+              signals → offers → matches → vibes → trust.
+            </span>
           </p>
         </div>
       </section>
@@ -584,13 +605,21 @@
             </div>
             <div class="console-header-row">
               <div class="console-subtitle">
-                See raw JSON responses from the OFF backend as you click around.
+                See raw JSON responses from the OFF backend as you click around,
+                including overviews and match flows.
               </div>
             </div>
           </div>
 
           <div class="console-header-row">
-            <div class="console-label">Backend health</div>
+            <div>
+              <div class="console-label">Backend health</div>
+              <div class="hint-text">
+                If this fails, the debug console won’t be able to call
+                <code>/signals</code>, <code>/offers</code>,
+                <code>/matches</code>, or <code>/overview</code>.
+              </div>
+            </div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <div id="health-pill" class="health-pill err">
                 <span class="health-dot"></span>

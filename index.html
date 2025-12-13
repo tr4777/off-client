@@ -1,325 +1,763 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>OFF / Tangent — Happy Path Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    :root {
-      --bg: #0b0f14;
-      --panel: #121823;
-      --panel-soft: #161d2b;
-      --text: #e6e9ef;
-      --muted: #9aa4b2;
-      --accent: #5eead4;
-      --ok: #22c55e;
-      --warn: #facc15;
-      --err: #ef4444;
-      --border: #1f2937;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    :root{
+      --bg0:#070a10; --bg1:#0b1220; --panel:#0f172a; --panel2:#111c33;
+      --stroke:#1f2a44; --stroke2:#2a3a5f;
+      --text:#e8edf7; --muted:#9aa7bf; --muted2:#7f8aa4;
+      --ok:#22c55e; --warn:#fbbf24; --err:#ef4444; --accent:#5eead4; --accent2:#60a5fa;
+      --shadow:0 12px 40px rgba(0,0,0,.35);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --round:16px;
     }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: radial-gradient(1200px 600px at 10% -10%, #162036, transparent),
-                  radial-gradient(1000px 500px at 90% -20%, #0f2a22, transparent),
-                  var(--bg);
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 420px at 12% -8%, rgba(96,165,250,.25), transparent 60%),
+        radial-gradient(900px 420px at 86% -12%, rgba(94,234,212,.20), transparent 60%),
+        radial-gradient(1200px 700px at 50% 110%, rgba(99,102,241,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+    header{
+      padding:18px 22px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(31,42,68,.75);
+      backdrop-filter: blur(8px);
+      position:sticky; top:0; z-index:20;
+      background: rgba(7,10,16,.65);
+    }
+    .title{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .title h1{margin:0; font-size:18px; font-weight:650; letter-spacing:.2px}
+    .subtitle{color:var(--muted); font-size:12.5px}
+    .pill{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border:1px solid rgba(31,42,68,.9);
+      background: linear-gradient(180deg, rgba(15,23,42,.9), rgba(17,28,51,.75));
+      border-radius:999px;
+      box-shadow: var(--shadow);
+    }
+    .dot{width:10px;height:10px;border-radius:50%; background:var(--warn); box-shadow:0 0 0 4px rgba(251,191,36,.12)}
+    .pill .meta{display:flex; flex-direction:column; line-height:1.1}
+    .pill .meta b{font-size:12.5px}
+    .pill .meta span{font-size:11.5px; color:var(--muted)}
+    .pill button{
+      margin-left:8px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(42,58,95,.85);
+      background: rgba(2,6,23,.35);
+      color:var(--text);
+      cursor:pointer;
+    }
+    .pill button:hover{border-color:rgba(94,234,212,.7)}
+    main{padding:18px 22px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    .card{
+      border-radius:var(--round);
+      border:1px solid rgba(31,42,68,.9);
+      background: linear-gradient(180deg, rgba(15,23,42,.92), rgba(17,28,51,.72));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHead{
+      padding:14px 14px 10px;
+      display:flex; justify-content:space-between; align-items:center;
+      border-bottom:1px solid rgba(31,42,68,.7);
+    }
+    .cardHead h2{
+      margin:0;
+      font-size:13px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .cardHead .hint{font-size:12px; color:var(--muted2)}
+    .cardBody{padding:14px}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .btn{
+      padding:11px 13px;
+      border-radius:12px;
+      border:1px solid rgba(42,58,95,.9);
+      background: rgba(2,6,23,.35);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:600;
+      font-size:13px;
+      transition: .15s ease;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(94,234,212,.7)}
+    .btn.primary{border-color: rgba(94,234,212,.75); color: var(--accent)}
+    .btn.ghost{opacity:.9}
+    .btn.danger{border-color: rgba(239,68,68,.6); color:#fecaca}
+    .btn:disabled{opacity:.45; cursor:not-allowed; transform:none}
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .field{display:flex; flex-direction:column; gap:6px}
+    label{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px}
+    .kdot{width:9px;height:9px;border-radius:50%; background:var(--warn); box-shadow:0 0 0 4px rgba(251,191,36,.10)}
+    input, textarea, select{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(31,42,68,.9);
+      background: rgba(2,6,23,.45);
       color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size:12.5px;
+      outline:none;
+    }
+    input:focus, textarea:focus, select:focus{border-color: rgba(94,234,212,.55)}
+    input.mono, textarea.mono{font-family:var(--mono)}
+    textarea{min-height:70px; resize:vertical}
+    .miniActions{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
+
+    /* Alive flow */
+    .timeline{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:420px;
+    }
+    .step{
+      display:grid;
+      grid-template-columns: 26px 1fr;
+      gap:10px;
+      align-items:start;
+      padding:10px 10px;
+      border-radius:14px;
+      background: rgba(255,255,255,.02);
+      border:1px solid rgba(31,42,68,.55);
+    }
+    .step .badge{
+      width:22px;height:22px;border-radius:8px;
+      display:grid; place-items:center;
+      background: rgba(96,165,250,.14);
+      border:1px solid rgba(96,165,250,.25);
+      color:#cfe3ff;
+      font-weight:800; font-size:12px;
+      margin-top:1px;
+    }
+    .step .content b{display:block; font-size:13.5px}
+    .step .content small{display:block; margin-top:3px; color:var(--muted); font-size:12px; line-height:1.25}
+    .statusPill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 9px;
+      border-radius:999px;
+      border:1px solid rgba(42,58,95,.85);
+      background: rgba(2,6,23,.35);
+      color:var(--muted);
+      font-size:12px;
+    }
+    .pulse{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--accent);
+      box-shadow: 0 0 0 0 rgba(94,234,212,.45);
+      animation: pulse 1.4s infinite;
+    }
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(94,234,212,.35)}
+      70%{box-shadow:0 0 0 10px rgba(94,234,212,0)}
+      100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}
+    }
+    .offersRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+    .offerCard{
+      flex: 1 1 240px;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid rgba(42,58,95,.85);
+      background: rgba(2,6,23,.32);
+    }
+    .offerCard .top{display:flex; justify-content:space-between; align-items:center; gap:10px}
+    .offerCard b{font-size:13px}
+    .offerCard small{color:var(--muted); display:block; margin-top:4px; line-height:1.25}
+    .tag{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(96,165,250,.35);
+      background: rgba(96,165,250,.12);
+      color:#cfe3ff;
+      white-space:nowrap;
+    }
+    .tag.good{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12); color:#c7f9d2}
+    .tag.bad{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); color:#fecaca}
+    .tag.warn{border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.10); color:#fde68a}
+
+    .logBox{
+      margin-top:12px;
+      border-radius:14px;
+      border:1px solid rgba(31,42,68,.85);
+      background: rgba(2,6,23,.55);
+      overflow:hidden;
+    }
+    .logHead{
+      padding:10px 12px;
+      display:flex; justify-content:space-between; align-items:center;
+      border-bottom:1px solid rgba(31,42,68,.75);
+      color:var(--muted);
+      font-size:12px;
+    }
+    pre{
+      margin:0; padding:10px 12px;
+      max-height:220px;
+      overflow:auto;
+      font-family:var(--mono);
+      font-size:10.5px;
+      line-height:1.3;
+      color:#b9c4ff;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
 
-    header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .locked{
+      opacity:.55;
+      filter:saturate(.85);
+      pointer-events:none;
+      user-select:none;
     }
-
-    h1 {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .badge {
-      font-size: 12px;
-      color: var(--muted);
-      margin-left: 8px;
-    }
-
-    .backend {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--panel);
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--warn);
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 20px;
-      padding: 24px;
-    }
-
-    section {
-      background: linear-gradient(180deg, var(--panel), var(--panel-soft));
-      border: 1px solid var(--border);
+    .unlockRow{display:flex; gap:10px; flex-wrap:wrap}
+    .toast{
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(2,6,23,.85);
+      border: 1px solid rgba(42,58,95,.9);
       border-radius: 14px;
-      padding: 18px;
-    }
-
-    section h2 {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-      margin: 0 0 12px 0;
-      text-transform: uppercase;
-    }
-
-    .flow {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-height: 360px;
-    }
-
-    .event {
-      border-left: 3px solid var(--accent);
       padding: 10px 12px;
-      background: rgba(255,255,255,0.02);
-      border-radius: 6px;
-      font-size: 13px;
-    }
-
-    .event small {
       color: var(--muted);
-      display: block;
-      margin-top: 4px;
+      box-shadow: var(--shadow);
+      display:none;
+      max-width: 420px;
     }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-top: auto;
-      flex-wrap: wrap;
-    }
-
-    button {
-      background: linear-gradient(180deg, #1f2937, #0f172a);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    button.primary {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    button.warn {
-      border-color: var(--warn);
-      color: var(--warn);
-    }
-
-    .config-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 12px;
-    }
-
-    .field label {
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--warn);
-    }
-
-    input {
-      background: #0b1220;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 12px;
-    }
-
-    .log {
-      margin-top: 14px;
-      background: #020617;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      height: 140px;
-      overflow: auto;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: #a5b4fc;
-    }
+    .toast b{color:var(--text)}
   </style>
 </head>
 
 <body>
   <header>
-    <h1>OFF / Tangent — “Happy Path” Demo <span class="badge">v0.451.1</span></h1>
-    <div class="backend">
+    <div class="title">
+      <h1>OFF / Tangent — “Happy Path” Demo <span class="badge" style="color:var(--muted);font-size:12px;margin-left:8px">v0.451.1</span></h1>
+      <div class="subtitle">Visual demo: signal → concierges consider → offers appear → guest accepts → vibe starts → messages appear (real API when keys permit).</div>
+    </div>
+
+    <div class="pill">
       <div class="dot" id="backendDot"></div>
-      <span id="backendStatus">Backend: checking…</span>
-      <button onclick="checkBackend()">Check</button>
+      <div class="meta">
+        <b>Backend</b>
+        <span id="backendLine">checking…</span>
+      </div>
+      <button id="btnHealth">Check</button>
     </div>
   </header>
 
   <main>
-    <section>
-      <h2>From Signal → Vibe</h2>
-
-      <div class="flow" id="flow">
-        <div class="event">Waiting for action…</div>
-      </div>
-
-      <div class="controls">
-        <button class="primary" onclick="seed()">Seed Happy Path</button>
-        <button class="primary" onclick="run()">Run Happy Path (visual)</button>
-        <button onclick="reset()">Reset UI</button>
-      </div>
-    </section>
-
-    <section>
-      <h2>Config & Telemetry</h2>
-
-      <div class="config-grid">
-        <div class="field">
-          <label>Backend Base URL</label>
-          <input id="baseUrl" value="https://off-backend.onrender.com" />
+    <div class="grid">
+      <!-- LEFT: FLOW -->
+      <section class="card">
+        <div class="cardHead">
+          <h2>From Signal to Vibe</h2>
+          <div class="hint">Run the flow. Watch it happen.</div>
         </div>
+        <div class="cardBody">
+          <div class="timeline" id="timeline"></div>
 
-        <div class="field">
-          <label><span class="status" id="adminDot"></span> Admin API Key</label>
-          <input id="adminKey" type="password" placeholder="••••••••" />
+          <div class="row" style="margin-top:14px">
+            <button class="btn primary" id="btnSeed">Seed Happy Path</button>
+            <button class="btn primary" id="btnRun">Run Happy Path (visual)</button>
+            <button class="btn ghost" id="btnReset">Reset UI</button>
+            <button class="btn ghost" id="btnUnlock">Unlock UI</button>
+          </div>
+
+          <div class="logBox">
+            <div class="logHead">
+              <span>demo log</span>
+              <button class="btn ghost" id="btnCopy" style="padding:6px 10px; border-radius:10px; font-weight:650; font-size:12px">Copy Log</button>
+            </div>
+            <pre id="log"></pre>
+          </div>
         </div>
+      </section>
 
-        <div class="field">
-          <label><span class="status" id="guestDot"></span> Guest API Key</label>
-          <input id="guestKey" type="password" placeholder="••••••••" />
+      <!-- RIGHT: CONFIG -->
+      <section class="card">
+        <div class="cardHead">
+          <h2>Config & Telemetry</h2>
+          <div class="hint">Paste keys. Save. Ship demos.</div>
         </div>
+        <div class="cardBody">
+          <div class="field">
+            <label>Backend Base URL</label>
+            <input id="baseUrl" value="https://off-backend.onrender.com" />
+          </div>
 
-        <div class="field">
-          <label><span class="status" id="conciergeDot"></span> Concierge API Key</label>
-          <input id="conciergeKey" type="password" placeholder="••••••••" />
+          <div class="split" style="margin-top:12px">
+            <div class="field">
+              <label><span class="kdot" id="adminDot"></span> Admin API Key</label>
+              <input class="mono" id="adminKey" type="password" placeholder="(required for /debug/seed)" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label><span class="kdot" id="guestDot"></span> Guest API Key</label>
+              <input class="mono" id="guestKey" type="password" placeholder="(for real message posts)" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="split" style="margin-top:12px">
+            <div class="field">
+              <label><span class="kdot" id="conciergeDot"></span> Concierge API Key</label>
+              <input class="mono" id="conciergeKey" type="password" placeholder="(for real offers)" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label>Actor ID (optional)</label>
+              <input class="mono" id="actorId" placeholder="guest_seed / conc_seed" />
+            </div>
+          </div>
+
+          <div class="split" style="margin-top:12px">
+            <div class="field">
+              <label>Guest ID</label>
+              <input class="mono" id="guestId" value="guest_seed" />
+            </div>
+            <div class="field">
+              <label>Concierge ID</label>
+              <input class="mono" id="conciergeId" value="conc_seed" />
+            </div>
+          </div>
+
+          <div class="split" style="margin-top:12px">
+            <div class="field">
+              <label>Signal intent</label>
+              <input id="intent" value="Coffee reset near Fellini" />
+            </div>
+            <div class="field">
+              <label>Location</label>
+              <input id="location" value="Upper West Side" />
+            </div>
+          </div>
+
+          <div class="split" style="margin-top:12px">
+            <div class="field">
+              <label>No-go topics (comma separated)</label>
+              <input id="nogos" value="politics, religion, economy" />
+            </div>
+            <div class="field">
+              <label>Time window</label>
+              <input id="window" value="12:00 → 13:30" />
+            </div>
+          </div>
+
+          <div class="split" style="margin-top:12px">
+            <div class="field">
+              <label>Offer message</label>
+              <input id="offerMsg" value="Calm coffee + short walk. 45 min reset." />
+            </div>
+            <div class="field">
+              <label>Offer bounty ($)</label>
+              <input class="mono" id="bounty" value="20" />
+            </div>
+          </div>
+
+          <div class="miniActions">
+            <button class="btn ghost" id="btnSave">Save</button>
+            <button class="btn ghost" id="btnLoad">Load</button>
+            <button class="btn danger" id="btnClear">Clear</button>
+          </div>
+
+          <div class="hint" style="margin-top:10px; color:var(--muted2); font-size:12px">
+            Keys are masked (screenshare-safe). Status dots turn green when present.
+          </div>
         </div>
-      </div>
-
-      <div class="log" id="log"></div>
-    </section>
+      </section>
+    </div>
   </main>
 
+  <div class="toast" id="toast"><b>Copied.</b> Log copied to clipboard.</div>
+
 <script>
-  const flow = document.getElementById("flow");
-  const log = document.getElementById("log");
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  const nowTs = () => new Date().toISOString();
 
-  function addEvent(text, meta = "") {
-    const div = document.createElement("div");
-    div.className = "event";
-    div.innerHTML = `${text}${meta ? `<small>${meta}</small>` : ""}`;
-    flow.appendChild(div);
-    flow.scrollTop = flow.scrollHeight;
+  function toast(msg="Copied.") {
+    const t = $("toast");
+    t.innerHTML = `<b>${msg}</b>`;
+    t.style.display = "block";
+    setTimeout(() => t.style.display = "none", 1600);
   }
 
-  function logLine(text) {
-    log.textContent += text + "\n";
-    log.scrollTop = log.scrollHeight;
+  function setDot(el, state){
+    const d = $(el);
+    if(state==="ok"){ d.style.background = "var(--ok)"; d.style.boxShadow="0 0 0 4px rgba(34,197,94,.12)"; }
+    else if(state==="err"){ d.style.background = "var(--err)"; d.style.boxShadow="0 0 0 4px rgba(239,68,68,.12)"; }
+    else { d.style.background = "var(--warn)"; d.style.boxShadow="0 0 0 4px rgba(251,191,36,.10)"; }
   }
 
-  async function checkBackend() {
-    const dot = document.getElementById("backendDot");
-    const label = document.getElementById("backendStatus");
-    try {
-      const res = await fetch(`${baseUrl.value}/health`);
-      if (!res.ok) throw new Error();
+  function log(line){
+    const pre = $("log");
+    pre.textContent += (pre.textContent ? "\n" : "") + line;
+    pre.scrollTop = pre.scrollHeight;
+  }
+
+  function clearTimeline(){
+    $("timeline").innerHTML = "";
+  }
+
+  function step(num, title, detail="", rightPill=null){
+    const el = document.createElement("div");
+    el.className = "step";
+    el.innerHTML = `
+      <div class="badge">${num}</div>
+      <div class="content">
+        <div style="display:flex; justify-content:space-between; gap:10px; align-items:center">
+          <b>${title}</b>
+          ${rightPill ? rightPill : ""}
+        </div>
+        ${detail ? `<small>${detail}</small>` : ""}
+      </div>
+    `;
+    $("timeline").appendChild(el);
+    return el;
+  }
+
+  function offerCard(name, msg, price, state="thinking"){
+    const tag =
+      state==="thinking" ? `<span class="tag warn"><span class="pulse"></span>&nbsp;considering</span>` :
+      state==="offered" ? `<span class="tag">offer sent</span>` :
+      state==="accepted" ? `<span class="tag good">accepted</span>` :
+      `<span class="tag bad">${state}</span>`;
+
+    return `
+      <div class="offerCard">
+        <div class="top">
+          <b>${name}</b>
+          ${tag}
+        </div>
+        <small>${msg}</small>
+        <small style="margin-top:6px; color:var(--muted2)">bounty: <b style="color:var(--text)">$${price}</b></small>
+      </div>
+    `;
+  }
+
+  function lockUI(locked){
+    const lockedEls = ["btnSeed","btnRun"];
+    lockedEls.forEach(id => { $(id).disabled = locked; });
+    if(locked){
+      log(`[ui] locked (seed/run disabled)`);
+    } else {
+      log(`[ui] unlocked`);
+    }
+  }
+
+  function keyPresent(v){ return typeof v === "string" && v.trim().length > 0; }
+
+  function refreshKeyDots(){
+    setDot("adminDot", keyPresent($("adminKey").value) ? "ok" : "warn");
+    setDot("guestDot", keyPresent($("guestKey").value) ? "ok" : "warn");
+    setDot("conciergeDot", keyPresent($("conciergeKey").value) ? "ok" : "warn");
+  }
+
+  // ---------- Health ----------
+  async function checkHealth(){
+    const base = $("baseUrl").value.trim().replace(/\/+$/,"");
+    setDot("backendDot","warn");
+    $("backendLine").textContent = "checking…";
+    try{
+      const t0 = performance.now();
+      const res = await fetch(`${base}/health`, { method:"GET" });
+      const ms = Math.round(performance.now()-t0);
+      if(!res.ok) throw new Error("bad status");
       const data = await res.json();
-      dot.style.background = "var(--ok)";
-      label.textContent = `Backend OK • uptime ${Math.floor(data.uptime)}s`;
-    } catch {
-      dot.style.background = "var(--err)";
-      label.textContent = "Backend unreachable";
+      setDot("backendDot","ok");
+      $("backendLine").textContent = `ok • ${ms}ms • uptime ${Math.floor(data.uptime)}s`;
+      log(`[health] ok (${ms}ms) uptime=${Math.floor(data.uptime)}s`);
+    }catch(e){
+      setDot("backendDot","err");
+      $("backendLine").textContent = `unreachable`;
+      log(`[health] unreachable`);
     }
   }
 
-  async function seed() {
-    addEvent("Seeding happy path…");
-    logLine("POST /debug/seed");
-    const res = await fetch(`${baseUrl.value}/debug/seed`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${adminKey.value}`
+  // ---------- API ----------
+  function headersFor(role){
+    const h = { "Content-Type":"application/json" };
+    const actor = $("actorId").value.trim();
+    if(actor) h["X-Actor-Id"] = actor;
+
+    if(role==="admin" && keyPresent($("adminKey").value)) h["Authorization"] = `Bearer ${$("adminKey").value.trim()}`;
+    if(role==="guest" && keyPresent($("guestKey").value)) h["Authorization"] = `Bearer ${$("guestKey").value.trim()}`;
+    if(role==="concierge" && keyPresent($("conciergeKey").value)) h["Authorization"] = `Bearer ${$("conciergeKey").value.trim()}`;
+    return h;
+  }
+
+  async function post(path, body, role, idemKey=null){
+    const base = $("baseUrl").value.trim().replace(/\/+$/,"");
+    const h = headersFor(role);
+    if(idemKey) h["Idempotency-Key"] = idemKey;
+    const url = `${base}${path}`;
+    log(`${role.toUpperCase()} POST ${path}${idemKey ? ` (Idem: ${idemKey})` : ""}`);
+    const res = await fetch(url, { method:"POST", headers:h, body: JSON.stringify(body || {}) });
+    const txt = await res.text();
+    let data = null;
+    try{ data = JSON.parse(txt); }catch{ data = { raw: txt }; }
+    log(`→ ${res.status} ${res.statusText} • ${data?.request_id ? "rid="+data.request_id : ""}`);
+    return { ok: res.ok, status: res.status, data };
+  }
+
+  // ---------- Demo Flow ----------
+  async function seedHappyPath(){
+    clearTimeline();
+    step(0, "Seeding", "Resetting store + inserting a ready-to-run scene…", `<span class="statusPill"><span class="pulse"></span> working</span>`);
+    await sleep(450);
+
+    const r = await post("/debug/seed", {}, "admin", `seed-${Date.now()}`);
+    if(!r.ok){
+      step("!", "Seed failed", `HTTP ${r.status}. If 401: add Admin key. If Failed to fetch: check CORS + base URL.`);
+      log(`[seed] failed`);
+      return { ok:false };
+    }
+
+    step(1, "Seeded", "Guest + Concierge + Signal + Offer + Vibe inserted. Ready to run.", `<span class="statusPill" style="color:#c7f9d2;border-color:rgba(34,197,94,.35)"><span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> ready</span>`);
+    log(`[seed] ok • ids: ${JSON.stringify(r.data?.ids || {})}`);
+    return { ok:true, ids: r.data?.ids || {} };
+  }
+
+  async function runHappyPathVisual(){
+    clearTimeline();
+
+    const intent = $("intent").value.trim() || "Coffee reset";
+    const loc = $("location").value.trim() || "Upper West Side";
+    const nogos = $("nogos").value.trim() || "politics, religion";
+    const window = $("window").value.trim() || "now → +90m";
+
+    // Step 1: Signal card
+    const s1 = step(1, "Guest creates a signal",
+      `“${intent}” • ${loc} • time window: ${window} • no-go: ${nogos}`,
+      `<span class="statusPill"><span class="pulse"></span> sending</span>`
+    );
+    await sleep(650);
+
+    // Optional real POST /signals (guest key required)
+    // If no guest key, we still animate.
+    let signalId = null;
+    if(keyPresent($("guestKey").value)){
+      const body = {
+        guest_id: $("guestId").value.trim() || "guest_seed",
+        intent,
+        location: loc,
+        metadata: { no_go_topics: nogos.split(",").map(s=>s.trim()).filter(Boolean), time_window: window }
+      };
+      const rr = await post("/signals", body, "guest", `sig-${Date.now()}`);
+      if(rr.ok) signalId = rr.data?.signal?.id || null;
+    }
+    s1.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> created`;
+    await sleep(450);
+
+    // Step 2: Concierges consider
+    const s2 = step(2, "Concierges consider the signal",
+      "Three nearby concierges skim the intent, location, and constraints. They decide if they can fulfill it.",
+      `<span class="statusPill"><span class="pulse"></span> evaluating</span>`
+    );
+    const offersWrap = document.createElement("div");
+    offersWrap.className = "offersRow";
+    offersWrap.innerHTML =
+      offerCard("Concierge Maya", "I can do a calm coffee + walk loop. Keep it light.", 20, "thinking") +
+      offerCard("Concierge Leo", "Fellini is great. Quick reset, low-stim, good vibe.", 18, "thinking") +
+      offerCard("Concierge Nina", "I’m close — can guide the ‘best table / best moment’ experience.", 22, "thinking");
+    s2.querySelector(".content").appendChild(offersWrap);
+    await sleep(900);
+
+    // Step 3: Offer appears (real POST /offers if concierge key present)
+    const offerMsg = $("offerMsg").value.trim() || "Calm coffee + short walk. 45 min reset.";
+    const bounty = Number(($("bounty").value || "20").trim()) || 20;
+    let offerId = null;
+
+    // Animate: one concierge makes the offer
+    offersWrap.children[0].querySelector(".tag").className = "tag";
+    offersWrap.children[0].querySelector(".tag").textContent = "offer drafted…";
+    await sleep(650);
+
+    if(keyPresent($("conciergeKey").value)){
+      const body = {
+        signal_id: signalId || "sig_seed_001",
+        concierge_id: $("conciergeId").value.trim() || "conc_seed",
+        message: offerMsg,
+        price: bounty,
+        metadata: { demo: true }
+      };
+      const rr = await post("/offers", body, "concierge", `off-${Date.now()}`);
+      if(rr.ok) offerId = rr.data?.offer?.id || null;
+    }
+
+    offersWrap.children[0].querySelector(".tag").className = "tag";
+    offersWrap.children[0].querySelector(".tag").textContent = "offer sent";
+    s2.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> offers visible`;
+    await sleep(550);
+
+    // Step 4: Guest accepts (prefer /offers/:id/accept when available, else /matches/accept)
+    const s3 = step(3, "Guest accepts an offer",
+      "Guest picks the best fit based on vibe, clarity, and constraints. Accepting creates an active vibe.",
+      `<span class="statusPill"><span class="pulse"></span> accepting</span>`
+    );
+    await sleep(650);
+
+    let vibeId = null;
+    const guest_id = $("guestId").value.trim() || "guest_seed";
+
+    // Try the nicer accept route first if we have offerId
+    if(keyPresent($("guestKey").value)){
+      if(offerId){
+        // /offers/:offer_id/accept (your offers.js supports this)
+        const rr = await post(`/offers/${encodeURIComponent(offerId)}/accept`, { guest_id }, "guest", `acc-${Date.now()}`);
+        if(rr.ok) vibeId = rr.data?.vibe?.id || null;
+        else {
+          // fallback /matches/accept expects { offer_id }
+          const rr2 = await post(`/matches/accept`, { offer_id: offerId }, "guest", `macc-${Date.now()}`);
+          if(rr2.ok) vibeId = rr2.data?.vibe?.id || null;
+        }
+      } else {
+        // If no offerId, just keep it cinematic
+        await sleep(400);
       }
-    });
-    if (!res.ok) {
-      addEvent("Seed failed", "Check admin key");
-      logLine("❌ Seed failed");
-      return;
     }
-    addEvent("Seed complete", "Guest + Concierge + Signal created");
-    logLine("✅ Seed success");
-    adminDot.style.background = "var(--ok)";
+
+    offersWrap.children[0].querySelector(".tag").className = "tag good";
+    offersWrap.children[0].querySelector(".tag").textContent = "accepted";
+    s3.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> vibe created`;
+    await sleep(550);
+
+    // Step 5: Messages appear (real POST /messages when guest key present)
+    const vib = vibeId || "vib_seed_001";
+    const s4 = step(4, "Vibe starts — messages appear",
+      `A shared offline moment is now “active.” Messaging is open for small coordination (time/place). vibe_id: ${vib}`,
+      `<span class="statusPill"><span class="pulse"></span> messaging</span>`
+    );
+    await sleep(650);
+
+    const msgs = document.createElement("div");
+    msgs.className = "offersRow";
+    msgs.innerHTML =
+      `<div class="offerCard" style="flex:1 1 320px">
+        <div class="top"><b>${guest_id}</b><span class="tag">guest</span></div>
+        <small>“yo — Fellini sounds perfect. meet at 12:05?”</small>
+        <small style="margin-top:6px;color:var(--muted2)">${nowTs()}</small>
+      </div>` +
+      `<div class="offerCard" style="flex:1 1 320px">
+        <div class="top"><b>${$("conciergeId").value.trim() || "conc_seed"}</b><span class="tag">concierge</span></div>
+        <small>“yes. i’ll grab us a quiet corner table.”</small>
+        <small style="margin-top:6px;color:var(--muted2)">${nowTs()}</small>
+      </div>`;
+    s4.querySelector(".content").appendChild(msgs);
+
+    if(keyPresent($("guestKey").value)){
+      await post("/messages",
+        { vibe_id: vib, from_role:"guest", from_id: guest_id, text:"yo — Fellini sounds perfect. meet at 12:05?" },
+        "guest",
+        `msg-g-${Date.now()}`
+      );
+    }
+
+    s4.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> active`;
+    log(`[run] completed (vibe_id=${vib})`);
   }
 
-  async function run() {
-    flow.innerHTML = "";
-    addEvent("Guest creates signal", "Coffee reset near Fellini");
-    await delay();
-    addEvent("Concierges reviewing signal");
-    await delay();
-    addEvent("Offer submitted", "$20 • calm coffee + walk");
-    await delay();
-    addEvent("Guest accepts offer");
-    await delay();
-    addEvent("Vibe started 🎉");
+  // ---------- Persistence (localStorage) ----------
+  const STORAGE_KEY = "off_demo_config_v1";
+  function saveConfig(){
+    const data = {
+      baseUrl: $("baseUrl").value,
+      adminKey: $("adminKey").value,
+      guestKey: $("guestKey").value,
+      conciergeKey: $("conciergeKey").value,
+      actorId: $("actorId").value,
+      guestId: $("guestId").value,
+      conciergeId: $("conciergeId").value,
+      intent: $("intent").value,
+      location: $("location").value,
+      nogos: $("nogos").value,
+      window: $("window").value,
+      offerMsg: $("offerMsg").value,
+      bounty: $("bounty").value,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    log(`[cfg] saved`);
+    toast("Saved.");
+    refreshKeyDots();
+  }
+  function loadConfig(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ toast("No saved config."); return; }
+    try{
+      const d = JSON.parse(raw);
+      Object.entries(d).forEach(([k,v]) => { if($(k)) $(k).value = v; });
+      log(`[cfg] loaded`);
+      toast("Loaded.");
+      refreshKeyDots();
+    }catch{
+      toast("Load failed.");
+    }
+  }
+  function clearConfig(){
+    localStorage.removeItem(STORAGE_KEY);
+    ["adminKey","guestKey","conciergeKey"].forEach(k => $(k).value = "");
+    log(`[cfg] cleared`);
+    toast("Cleared.");
+    refreshKeyDots();
   }
 
-  function reset() {
-    flow.innerHTML = `<div class="event">Waiting for action…</div>`;
-    log.textContent = "";
+  // ---------- Wire up ----------
+  function resetUI(){
+    clearTimeline();
+    $("log").textContent = "";
+    step(0, "Ready", "Seed to create a known scene, or run the visual happy path. Real API calls happen when keys are present.",
+      `<span class="statusPill"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent2)"></span> idle</span>`);
+    refreshKeyDots();
   }
 
-  function delay(ms = 500) {
-    return new Promise(r => setTimeout(r, ms));
-  }
+  $("btnHealth").onclick = checkHealth;
+  $("btnSeed").onclick = async () => { lockUI(true); await seedHappyPath(); lockUI(false); };
+  $("btnRun").onclick  = async () => { lockUI(true); await runHappyPathVisual(); lockUI(false); };
+  $("btnReset").onclick = resetUI;
+  $("btnUnlock").onclick = () => lockUI(false);
+  $("btnCopy").onclick = async () => {
+    try{
+      await navigator.clipboard.writeText($("log").textContent || "");
+      toast("Copied.");
+      log(`[ui] copied log`);
+    }catch{
+      toast("Copy failed.");
+    }
+  };
 
-  // Initial check
-  checkBackend();
+  $("btnSave").onclick = saveConfig;
+  $("btnLoad").onclick = loadConfig;
+  $("btnClear").onclick = clearConfig;
+
+  ["adminKey","guestKey","conciergeKey"].forEach(id=>{
+    $(id).addEventListener("input", refreshKeyDots);
+  });
+
+  // Initialize
+  resetUI();
+  checkHealth();
 </script>
 </body>
 </html>

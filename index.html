@@ -3,761 +3,1164 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OFF / Tangent — Happy Path Demo</title>
+  <title>OFF / Tangent — Demo</title>
+  <meta name="description" content="OFF / Tangent demo: Signal → Offer → Vibe" />
 
   <style>
     :root{
-      --bg0:#070a10; --bg1:#0b1220; --panel:#0f172a; --panel2:#111c33;
-      --stroke:#1f2a44; --stroke2:#2a3a5f;
-      --text:#e8edf7; --muted:#9aa7bf; --muted2:#7f8aa4;
-      --ok:#22c55e; --warn:#fbbf24; --err:#ef4444; --accent:#5eead4; --accent2:#60a5fa;
-      --shadow:0 12px 40px rgba(0,0,0,.35);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --round:16px;
+      --bg:#0b0f14;
+      --panel:#0f1620;
+      --panel2:#0c131c;
+      --text:#e8eef7;
+      --muted:#9aa8bb;
+      --line:#1b2636;
+
+      --accent:#7dd3fc;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+
+      --shadow: 0 12px 40px rgba(0,0,0,.45);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color:var(--text);
       background:
-        radial-gradient(900px 420px at 12% -8%, rgba(96,165,250,.25), transparent 60%),
-        radial-gradient(900px 420px at 86% -12%, rgba(94,234,212,.20), transparent 60%),
-        radial-gradient(1200px 700px at 50% 110%, rgba(99,102,241,.12), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      min-height:100vh;
-    }
-    header{
-      padding:18px 22px;
-      display:flex; align-items:center; justify-content:space-between;
-      border-bottom:1px solid rgba(31,42,68,.75);
-      backdrop-filter: blur(8px);
-      position:sticky; top:0; z-index:20;
-      background: rgba(7,10,16,.65);
-    }
-    .title{
-      display:flex; flex-direction:column; gap:4px;
-    }
-    .title h1{margin:0; font-size:18px; font-weight:650; letter-spacing:.2px}
-    .subtitle{color:var(--muted); font-size:12.5px}
-    .pill{
-      display:flex; align-items:center; gap:10px;
-      padding:10px 12px;
-      border:1px solid rgba(31,42,68,.9);
-      background: linear-gradient(180deg, rgba(15,23,42,.9), rgba(17,28,51,.75));
-      border-radius:999px;
-      box-shadow: var(--shadow);
-    }
-    .dot{width:10px;height:10px;border-radius:50%; background:var(--warn); box-shadow:0 0 0 4px rgba(251,191,36,.12)}
-    .pill .meta{display:flex; flex-direction:column; line-height:1.1}
-    .pill .meta b{font-size:12.5px}
-    .pill .meta span{font-size:11.5px; color:var(--muted)}
-    .pill button{
-      margin-left:8px;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid rgba(42,58,95,.85);
-      background: rgba(2,6,23,.35);
+        radial-gradient(1200px 700px at 20% -10%, rgba(125,211,252,.10), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(52,211,153,.08), transparent 55%),
+        radial-gradient(1200px 700px at 50% 110%, rgba(251,113,133,.06), transparent 60%),
+        var(--bg);
       color:var(--text);
-      cursor:pointer;
+      font-family: var(--sans);
     }
-    .pill button:hover{border-color:rgba(94,234,212,.7)}
-    main{padding:18px 22px}
-    .grid{
-      display:grid;
-      grid-template-columns: 1.7fr 1fr;
-      gap:16px;
-      align-items:start;
-    }
-    .card{
-      border-radius:var(--round);
-      border:1px solid rgba(31,42,68,.9);
-      background: linear-gradient(180deg, rgba(15,23,42,.92), rgba(17,28,51,.72));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .cardHead{
-      padding:14px 14px 10px;
-      display:flex; justify-content:space-between; align-items:center;
-      border-bottom:1px solid rgba(31,42,68,.7);
-    }
-    .cardHead h2{
-      margin:0;
-      font-size:13px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      color:var(--muted);
-    }
-    .cardHead .hint{font-size:12px; color:var(--muted2)}
-    .cardBody{padding:14px}
-    .row{display:flex; gap:12px; flex-wrap:wrap}
-    .btn{
-      padding:11px 13px;
-      border-radius:12px;
-      border:1px solid rgba(42,58,95,.9);
-      background: rgba(2,6,23,.35);
-      color:var(--text);
-      cursor:pointer;
-      font-weight:600;
-      font-size:13px;
-      transition: .15s ease;
-    }
-    .btn:hover{transform: translateY(-1px); border-color: rgba(94,234,212,.7)}
-    .btn.primary{border-color: rgba(94,234,212,.75); color: var(--accent)}
-    .btn.ghost{opacity:.9}
-    .btn.danger{border-color: rgba(239,68,68,.6); color:#fecaca}
-    .btn:disabled{opacity:.45; cursor:not-allowed; transform:none}
-    .split{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    .field{display:flex; flex-direction:column; gap:6px}
-    label{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:8px}
-    .kdot{width:9px;height:9px;border-radius:50%; background:var(--warn); box-shadow:0 0 0 4px rgba(251,191,36,.10)}
-    input, textarea, select{
-      width:100%;
-      padding:10px 10px;
-      border-radius:12px;
-      border:1px solid rgba(31,42,68,.9);
-      background: rgba(2,6,23,.45);
-      color: var(--text);
-      font-size:12.5px;
-      outline:none;
-    }
-    input:focus, textarea:focus, select:focus{border-color: rgba(94,234,212,.55)}
-    input.mono, textarea.mono{font-family:var(--mono)}
-    textarea{min-height:70px; resize:vertical}
-    .miniActions{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
 
-    /* Alive flow */
-    .timeline{
+    .wrap{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 16px 80px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin: 6px 0 14px;
+    }
+
+    .brand{
       display:flex;
       flex-direction:column;
+      gap:6px;
+    }
+    .title{
+      display:flex;
+      align-items:center;
       gap:10px;
-      min-height:420px;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: .2px;
     }
-    .step{
-      display:grid;
-      grid-template-columns: 26px 1fr;
-      gap:10px;
-      align-items:start;
-      padding:10px 10px;
-      border-radius:14px;
-      background: rgba(255,255,255,.02);
-      border:1px solid rgba(31,42,68,.55);
-    }
-    .step .badge{
-      width:22px;height:22px;border-radius:8px;
-      display:grid; place-items:center;
-      background: rgba(96,165,250,.14);
-      border:1px solid rgba(96,165,250,.25);
-      color:#cfe3ff;
-      font-weight:800; font-size:12px;
-      margin-top:1px;
-    }
-    .step .content b{display:block; font-size:13.5px}
-    .step .content small{display:block; margin-top:3px; color:var(--muted); font-size:12px; line-height:1.25}
-    .statusPill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 9px;
-      border-radius:999px;
-      border:1px solid rgba(42,58,95,.85);
-      background: rgba(2,6,23,.35);
-      color:var(--muted);
-      font-size:12px;
-    }
-    .pulse{
-      width:8px;height:8px;border-radius:50%;
-      background:var(--accent);
-      box-shadow: 0 0 0 0 rgba(94,234,212,.45);
-      animation: pulse 1.4s infinite;
-    }
-    @keyframes pulse{
-      0%{box-shadow:0 0 0 0 rgba(94,234,212,.35)}
-      70%{box-shadow:0 0 0 10px rgba(94,234,212,0)}
-      100%{box-shadow:0 0 0 0 rgba(94,234,212,0)}
-    }
-    .offersRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
-    .offerCard{
-      flex: 1 1 240px;
-      padding:10px 10px;
-      border-radius:14px;
-      border:1px solid rgba(42,58,95,.85);
-      background: rgba(2,6,23,.32);
-    }
-    .offerCard .top{display:flex; justify-content:space-between; align-items:center; gap:10px}
-    .offerCard b{font-size:13px}
-    .offerCard small{color:var(--muted); display:block; margin-top:4px; line-height:1.25}
     .tag{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(96,165,250,.35);
-      background: rgba(96,165,250,.12);
-      color:#cfe3ff;
-      white-space:nowrap;
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(27,38,54,.9);
+      background: rgba(17,26,38,.7);
+      color: rgba(232,238,247,.85);
     }
-    .tag.good{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12); color:#c7f9d2}
-    .tag.bad{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); color:#fecaca}
-    .tag.warn{border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.10); color:#fde68a}
+    .subtitle{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      max-width: 760px;
+    }
 
-    .logBox{
-      margin-top:12px;
-      border-radius:14px;
-      border:1px solid rgba(31,42,68,.85);
-      background: rgba(2,6,23,.55);
+    .statusbar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      background: rgba(15,22,32,.7);
+      border: 1px solid rgba(27,38,54,.8);
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
+      white-space: nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(154,168,187,.55);
+      box-shadow: 0 0 0 0 rgba(152,166,184,.0);
+    }
+    .dot.good{ background: var(--good); box-shadow: 0 0 0 6px rgba(52,211,153,.10); }
+    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 6px rgba(251,191,36,.10); }
+    .dot.bad{  background: var(--bad);  box-shadow: 0 0 0 6px rgba(251,113,133,.10); }
+
+    .statusText{ display:flex; flex-direction:column; gap:2px; line-height:1.1; }
+    .statusText strong{ font-size: 12px; }
+    .statusText span{ font-size: 11px; color: var(--muted); }
+
+    button{
+      border: 1px solid rgba(27,38,54,.95);
+      background: rgba(17,26,38,.85);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 750;
+      font-size: 12px;
+      letter-spacing: .2px;
+      transition: transform .06s ease, border-color .15s ease, background .15s ease;
+    }
+    button:hover{ transform: translateY(-1px); border-color: rgba(125,211,252,.35); }
+    button:active{ transform: translateY(0px); }
+    button.primary{ background: rgba(125,211,252,.12); border-color: rgba(125,211,252,.35); }
+    button.danger{  background: rgba(251,113,133,.10); border-color: rgba(251,113,133,.35); }
+    button:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      header{ flex-direction: column; align-items: stretch; }
+      .statusbar{ justify-content: space-between; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(15,22,32,.92), rgba(12,19,28,.92));
+      border: 1px solid rgba(27,38,54,.92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .logHead{
-      padding:10px 12px;
-      display:flex; justify-content:space-between; align-items:center;
-      border-bottom:1px solid rgba(31,42,68,.75);
-      color:var(--muted);
-      font-size:12px;
+    .cardHeader{
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid rgba(27,38,54,.85);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
     }
-    pre{
-      margin:0; padding:10px 12px;
-      max-height:220px;
-      overflow:auto;
-      font-family:var(--mono);
-      font-size:10.5px;
-      line-height:1.3;
-      color:#b9c4ff;
-      white-space:pre-wrap;
-      word-break:break-word;
+    .cardHeader h2{
+      margin:0;
+      font-size: 12px;
+      letter-spacing: .25px;
+      text-transform: uppercase;
+      color: rgba(232,238,247,.9);
+    }
+    .cardBody{ padding: 12px; }
+
+    .tiny{
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
     }
 
-    .locked{
-      opacity:.55;
-      filter:saturate(.85);
-      pointer-events:none;
-      user-select:none;
+    /* Story lane */
+    .lane{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      min-height: 560px;
     }
-    .unlockRow{display:flex; gap:10px; flex-wrap:wrap}
-    .toast{
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      background: rgba(2,6,23,.85);
-      border: 1px solid rgba(42,58,95,.9);
+    .stageTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 6px;
+    }
+    .stageTitle .pill{
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(232,238,247,.8);
+      background: rgba(17,26,38,.55);
+      border: 1px solid rgba(27,38,54,.85);
+      padding: 5px 8px;
+      border-radius: 999px;
+    }
+
+    .storyCard{
+      border: 1px solid rgba(27,38,54,.9);
+      background: rgba(11,15,20,.55);
+      border-radius: 16px;
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      position: relative;
+      overflow:hidden;
+      transform: translateY(6px);
+      opacity: 0;
+      animation: popIn .35s ease forwards;
+    }
+    @keyframes popIn{
+      from{ transform: translateY(10px); opacity: 0; }
+      to{ transform: translateY(0px); opacity: 1; }
+    }
+
+    .storyCard::before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width: 3px;
+      background: rgba(125,211,252,.35);
+    }
+
+    .storyTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .storyTop strong{
+      font-size: 13px;
+      letter-spacing: .2px;
+    }
+    .badge{
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(27,38,54,.85);
+      background: rgba(17,26,38,.65);
+      color: rgba(232,238,247,.85);
+    }
+    .badge.good{ border-color: rgba(52,211,153,.35); background: rgba(52,211,153,.08); }
+    .badge.warn{ border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.08); }
+    .badge.bad{  border-color: rgba(251,113,133,.35); background: rgba(251,113,133,.08); }
+
+    .kv{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap: 6px 10px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    .kv b{ color: var(--muted); font-weight: 700; }
+
+    .conciergeRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .concierge{
+      min-width: 165px;
+      flex: 1;
+      border: 1px solid rgba(27,38,54,.85);
+      background: rgba(17,26,38,.45);
       border-radius: 14px;
-      padding: 10px 12px;
-      color: var(--muted);
-      box-shadow: var(--shadow);
-      display:none;
-      max-width: 420px;
+      padding: 10px;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      position: relative;
+      overflow:hidden;
     }
-    .toast b{color:var(--text)}
+    .concierge .name{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .concierge .meta{ font-size: 11px; color: var(--muted); line-height:1.25; }
+    .typing{
+      display:flex;
+      gap: 4px;
+      align-items:center;
+      opacity:.85;
+    }
+    .typing span{
+      width: 5px; height: 5px;
+      background: rgba(232,238,247,.55);
+      border-radius: 999px;
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2){ animation-delay: .12s; }
+    .typing span:nth-child(3){ animation-delay: .24s; }
+    @keyframes bounce{
+      0%, 60%, 100%{ transform: translateY(0); opacity: .55; }
+      30%{ transform: translateY(-4px); opacity: 1; }
+    }
+
+    .offerStack{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .offer{
+      border: 1px solid rgba(27,38,54,.85);
+      background: rgba(17,26,38,.42);
+      border-radius: 14px;
+      padding: 10px;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      position: relative;
+      overflow:hidden;
+    }
+    .offer .top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .offer .top strong{ font-size: 12px; }
+    .offer .msg{ font-size: 12px; color: rgba(232,238,247,.92); line-height: 1.35; }
+    .offer .sub{ font-size: 11px; color: var(--muted); line-height: 1.25; }
+
+    .acceptRow{
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:flex-end;
+      margin-top: 6px;
+    }
+
+    .notice{
+      font-size: 10px;
+      color: rgba(154,168,187,.9);
+      margin-top: 4px;
+    }
+
+    /* Right panel controls */
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 540px){ .row2{ grid-template-columns:1fr; } }
+
+    label{
+      display:block;
+      font-size: 11px;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    input, select{
+      width:100%;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(27,38,54,.95);
+      background: rgba(11,15,20,.65);
+      color: var(--text);
+      outline: none;
+    }
+
+    .terminal{
+      margin-top: 10px;
+      background: rgba(8,11,16,.70);
+      border: 1px solid rgba(27,38,54,.85);
+      border-radius: 16px;
+      padding: 10px 10px 8px;
+      overflow:hidden;
+    }
+    .terminalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 8px;
+    }
+    .dots{
+      display:flex; gap:6px; align-items:center;
+    }
+    .dots span{ width: 9px; height: 9px; border-radius: 999px; background: rgba(152,166,184,.35); }
+    .dots span:nth-child(1){ background: rgba(251,113,133,.55); }
+    .dots span:nth-child(2){ background: rgba(251,191,36,.55); }
+    .dots span:nth-child(3){ background: rgba(52,211,153,.55); }
+    .terminalMeta{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .log{
+      font-family: var(--mono);
+      font-size: 8px;
+      line-height: 1.45;
+      color: rgba(232,238,247,.82);
+      height: 240px;
+      overflow:auto;
+      padding-right: 6px;
+      white-space: pre-wrap;
+    }
+    .log .muted{ color: rgba(152,166,184,.78); }
+    .log .good{ color: rgba(52,211,153,.92); }
+    .log .warn{ color: rgba(251,191,36,.92); }
+    .log .bad{ color: rgba(251,113,133,.92); }
+    .log .accent{ color: rgba(125,211,252,.92); }
+
+    .divider{
+      height:1px;
+      background: rgba(27,38,54,.85);
+      margin: 10px 0;
+    }
+
+    .kbd{
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(27,38,54,.9);
+      background: rgba(17,26,38,.7);
+      color: rgba(232,238,247,.85);
+    }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="title">
-      <h1>OFF / Tangent — “Happy Path” Demo <span class="badge" style="color:var(--muted);font-size:12px;margin-left:8px">v0.451.1</span></h1>
-      <div class="subtitle">Visual demo: signal → concierges consider → offers appear → guest accepts → vibe starts → messages appear (real API when keys permit).</div>
-    </div>
-
-    <div class="pill">
-      <div class="dot" id="backendDot"></div>
-      <div class="meta">
-        <b>Backend</b>
-        <span id="backendLine">checking…</span>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="title">
+          OFF / Tangent — “Happy Path” Demo
+          <span class="tag">v0.451.1</span>
+        </div>
+        <div class="subtitle">
+          Visual demo: a guest creates a signal, concierges consider it, offers appear, one is accepted, and a vibe starts.
+          Some market activity is <span class="kbd">demo-simulated</span> so it feels real even with a minimal backend.
+        </div>
       </div>
-      <button id="btnHealth">Check</button>
-    </div>
-  </header>
 
-  <main>
+      <div class="statusbar" role="status" aria-live="polite">
+        <div class="dot" id="healthDot"></div>
+        <div class="statusText">
+          <strong id="healthLabel">Backend</strong>
+          <span id="healthDetail">Not checked yet</span>
+        </div>
+        <button id="btnHealth" class="primary" type="button">Check</button>
+      </div>
+    </header>
+
     <div class="grid">
-      <!-- LEFT: FLOW -->
+      <!-- LEFT: Story -->
       <section class="card">
-        <div class="cardHead">
+        <div class="cardHeader">
           <h2>From Signal to Vibe</h2>
-          <div class="hint">Run the flow. Watch it happen.</div>
+          <div class="tiny">
+            Run the flow. Watch it happen.
+          </div>
         </div>
         <div class="cardBody">
-          <div class="timeline" id="timeline"></div>
-
-          <div class="row" style="margin-top:14px">
-            <button class="btn primary" id="btnSeed">Seed Happy Path</button>
-            <button class="btn primary" id="btnRun">Run Happy Path (visual)</button>
-            <button class="btn ghost" id="btnReset">Reset UI</button>
-            <button class="btn ghost" id="btnUnlock">Unlock UI</button>
+          <div class="stageTitle">
+            <div class="pill" id="stagePill">idle</div>
+            <div class="tiny" id="stageMeta">—</div>
           </div>
 
-          <div class="logBox">
-            <div class="logHead">
-              <span>demo log</span>
-              <button class="btn ghost" id="btnCopy" style="padding:6px 10px; border-radius:10px; font-weight:650; font-size:12px">Copy Log</button>
-            </div>
-            <pre id="log"></pre>
+          <div class="lane" id="lane"></div>
+
+          <div class="acceptRow">
+            <button id="btnSeed" class="primary" type="button">Seed Happy Path</button>
+            <button id="btnRun" class="primary" type="button">Run Happy Path (visual)</button>
+            <button id="btnReset" class="danger" type="button">Reset UI</button>
+          </div>
+
+          <div class="notice">
+            Note: “concierges considering” + extra offers can be simulated for demo energy. The accepted offer and vibe are real API calls.
           </div>
         </div>
       </section>
 
-      <!-- RIGHT: CONFIG -->
+      <!-- RIGHT: Config + Telemetry -->
       <section class="card">
-        <div class="cardHead">
+        <div class="cardHeader">
           <h2>Config & Telemetry</h2>
-          <div class="hint">Paste keys. Save. Ship demos.</div>
+          <div class="tiny">Paste keys. Save. Ship demos.</div>
         </div>
         <div class="cardBody">
-          <div class="field">
-            <label>Backend Base URL</label>
-            <input id="baseUrl" value="https://off-backend.onrender.com" />
-          </div>
-
-          <div class="split" style="margin-top:12px">
-            <div class="field">
-              <label><span class="kdot" id="adminDot"></span> Admin API Key</label>
-              <input class="mono" id="adminKey" type="password" placeholder="(required for /debug/seed)" autocomplete="off" />
+          <div class="row2">
+            <div>
+              <label for="baseUrl">Backend Base URL</label>
+              <input id="baseUrl" placeholder="https://off-backend.onrender.com" />
             </div>
-            <div class="field">
-              <label><span class="kdot" id="guestDot"></span> Guest API Key</label>
-              <input class="mono" id="guestKey" type="password" placeholder="(for real message posts)" autocomplete="off" />
-            </div>
-          </div>
-
-          <div class="split" style="margin-top:12px">
-            <div class="field">
-              <label><span class="kdot" id="conciergeDot"></span> Concierge API Key</label>
-              <input class="mono" id="conciergeKey" type="password" placeholder="(for real offers)" autocomplete="off" />
-            </div>
-            <div class="field">
-              <label>Actor ID (optional)</label>
-              <input class="mono" id="actorId" placeholder="guest_seed / conc_seed" />
+            <div>
+              <label for="demoSpeed">Demo Speed</label>
+              <select id="demoSpeed">
+                <option value="fast">Fast</option>
+                <option value="demo" selected>Demo</option>
+                <option value="slow">Slow</option>
+              </select>
             </div>
           </div>
 
-          <div class="split" style="margin-top:12px">
-            <div class="field">
-              <label>Guest ID</label>
-              <input class="mono" id="guestId" value="guest_seed" />
+          <div class="row2">
+            <div>
+              <label for="adminKey">Admin API Key</label>
+              <input id="adminKey" placeholder="admin token (Bearer… optional)" />
             </div>
-            <div class="field">
-              <label>Concierge ID</label>
-              <input class="mono" id="conciergeId" value="conc_seed" />
-            </div>
-          </div>
-
-          <div class="split" style="margin-top:12px">
-            <div class="field">
-              <label>Signal intent</label>
-              <input id="intent" value="Coffee reset near Fellini" />
-            </div>
-            <div class="field">
-              <label>Location</label>
-              <input id="location" value="Upper West Side" />
+            <div>
+              <label for="guestKey">Guest API Key</label>
+              <input id="guestKey" placeholder="guest token (Bearer… optional)" />
             </div>
           </div>
 
-          <div class="split" style="margin-top:12px">
-            <div class="field">
-              <label>No-go topics (comma separated)</label>
-              <input id="nogos" value="politics, religion, economy" />
+          <div class="row2">
+            <div>
+              <label for="concKey">Concierge API Key</label>
+              <input id="concKey" placeholder="concierge token (Bearer… optional)" />
             </div>
-            <div class="field">
-              <label>Time window</label>
-              <input id="window" value="12:00 → 13:30" />
-            </div>
-          </div>
-
-          <div class="split" style="margin-top:12px">
-            <div class="field">
-              <label>Offer message</label>
-              <input id="offerMsg" value="Calm coffee + short walk. 45 min reset." />
-            </div>
-            <div class="field">
-              <label>Offer bounty ($)</label>
-              <input class="mono" id="bounty" value="20" />
+            <div>
+              <label for="actorId">Actor ID (optional)</label>
+              <input id="actorId" placeholder="guest_seed / conc_seed" />
             </div>
           </div>
 
-          <div class="miniActions">
-            <button class="btn ghost" id="btnSave">Save</button>
-            <button class="btn ghost" id="btnLoad">Load</button>
-            <button class="btn danger" id="btnClear">Clear</button>
+          <div class="row2">
+            <div>
+              <label for="guestId">Guest ID</label>
+              <input id="guestId" placeholder="guest_seed" />
+            </div>
+            <div>
+              <label for="conciergeId">Concierge ID</label>
+              <input id="conciergeId" placeholder="conc_seed" />
+            </div>
           </div>
 
-          <div class="hint" style="margin-top:10px; color:var(--muted2); font-size:12px">
-            Keys are masked (screenshare-safe). Status dots turn green when present.
+          <div class="row2">
+            <div>
+              <label for="intent">Signal intent</label>
+              <input id="intent" placeholder="Coffee reset near Fellini" />
+            </div>
+            <div>
+              <label for="location">Location</label>
+              <input id="location" placeholder="Upper West Side" />
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label for="noGo">No-go topics (comma separated)</label>
+              <input id="noGo" placeholder="politics, religion, economy" />
+            </div>
+            <div>
+              <label for="timeWindow">Time window</label>
+              <input id="timeWindow" placeholder="12:00 → 13:30" />
+            </div>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label for="offerMsg">Offer message</label>
+              <input id="offerMsg" placeholder="Calm coffee + short walk. 45 min." />
+            </div>
+            <div>
+              <label for="offerPrice">Offer bounty ($)</label>
+              <input id="offerPrice" inputmode="numeric" placeholder="20" />
+            </div>
+          </div>
+
+          <div class="acceptRow" style="justify-content:flex-start;">
+            <button id="btnSave" type="button">Save</button>
+            <button id="btnLoad" type="button">Load</button>
+            <button id="btnClear" class="danger" type="button">Clear</button>
+            <button id="btnCopyLog" type="button">Copy Log</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="terminal">
+            <div class="terminalTop">
+              <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="terminalMeta">
+                <span id="runState">idle</span>
+                <span>•</span>
+                <span id="lastReq">—</span>
+              </div>
+            </div>
+            <div class="log" id="log"></div>
+          </div>
+
+          <div class="tiny" style="margin-top:10px;">
+            The telemetry log is there if you want it — but the story is the point.
           </div>
         </div>
       </section>
     </div>
-  </main>
-
-  <div class="toast" id="toast"><b>Copied.</b> Log copied to clipboard.</div>
+  </div>
 
 <script>
-  // ---------- Helpers ----------
+(function(){
+  // ---------- helpers ----------
   const $ = (id) => document.getElementById(id);
+  const lane = $("lane");
+  const logEl = $("log");
+
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const nowTs = () => new Date().toISOString();
+  const nowIso = () => new Date().toISOString();
 
-  function toast(msg="Copied.") {
-    const t = $("toast");
-    t.innerHTML = `<b>${msg}</b>`;
-    t.style.display = "block";
-    setTimeout(() => t.style.display = "none", 1600);
+  function demoDelayMode(){
+    const mode = $("demoSpeed").value;
+    if (mode === "fast") return { step: 160, between: 220 };
+    if (mode === "slow") return { step: 520, between: 560 };
+    return { step: 300, between: 320 }; // demo
   }
 
-  function setDot(el, state){
-    const d = $(el);
-    if(state==="ok"){ d.style.background = "var(--ok)"; d.style.boxShadow="0 0 0 4px rgba(34,197,94,.12)"; }
-    else if(state==="err"){ d.style.background = "var(--err)"; d.style.boxShadow="0 0 0 4px rgba(239,68,68,.12)"; }
-    else { d.style.background = "var(--warn)"; d.style.boxShadow="0 0 0 4px rgba(251,191,36,.10)"; }
+  function setDot(state){
+    const dot = $("healthDot");
+    dot.classList.remove("good","warn","bad");
+    if (state === "good") dot.classList.add("good");
+    else if (state === "warn") dot.classList.add("warn");
+    else if (state === "bad") dot.classList.add("bad");
   }
 
-  function log(line){
-    const pre = $("log");
-    pre.textContent += (pre.textContent ? "\n" : "") + line;
-    pre.scrollTop = pre.scrollHeight;
+  function logLine(text, cls="muted"){
+    const span = document.createElement("span");
+    span.className = cls;
+    span.textContent = text + "\n";
+    logEl.appendChild(span);
+    logEl.scrollTop = logEl.scrollHeight;
   }
 
-  function clearTimeline(){
-    $("timeline").innerHTML = "";
+  function clearLog(){ logEl.innerHTML = ""; }
+  function clearLane(){ lane.innerHTML = ""; }
+
+  function setStage(stage, meta=""){
+    $("stagePill").textContent = stage;
+    $("stageMeta").textContent = meta || "—";
   }
 
-  function step(num, title, detail="", rightPill=null){
-    const el = document.createElement("div");
-    el.className = "step";
-    el.innerHTML = `
-      <div class="badge">${num}</div>
-      <div class="content">
-        <div style="display:flex; justify-content:space-between; gap:10px; align-items:center">
-          <b>${title}</b>
-          ${rightPill ? rightPill : ""}
-        </div>
-        ${detail ? `<small>${detail}</small>` : ""}
+  function updateRunState(s){ $("runState").textContent = s; }
+
+  function normalizeBaseUrl(url){
+    const u = (url || "").trim();
+    if (!u) return "https://off-backend.onrender.com";
+    return u.replace(/\/+$/,"");
+  }
+
+  function bearerHeader(token){
+    const t = (token || "").trim();
+    if (!t) return null;
+    return t.toLowerCase().startsWith("bearer ") ? t : ("Bearer " + t);
+  }
+
+  async function apiFetch(path, { token, method="GET", body=null, idemKey=null, actorId=null } = {}){
+    const baseUrl = normalizeBaseUrl($("baseUrl").value);
+    const url = baseUrl + path;
+
+    const headers = { "Accept":"application/json" };
+    const auth = bearerHeader(token);
+    if (auth) headers["Authorization"] = auth;
+    if (idemKey) headers["Idempotency-Key"] = idemKey;
+    if (actorId) headers["X-Actor-Id"] = actorId;
+    if (body !== null) headers["Content-Type"] = "application/json";
+
+    const res = await fetch(url, { method, headers, body: body !== null ? JSON.stringify(body) : undefined });
+    const replay = res.headers.get("idempotency-replay");
+    const reqId = res.headers.get("x-request-id");
+    const ct = res.headers.get("content-type") || "";
+
+    let data = null;
+    if (ct.includes("application/json")) data = await res.json().catch(()=>null);
+    else data = { raw: await res.text().catch(()=> "") };
+
+    return { ok: res.ok, status: res.status, replay, reqId, data, url };
+  }
+
+  // ---------- UI cards ----------
+  function mkStoryCard(title, badgeText, badgeClass, innerHtml, accent="accent"){
+    const div = document.createElement("div");
+    div.className = "storyCard";
+    div.style.setProperty("--accent", accent);
+    div.innerHTML = `
+      <div class="storyTop">
+        <strong>${title}</strong>
+        <span class="badge ${badgeClass || ""}">${badgeText || ""}</span>
+      </div>
+      <div>${innerHtml}</div>
+    `;
+    lane.appendChild(div);
+    lane.scrollTop = lane.scrollHeight;
+    return div;
+  }
+
+  function kvHtml(pairs){
+    return `
+      <div class="kv">
+        ${pairs.map(([k,v]) => `<b>${k}</b><div>${v}</div>`).join("")}
       </div>
     `;
-    $("timeline").appendChild(el);
-    return el;
   }
 
-  function offerCard(name, msg, price, state="thinking"){
-    const tag =
-      state==="thinking" ? `<span class="tag warn"><span class="pulse"></span>&nbsp;considering</span>` :
-      state==="offered" ? `<span class="tag">offer sent</span>` :
-      state==="accepted" ? `<span class="tag good">accepted</span>` :
-      `<span class="tag bad">${state}</span>`;
+  function conciergeTile({ name, eta, vibe, status="considering", note="" }){
+    const typing = status === "considering"
+      ? `<div class="typing" aria-label="typing"><span></span><span></span><span></span></div>`
+      : ``;
+    const badge = status === "offered"
+      ? `<span class="badge good">offering</span>`
+      : status === "passed"
+      ? `<span class="badge">passed</span>`
+      : `<span class="badge warn">considering</span>`;
 
     return `
-      <div class="offerCard">
-        <div class="top">
-          <b>${name}</b>
-          ${tag}
+      <div class="concierge">
+        <div class="name">
+          <span>${name}</span>
+          ${badge}
         </div>
-        <small>${msg}</small>
-        <small style="margin-top:6px; color:var(--muted2)">bounty: <b style="color:var(--text)">$${price}</b></small>
+        <div class="meta">${eta}</div>
+        <div class="meta">${vibe}</div>
+        ${typing}
+        ${note ? `<div class="meta">“${note}”</div>` : ``}
       </div>
     `;
   }
 
-  function lockUI(locked){
-    const lockedEls = ["btnSeed","btnRun"];
-    lockedEls.forEach(id => { $(id).disabled = locked; });
-    if(locked){
-      log(`[ui] locked (seed/run disabled)`);
-    } else {
-      log(`[ui] unlocked`);
-    }
+  function offerHtml({ who, price, msg, simulated=false }){
+    return `
+      <div class="offer">
+        <div class="top">
+          <strong>${who}</strong>
+          <span class="badge ${simulated ? "warn" : "good"}">${simulated ? "demo-sim" : "real"}</span>
+        </div>
+        <div class="msg">${msg}</div>
+        <div class="sub">bounty: <b>$${price}</b> • ${simulated ? "simulated offer for demo energy" : "created via API"}</div>
+      </div>
+    `;
   }
 
-  function keyPresent(v){ return typeof v === "string" && v.trim().length > 0; }
+  // ---------- state ----------
+  const run = {
+    signal: null,
+    offer: null,
+    vibe: null
+  };
 
-  function refreshKeyDots(){
-    setDot("adminDot", keyPresent($("adminKey").value) ? "ok" : "warn");
-    setDot("guestDot", keyPresent($("guestKey").value) ? "ok" : "warn");
-    setDot("conciergeDot", keyPresent($("conciergeKey").value) ? "ok" : "warn");
-  }
-
-  // ---------- Health ----------
-  async function checkHealth(){
-    const base = $("baseUrl").value.trim().replace(/\/+$/,"");
-    setDot("backendDot","warn");
-    $("backendLine").textContent = "checking…";
-    try{
-      const t0 = performance.now();
-      const res = await fetch(`${base}/health`, { method:"GET" });
-      const ms = Math.round(performance.now()-t0);
-      if(!res.ok) throw new Error("bad status");
-      const data = await res.json();
-      setDot("backendDot","ok");
-      $("backendLine").textContent = `ok • ${ms}ms • uptime ${Math.floor(data.uptime)}s`;
-      log(`[health] ok (${ms}ms) uptime=${Math.floor(data.uptime)}s`);
-    }catch(e){
-      setDot("backendDot","err");
-      $("backendLine").textContent = `unreachable`;
-      log(`[health] unreachable`);
-    }
-  }
-
-  // ---------- API ----------
-  function headersFor(role){
-    const h = { "Content-Type":"application/json" };
-    const actor = $("actorId").value.trim();
-    if(actor) h["X-Actor-Id"] = actor;
-
-    if(role==="admin" && keyPresent($("adminKey").value)) h["Authorization"] = `Bearer ${$("adminKey").value.trim()}`;
-    if(role==="guest" && keyPresent($("guestKey").value)) h["Authorization"] = `Bearer ${$("guestKey").value.trim()}`;
-    if(role==="concierge" && keyPresent($("conciergeKey").value)) h["Authorization"] = `Bearer ${$("conciergeKey").value.trim()}`;
-    return h;
-  }
-
-  async function post(path, body, role, idemKey=null){
-    const base = $("baseUrl").value.trim().replace(/\/+$/,"");
-    const h = headersFor(role);
-    if(idemKey) h["Idempotency-Key"] = idemKey;
-    const url = `${base}${path}`;
-    log(`${role.toUpperCase()} POST ${path}${idemKey ? ` (Idem: ${idemKey})` : ""}`);
-    const res = await fetch(url, { method:"POST", headers:h, body: JSON.stringify(body || {}) });
-    const txt = await res.text();
-    let data = null;
-    try{ data = JSON.parse(txt); }catch{ data = { raw: txt }; }
-    log(`→ ${res.status} ${res.statusText} • ${data?.request_id ? "rid="+data.request_id : ""}`);
-    return { ok: res.ok, status: res.status, data };
-  }
-
-  // ---------- Demo Flow ----------
-  async function seedHappyPath(){
-    clearTimeline();
-    step(0, "Seeding", "Resetting store + inserting a ready-to-run scene…", `<span class="statusPill"><span class="pulse"></span> working</span>`);
-    await sleep(450);
-
-    const r = await post("/debug/seed", {}, "admin", `seed-${Date.now()}`);
-    if(!r.ok){
-      step("!", "Seed failed", `HTTP ${r.status}. If 401: add Admin key. If Failed to fetch: check CORS + base URL.`);
-      log(`[seed] failed`);
-      return { ok:false };
-    }
-
-    step(1, "Seeded", "Guest + Concierge + Signal + Offer + Vibe inserted. Ready to run.", `<span class="statusPill" style="color:#c7f9d2;border-color:rgba(34,197,94,.35)"><span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> ready</span>`);
-    log(`[seed] ok • ids: ${JSON.stringify(r.data?.ids || {})}`);
-    return { ok:true, ids: r.data?.ids || {} };
-  }
-
-  async function runHappyPathVisual(){
-    clearTimeline();
-
-    const intent = $("intent").value.trim() || "Coffee reset";
-    const loc = $("location").value.trim() || "Upper West Side";
-    const nogos = $("nogos").value.trim() || "politics, religion";
-    const window = $("window").value.trim() || "now → +90m";
-
-    // Step 1: Signal card
-    const s1 = step(1, "Guest creates a signal",
-      `“${intent}” • ${loc} • time window: ${window} • no-go: ${nogos}`,
-      `<span class="statusPill"><span class="pulse"></span> sending</span>`
-    );
-    await sleep(650);
-
-    // Optional real POST /signals (guest key required)
-    // If no guest key, we still animate.
-    let signalId = null;
-    if(keyPresent($("guestKey").value)){
-      const body = {
-        guest_id: $("guestId").value.trim() || "guest_seed",
-        intent,
-        location: loc,
-        metadata: { no_go_topics: nogos.split(",").map(s=>s.trim()).filter(Boolean), time_window: window }
-      };
-      const rr = await post("/signals", body, "guest", `sig-${Date.now()}`);
-      if(rr.ok) signalId = rr.data?.signal?.id || null;
-    }
-    s1.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> created`;
-    await sleep(450);
-
-    // Step 2: Concierges consider
-    const s2 = step(2, "Concierges consider the signal",
-      "Three nearby concierges skim the intent, location, and constraints. They decide if they can fulfill it.",
-      `<span class="statusPill"><span class="pulse"></span> evaluating</span>`
-    );
-    const offersWrap = document.createElement("div");
-    offersWrap.className = "offersRow";
-    offersWrap.innerHTML =
-      offerCard("Concierge Maya", "I can do a calm coffee + walk loop. Keep it light.", 20, "thinking") +
-      offerCard("Concierge Leo", "Fellini is great. Quick reset, low-stim, good vibe.", 18, "thinking") +
-      offerCard("Concierge Nina", "I’m close — can guide the ‘best table / best moment’ experience.", 22, "thinking");
-    s2.querySelector(".content").appendChild(offersWrap);
-    await sleep(900);
-
-    // Step 3: Offer appears (real POST /offers if concierge key present)
-    const offerMsg = $("offerMsg").value.trim() || "Calm coffee + short walk. 45 min reset.";
-    const bounty = Number(($("bounty").value || "20").trim()) || 20;
-    let offerId = null;
-
-    // Animate: one concierge makes the offer
-    offersWrap.children[0].querySelector(".tag").className = "tag";
-    offersWrap.children[0].querySelector(".tag").textContent = "offer drafted…";
-    await sleep(650);
-
-    if(keyPresent($("conciergeKey").value)){
-      const body = {
-        signal_id: signalId || "sig_seed_001",
-        concierge_id: $("conciergeId").value.trim() || "conc_seed",
-        message: offerMsg,
-        price: bounty,
-        metadata: { demo: true }
-      };
-      const rr = await post("/offers", body, "concierge", `off-${Date.now()}`);
-      if(rr.ok) offerId = rr.data?.offer?.id || null;
-    }
-
-    offersWrap.children[0].querySelector(".tag").className = "tag";
-    offersWrap.children[0].querySelector(".tag").textContent = "offer sent";
-    s2.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> offers visible`;
-    await sleep(550);
-
-    // Step 4: Guest accepts (prefer /offers/:id/accept when available, else /matches/accept)
-    const s3 = step(3, "Guest accepts an offer",
-      "Guest picks the best fit based on vibe, clarity, and constraints. Accepting creates an active vibe.",
-      `<span class="statusPill"><span class="pulse"></span> accepting</span>`
-    );
-    await sleep(650);
-
-    let vibeId = null;
-    const guest_id = $("guestId").value.trim() || "guest_seed";
-
-    // Try the nicer accept route first if we have offerId
-    if(keyPresent($("guestKey").value)){
-      if(offerId){
-        // /offers/:offer_id/accept (your offers.js supports this)
-        const rr = await post(`/offers/${encodeURIComponent(offerId)}/accept`, { guest_id }, "guest", `acc-${Date.now()}`);
-        if(rr.ok) vibeId = rr.data?.vibe?.id || null;
-        else {
-          // fallback /matches/accept expects { offer_id }
-          const rr2 = await post(`/matches/accept`, { offer_id: offerId }, "guest", `macc-${Date.now()}`);
-          if(rr2.ok) vibeId = rr2.data?.vibe?.id || null;
-        }
-      } else {
-        // If no offerId, just keep it cinematic
-        await sleep(400);
-      }
-    }
-
-    offersWrap.children[0].querySelector(".tag").className = "tag good";
-    offersWrap.children[0].querySelector(".tag").textContent = "accepted";
-    s3.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> vibe created`;
-    await sleep(550);
-
-    // Step 5: Messages appear (real POST /messages when guest key present)
-    const vib = vibeId || "vib_seed_001";
-    const s4 = step(4, "Vibe starts — messages appear",
-      `A shared offline moment is now “active.” Messaging is open for small coordination (time/place). vibe_id: ${vib}`,
-      `<span class="statusPill"><span class="pulse"></span> messaging</span>`
-    );
-    await sleep(650);
-
-    const msgs = document.createElement("div");
-    msgs.className = "offersRow";
-    msgs.innerHTML =
-      `<div class="offerCard" style="flex:1 1 320px">
-        <div class="top"><b>${guest_id}</b><span class="tag">guest</span></div>
-        <small>“yo — Fellini sounds perfect. meet at 12:05?”</small>
-        <small style="margin-top:6px;color:var(--muted2)">${nowTs()}</small>
-      </div>` +
-      `<div class="offerCard" style="flex:1 1 320px">
-        <div class="top"><b>${$("conciergeId").value.trim() || "conc_seed"}</b><span class="tag">concierge</span></div>
-        <small>“yes. i’ll grab us a quiet corner table.”</small>
-        <small style="margin-top:6px;color:var(--muted2)">${nowTs()}</small>
-      </div>`;
-    s4.querySelector(".content").appendChild(msgs);
-
-    if(keyPresent($("guestKey").value)){
-      await post("/messages",
-        { vibe_id: vib, from_role:"guest", from_id: guest_id, text:"yo — Fellini sounds perfect. meet at 12:05?" },
-        "guest",
-        `msg-g-${Date.now()}`
-      );
-    }
-
-    s4.querySelector(".statusPill").innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span> active`;
-    log(`[run] completed (vibe_id=${vib})`);
-  }
-
-  // ---------- Persistence (localStorage) ----------
-  const STORAGE_KEY = "off_demo_config_v1";
-  function saveConfig(){
-    const data = {
+  function readInputs(){
+    return {
       baseUrl: $("baseUrl").value,
       adminKey: $("adminKey").value,
       guestKey: $("guestKey").value,
-      conciergeKey: $("conciergeKey").value,
+      concKey: $("concKey").value,
       actorId: $("actorId").value,
-      guestId: $("guestId").value,
-      conciergeId: $("conciergeId").value,
-      intent: $("intent").value,
-      location: $("location").value,
-      nogos: $("nogos").value,
-      window: $("window").value,
-      offerMsg: $("offerMsg").value,
-      bounty: $("bounty").value,
+      guestId: $("guestId").value || "guest_seed",
+      conciergeId: $("conciergeId").value || "conc_seed",
+      intent: $("intent").value || "Coffee reset",
+      location: $("location").value || "NYC",
+      noGo: $("noGo").value || "politics, religion, economy",
+      timeWindow: $("timeWindow").value || "12:00 → 13:30",
+      offerMsg: $("offerMsg").value || "Calm coffee + short walk.",
+      offerPrice: $("offerPrice").value || "20"
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    log(`[cfg] saved`);
-    toast("Saved.");
-    refreshKeyDots();
   }
-  function loadConfig(){
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw){ toast("No saved config."); return; }
+
+  function defaultState(){
+    return {
+      baseUrl: "https://off-backend.onrender.com",
+      adminKey: "",
+      guestKey: "",
+      concKey: "",
+      actorId: "",
+      guestId: "guest_seed",
+      conciergeId: "conc_seed",
+      intent: "Coffee reset near Fellini",
+      location: "Upper West Side",
+      noGo: "politics, religion, economy",
+      timeWindow: "12:00 → 13:30",
+      offerMsg: "Calm coffee + short walk. 45 min.",
+      offerPrice: "20"
+    };
+  }
+
+  function applyInputs(st){
+    $("baseUrl").value = st.baseUrl ?? "";
+    $("adminKey").value = st.adminKey ?? "";
+    $("guestKey").value = st.guestKey ?? "";
+    $("concKey").value  = st.concKey ?? "";
+    $("actorId").value  = st.actorId ?? "";
+    $("guestId").value  = st.guestId ?? "";
+    $("conciergeId").value = st.conciergeId ?? "";
+    $("intent").value = st.intent ?? "";
+    $("location").value = st.location ?? "";
+    $("noGo").value = st.noGo ?? "";
+    $("timeWindow").value = st.timeWindow ?? "";
+    $("offerMsg").value = st.offerMsg ?? "";
+    $("offerPrice").value = st.offerPrice ?? "";
+  }
+
+  function saveState(){
+    localStorage.setItem("off_demo_state_v2", JSON.stringify(readInputs()));
+    logLine(`[ui] saved (${nowIso()})`, "accent");
+  }
+  function loadState(){
+    const raw = localStorage.getItem("off_demo_state_v2");
+    if (!raw) { logLine("[ui] nothing saved yet", "warn"); return; }
+    try { applyInputs(JSON.parse(raw)); logLine(`[ui] loaded (${nowIso()})`, "accent"); }
+    catch { logLine("[ui] save corrupt", "bad"); }
+  }
+  function clearState(){
+    localStorage.removeItem("off_demo_state_v2");
+    applyInputs(defaultState());
+    logLine(`[ui] cleared (${nowIso()})`, "warn");
+  }
+
+  // ---------- health ----------
+  async function checkHealth(){
+    $("healthDetail").textContent = "Checking…";
+    setDot("warn");
+    const baseUrl = normalizeBaseUrl($("baseUrl").value);
+
+    const started = performance.now();
     try{
-      const d = JSON.parse(raw);
-      Object.entries(d).forEach(([k,v]) => { if($(k)) $(k).value = v; });
-      log(`[cfg] loaded`);
-      toast("Loaded.");
-      refreshKeyDots();
-    }catch{
-      toast("Load failed.");
+      const res = await fetch(baseUrl + "/health", { method:"GET" });
+      const ms = Math.round(performance.now() - started);
+      if (!res.ok){
+        setDot("bad");
+        $("healthDetail").textContent = `HTTP ${res.status} • ${ms}ms`;
+        return;
+      }
+      const data = await res.json().catch(()=> ({}));
+      setDot("good");
+      $("healthDetail").textContent = `ok • ${ms}ms • uptime ${Math.round(data.uptime||0)}s`;
+    } catch {
+      setDot("bad");
+      $("healthDetail").textContent = "unreachable";
     }
   }
-  function clearConfig(){
-    localStorage.removeItem(STORAGE_KEY);
-    ["adminKey","guestKey","conciergeKey"].forEach(k => $(k).value = "");
-    log(`[cfg] cleared`);
-    toast("Cleared.");
-    refreshKeyDots();
+
+  // ---------- flow ----------
+  function lockUi(lock){
+    ["btnSeed","btnRun","btnReset","btnHealth"].forEach(id => $(id).disabled = lock);
   }
 
-  // ---------- Wire up ----------
-  function resetUI(){
-    clearTimeline();
-    $("log").textContent = "";
-    step(0, "Ready", "Seed to create a known scene, or run the visual happy path. Real API calls happen when keys are present.",
-      `<span class="statusPill"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent2)"></span> idle</span>`);
-    refreshKeyDots();
+  function fmtId(id){
+    if (!id) return "—";
+    return id.length > 22 ? (id.slice(0, 10) + "…" + id.slice(-8)) : id;
   }
 
-  $("btnHealth").onclick = checkHealth;
-  $("btnSeed").onclick = async () => { lockUI(true); await seedHappyPath(); lockUI(false); };
-  $("btnRun").onclick  = async () => { lockUI(true); await runHappyPathVisual(); lockUI(false); };
-  $("btnReset").onclick = resetUI;
-  $("btnUnlock").onclick = () => lockUI(false);
-  $("btnCopy").onclick = async () => {
-    try{
-      await navigator.clipboard.writeText($("log").textContent || "");
-      toast("Copied.");
-      log(`[ui] copied log`);
-    }catch{
-      toast("Copy failed.");
+  async function seedHappyPath(){
+    clearLane(); clearLog();
+    setStage("seeding", "Reset store + insert scene");
+    updateRunState("seeding");
+    lockUi(true);
+
+    const st = readInputs();
+    const actorId = (st.actorId || "").trim() || null;
+
+    logLine("POST /debug/seed", "accent");
+    const resp = await apiFetch("/debug/seed", {
+      token: st.adminKey,
+      method: "POST",
+      idemKey: "ui-seed-001",
+      actorId
+    });
+
+    $("lastReq").textContent = resp.reqId || "—";
+
+    if (!resp.ok){
+      setStage("error", `seed failed (HTTP ${resp.status})`);
+      updateRunState("error");
+      logLine(JSON.stringify(resp.data, null, 2), "bad");
+      mkStoryCard("Seed failed", "error", "bad",
+        `<div class="tiny">HTTP ${resp.status}. Check admin key + CORS + base URL.</div>`
+      );
+      lockUi(false);
+      return;
     }
-  };
 
-  $("btnSave").onclick = saveConfig;
-  $("btnLoad").onclick = loadConfig;
-  $("btnClear").onclick = clearConfig;
+    run.signal = { id: resp.data?.ids?.signal_id || null, intent: "Seeded signal", location:"—" };
+    run.offer  = { id: resp.data?.ids?.offer_id || null };
+    run.vibe   = { id: resp.data?.ids?.vibe_id || null };
 
-  ["adminKey","guestKey","conciergeKey"].forEach(id=>{
-    $(id).addEventListener("input", refreshKeyDots);
-  });
+    mkStoryCard("Store seeded", "ok", "good",
+      kvHtml([
+        ["signal_id", fmtId(run.signal.id)],
+        ["offer_id", fmtId(run.offer.id)],
+        ["vibe_id", fmtId(run.vibe.id)]
+      ])
+    );
 
-  // Initialize
-  resetUI();
-  checkHealth();
+    setStage("ready", "Try: Run Happy Path (visual)");
+    updateRunState("ready");
+    lockUi(false);
+  }
+
+  async function runHappyPathVisual(){
+    clearLane(); clearLog();
+    lockUi(true);
+
+    const st = readInputs();
+    const actorId = (st.actorId || "").trim() || null;
+    const { step, between } = demoDelayMode();
+    setStage("running", "Signal → Concierge consideration → Offers → Vibe");
+    updateRunState("running");
+
+    // 1) Create signal (real)
+    logLine("POST /signals", "accent");
+    const sigResp = await apiFetch("/signals", {
+      token: st.guestKey,
+      method:"POST",
+      idemKey: "ui-signal-001",
+      actorId,
+      body: {
+        guest_id: st.guestId.trim(),
+        intent: st.intent.trim(),
+        location: st.location.trim(),
+        metadata: {
+          time_window: st.timeWindow.trim(),
+          no_go_topics: st.noGo.split(",").map(s=>s.trim()).filter(Boolean)
+        }
+      }
+    });
+    $("lastReq").textContent = sigResp.reqId || "—";
+
+    if (!sigResp.ok){
+      setStage("error", `signal failed (HTTP ${sigResp.status})`);
+      updateRunState("error");
+      logLine(JSON.stringify(sigResp.data, null, 2), "bad");
+      mkStoryCard("Signal creation failed", "error", "bad",
+        `<div class="tiny">HTTP ${sigResp.status}. Check guest key + request body.</div>`
+      );
+      lockUi(false);
+      return;
+    }
+
+    run.signal = sigResp.data?.signal || null;
+
+    mkStoryCard("Signal created", "real", "good",
+      kvHtml([
+        ["intent", `<b>${escapeHtml(run.signal.intent || "")}</b>`],
+        ["location", escapeHtml(run.signal.location || "—")],
+        ["time", escapeHtml(st.timeWindow)],
+        ["no-go", escapeHtml(st.noGo)]
+      ]) +
+      `<div class="tiny">signal_id: <span class="kbd">${escapeHtml(run.signal.id)}</span></div>`
+    );
+
+    await sleep(between);
+
+    // 2) Concierge consideration (demo-sim)
+    const concNames = [
+      { name:"Maya (UWS)", eta:"ETA: 6 min", vibe:"vibe: calm + premium", note:"I know a quiet corner spot." },
+      { name:"Jordan (Runner)", eta:"ETA: 9 min", vibe:"vibe: active + grounded", note:"Short walk after coffee?" },
+      { name:"Eli (Insider)", eta:"ETA: 7 min", vibe:"vibe: local tips", note:"Knows the fast ordering flow." },
+      { name:"Sam (Low-key)", eta:"ETA: 11 min", vibe:"vibe: gentle reset", note:"Can keep it light + simple." }
+    ];
+
+    const concCard = mkStoryCard("Concierges considering", "demo-sim", "warn",
+      `<div class="conciergeRow" id="concRow"></div>
+       <div class="tiny">Simulated presence to make the marketplace feel alive.</div>`
+    );
+
+    const concRow = concCard.querySelector("#concRow");
+    concNames.slice(0, 3).forEach((c)=> {
+      const div = document.createElement("div");
+      div.innerHTML = conciergeTile({ ...c, status:"considering" });
+      concRow.appendChild(div.firstElementChild);
+    });
+
+    await sleep(step);
+
+    // update one concierge to “offering”
+    concRow.children[1].innerHTML = conciergeTile({ ...concNames[1], status:"offered" });
+    await sleep(step);
+
+    concRow.appendChild((() => {
+      const wrap = document.createElement("div");
+      wrap.innerHTML = conciergeTile({ ...concNames[3], status:"considering" });
+      return wrap.firstElementChild;
+    })());
+
+    await sleep(between);
+
+    // 3) Offers appear (1 real + 1–2 simulated)
+    const offerCard = mkStoryCard("Offers received", "mixed", "warn",
+      `<div class="offerStack" id="offerStack"></div>
+       <div class="tiny">Real offer is created via API. Extra offers can be simulated for demo richness.</div>`
+    );
+    const offerStack = offerCard.querySelector("#offerStack");
+
+    // 3a) Create real offer (concierge) via API
+    logLine("POST /offers", "accent");
+    const price = Number(st.offerPrice.trim());
+    const offResp = await apiFetch("/offers", {
+      token: st.concKey,
+      method:"POST",
+      idemKey: "ui-offer-001",
+      actorId,
+      body: {
+        signal_id: run.signal.id,
+        concierge_id: st.conciergeId.trim(),
+        message: st.offerMsg.trim(),
+        price: Number.isFinite(price) ? price : 20
+      }
+    });
+    $("lastReq").textContent = offResp.reqId || "—";
+
+    if (!offResp.ok){
+      setStage("error", `offer failed (HTTP ${offResp.status})`);
+      updateRunState("error");
+      logLine(JSON.stringify(offResp.data, null, 2), "bad");
+      mkStoryCard("Offer creation failed", "error", "bad",
+        `<div class="tiny">HTTP ${offResp.status}. Check concierge key + concierge_id + signal_id.</div>`
+      );
+      lockUi(false);
+      return;
+    }
+
+    run.offer = offResp.data?.offer || null;
+
+    // insert a simulated offer first (so it looks dynamic), then real, then another sim
+    offerStack.insertAdjacentHTML("beforeend",
+      offerHtml({ who:"Maya (UWS)", price: 18, msg:"Quiet table + fast flow. 45 minutes. Keep it light.", simulated:true })
+    );
+    await sleep(step);
+
+    offerStack.insertAdjacentHTML("beforeend",
+      offerHtml({ who: escapeHtml(st.conciergeId) + " (you)", price: Number.isFinite(price)? price : 20, msg: escapeHtml(st.offerMsg), simulated:false })
+    );
+    await sleep(step);
+
+    offerStack.insertAdjacentHTML("beforeend",
+      offerHtml({ who:"Eli (Insider)", price: 22, msg:"Best-order hack + calm corner. I’ll guide the flow.", simulated:true })
+    );
+
+    await sleep(between);
+
+    // 4) Accept (real) – button in-story
+    const acceptCard = mkStoryCard("Guest chooses", "action", "warn",
+      `<div class="tiny">Click accept to lock in the vibe.</div>
+       <div class="acceptRow" style="justify-content:flex-end;">
+         <button id="acceptBtn" class="primary" type="button">Accept offer → Create vibe</button>
+       </div>`
+    );
+
+    const acceptBtn = acceptCard.querySelector("#acceptBtn");
+    acceptBtn.addEventListener("click", async () => {
+      acceptBtn.disabled = true;
+      setStage("accepting", "Creating vibe…");
+      updateRunState("accepting");
+      logLine("POST /offers/:id/accept", "accent");
+
+      const accResp = await apiFetch(`/offers/${encodeURIComponent(run.offer.id)}/accept`, {
+        token: st.guestKey,
+        method:"POST",
+        idemKey: "ui-accept-001",
+        actorId,
+        body: { guest_id: st.guestId.trim() }
+      });
+      $("lastReq").textContent = accResp.reqId || "—";
+
+      if (!accResp.ok){
+        setStage("error", `accept failed (HTTP ${accResp.status})`);
+        updateRunState("error");
+        logLine(JSON.stringify(accResp.data, null, 2), "bad");
+        mkStoryCard("Accept failed", "error", "bad",
+          `<div class="tiny">HTTP ${accResp.status}. Likely mismatch guest_id vs signal owner, or offer already accepted.</div>`
+        );
+        lockUi(false);
+        return;
+      }
+
+      run.vibe = accResp.data?.vibe || null;
+
+      mkStoryCard("Vibe created", "real", "good",
+        kvHtml([
+          ["vibe_id", `<span class="kbd">${escapeHtml(run.vibe.id)}</span>`],
+          ["guest", escapeHtml(run.vibe.guest_id || st.guestId)],
+          ["concierge", escapeHtml(run.vibe.concierge_id || st.conciergeId)],
+          ["status", `<b>${escapeHtml(run.vibe.status || "active")}</b>`]
+        ])
+      );
+
+      await sleep(step);
+
+      mkStoryCard("Conversation begins", "demo", "warn",
+        `<div class="tiny">Next: we can wire this to <span class="kbd">/messages</span> for real chat bubbles.</div>
+         <div class="offerStack">
+           <div class="offer">
+             <div class="top"><strong>guest</strong><span class="badge good">real (optional)</span></div>
+             <div class="msg">“Perfect. Let’s keep it calm — no heavy topics.”</div>
+             <div class="sub">Demo bubble (we can make these real messages next).</div>
+           </div>
+           <div class="offer">
+             <div class="top"><strong>concierge</strong><span class="badge good">real (optional)</span></div>
+             <div class="msg">“Done. I’ll meet you out front in 6 minutes.”</div>
+             <div class="sub">Demo bubble (we can make these real messages next).</div>
+           </div>
+         </div>`
+      );
+
+      setStage("done", "Happy Path complete");
+      updateRunState("done");
+      lockUi(false);
+    });
+
+    setStage("ready", "Review offers → Accept to create vibe");
+    updateRunState("ready");
+    lockUi(false);
+  }
+
+  // escape helper
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ---------- reset ----------
+  function resetUi(){
+    clearLane();
+    clearLog();
+    setStage("idle", "");
+    updateRunState("idle");
+    logLine("[ui] reset", "warn");
+  }
+
+  // ---------- init ----------
+  function init(){
+    applyInputs(defaultState());
+    loadState();
+    $("baseUrl").value = normalizeBaseUrl($("baseUrl").value);
+
+    $("btnHealth").addEventListener("click", checkHealth);
+    $("btnSeed").addEventListener("click", seedHappyPath);
+    $("btnRun").addEventListener("click", runHappyPathVisual);
+    $("btnReset").addEventListener("click", resetUi);
+
+    $("btnSave").addEventListener("click", saveState);
+    $("btnLoad").addEventListener("click", loadState);
+    $("btnClear").addEventListener("click", clearState);
+
+    $("btnCopyLog").addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(logEl.innerText || "");
+        logLine("[ui] copied log", "good");
+      } catch {
+        logLine("[ui] clipboard blocked", "warn");
+      }
+    });
+
+    // gentle alive pulse
+    setInterval(() => {
+      if (document.hidden) return;
+      checkHealth();
+    }, 30000);
+
+    checkHealth();
+    setStage("idle", "Seed or Run");
+    logLine("[ui] ready", "muted");
+  }
+
+  init();
+})();
 </script>
 </body>
 </html>

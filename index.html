@@ -1,253 +1,1016 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>OFF — Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OFF / Tangent — Demo Console</title>
+  <meta name="description" content="OFF / Tangent demo console (Happy Path: Signal → Offer → Vibe)" />
 
   <style>
-    :root {
-      --bg: #0f1115;
-      --panel: #151821;
-      --text: #e6e8ee;
-      --muted: #8b90a0;
-      --accent: #7cf2c2;
-      --danger: #ff6b6b;
-      --code: #9aa0b3;
+    :root{
+      --bg:#0b0f14;
+      --card:#0f1620;
+      --card2:#0c131c;
+      --text:#e8eef7;
+      --muted:#98a6b8;
+      --line:#1b2636;
+      --accent:#7dd3fc;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --chip:#111a26;
+      --shadow: 0 12px 40px rgba(0,0,0,.45);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      padding: 32px 16px;
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 700px at 20% -10%, rgba(125,211,252,.10), transparent 60%),
+        radial-gradient(900px 600px at 90% 0%, rgba(52,211,153,.08), transparent 55%),
+        radial-gradient(1200px 700px at 50% 110%, rgba(251,113,133,.06), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      font-family: var(--sans);
+      letter-spacing: .1px;
     }
 
-    .app {
-      width: 100%;
-      max-width: 860px;
-      background: var(--panel);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    .wrap{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 24px 18px 80px;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin: 10px 0 18px;
     }
 
-    h1 {
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight: 700;
       font-size: 20px;
-      font-weight: 600;
-      letter-spacing: 0.2px;
+      letter-spacing: .2px;
     }
 
-    .health {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .subtitle{
+      color: var(--muted);
       font-size: 13px;
-      color: var(--muted);
+      max-width: 720px;
+      line-height: 1.35;
     }
 
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #666;
-      box-shadow: 0 0 0 rgba(0,0,0,0);
-      transition: background 0.3s;
-    }
-
-    .dot.ok {
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(124,242,194,0.6);
-    }
-
-    .dot.bad {
-      background: var(--danger);
-      box-shadow: 0 0 12px rgba(255,107,107,0.6);
-    }
-
-    .section {
-      margin-bottom: 28px;
-    }
-
-    .section h2 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--muted);
-      letter-spacing: 0.3px;
-    }
-
-    button {
-      appearance: none;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 16px;
-      background: var(--accent);
-      color: #0b0e13;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.05s ease, opacity 0.15s ease;
-    }
-
-    button:active {
-      transform: translateY(1px);
-      opacity: 0.9;
-    }
-
-    .log {
-      background: #0b0d12;
-      border-radius: 12px;
-      padding: 12px;
-      height: 180px;
-      overflow: hidden;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 11px;
-      color: var(--code);
-      line-height: 1.4;
-    }
-
-    .log-line {
+    .statusbar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      background: rgba(15,22,32,.7);
+      border: 1px solid rgba(27,38,54,.8);
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
       white-space: nowrap;
-      opacity: 0.85;
     }
 
-    .log-line.ok { color: #7cf2c2; }
-    .log-line.warn { color: #f2c97c; }
-    .log-line.err { color: #ff8a8a; }
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius: 999px;
+      background: var(--muted);
+      box-shadow: 0 0 0 0 rgba(152,166,184,.0);
+    }
+    .dot.good{
+      background: var(--good);
+      box-shadow: 0 0 0 6px rgba(52,211,153,.10);
+    }
+    .dot.warn{
+      background: var(--warn);
+      box-shadow: 0 0 0 6px rgba(251,191,36,.10);
+    }
+    .dot.bad{
+      background: var(--bad);
+      box-shadow: 0 0 0 6px rgba(251,113,133,.10);
+    }
 
-    footer {
-      margin-top: 24px;
+    .statusText{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      line-height: 1.2;
+    }
+    .statusText strong{
       font-size: 12px;
+    }
+    .statusText span{
+      font-size: 11px;
       color: var(--muted);
-      text-align: right;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      header{ flex-direction: column; align-items: stretch; }
+      .statusbar{ justify-content: space-between; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(15,22,32,.9), rgba(12,19,28,.9));
+      border: 1px solid rgba(27,38,54,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .cardHeader{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(27,38,54,.85);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .cardHeader h2{
+      margin:0;
+      font-size: 13px;
+      letter-spacing: .25px;
+      text-transform: uppercase;
+      color: rgba(232,238,247,.9);
+    }
+
+    .cardBody{
+      padding: 14px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 540px){
+      .row{ grid-template-columns: 1fr; }
+    }
+
+    label{
+      display:block;
+      font-size: 11px;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(27,38,54,.95);
+      background: rgba(11,15,20,.65);
+      color: var(--text);
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+
+    textarea{
+      min-height: 84px;
+      resize: vertical;
+      font-family: var(--sans);
+      line-height: 1.35;
+    }
+
+    .btnRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button{
+      border: 1px solid rgba(27,38,54,.95);
+      background: rgba(17,26,38,.85);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 12px;
+      letter-spacing: .2px;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+    }
+    button:hover{ transform: translateY(-1px); border-color: rgba(125,211,252,.35); }
+    button:active{ transform: translateY(0px); }
+    button.primary{
+      background: rgba(125,211,252,.12);
+      border-color: rgba(125,211,252,.35);
+    }
+    button.danger{
+      background: rgba(251,113,133,.10);
+      border-color: rgba(251,113,133,.35);
+    }
+    button:disabled{
+      opacity: .55;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .chips{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .chip{
+      font-family: var(--mono);
+      font-size: 11px;
+      background: rgba(17,26,38,.75);
+      border: 1px solid rgba(27,38,54,.85);
+      color: rgba(232,238,247,.9);
+      padding: 7px 10px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      max-width: 100%;
+    }
+    .chip b{
+      font-family: var(--sans);
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 650;
+    }
+    .chip .val{
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 420px;
+    }
+
+    .tiny{
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .terminal{
+      background: rgba(8,11,16,.70);
+      border: 1px solid rgba(27,38,54,.85);
+      border-radius: 16px;
+      padding: 12px 12px 10px;
+      overflow:hidden;
+    }
+
+    .terminalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .dots{
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .dots span{
+      width: 9px; height: 9px; border-radius: 999px;
+      background: rgba(152,166,184,.35);
+    }
+    .dots span:nth-child(1){ background: rgba(251,113,133,.55); }
+    .dots span:nth-child(2){ background: rgba(251,191,36,.55); }
+    .dots span:nth-child(3){ background: rgba(52,211,153,.55); }
+
+    .terminalMeta{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .log{
+      font-family: var(--mono);
+      font-size: 7px; /* 👈 tiny by default; user asked 6–8 */
+      line-height: 1.45;
+      color: rgba(232,238,247,.82);
+      height: 320px;
+      overflow:auto;
+      padding-right: 6px;
+      white-space: pre-wrap;
+    }
+    .log .muted{ color: rgba(152,166,184,.75); }
+    .log .good{ color: rgba(52,211,153,.92); }
+    .log .warn{ color: rgba(251,191,36,.92); }
+    .log .bad{ color: rgba(251,113,133,.92); }
+    .log .accent{ color: rgba(125,211,252,.92); }
+
+    .footerNote{
+      margin-top: 14px;
+      font-size: 11px;
+      color: rgba(152,166,184,.9);
+      line-height: 1.35;
+    }
+    .kbd{
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(27,38,54,.9);
+      background: rgba(17,26,38,.7);
+      color: rgba(232,238,247,.85);
+    }
+
+    .inlineLink{
+      color: rgba(125,211,252,.95);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(125,211,252,.45);
+    }
+    .inlineLink:hover{ border-bottom-style: solid; }
+
+    .pill{
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(232,238,247,.8);
+      background: rgba(17,26,38,.55);
+      border: 1px solid rgba(27,38,54,.85);
+      padding: 5px 8px;
+      border-radius: 999px;
     }
   </style>
 </head>
 
 <body>
-  <div class="app">
+  <div class="wrap">
     <header>
-      <h1>OFF — Demo</h1>
-      <div class="health">
-        <div id="healthDot" class="dot"></div>
-        <span id="healthText">Checking backend…</span>
+      <div class="brand">
+        <div class="title">
+          OFF / Tangent — Demo Console
+          <span class="pill" id="buildTag">v0.451.1</span>
+        </div>
+        <div class="subtitle">
+          A tiny, insider-friendly console to run the <b>Happy Path</b> (<span class="muted">Signal → Offer → Vibe</span>),
+          verify idempotency behavior, and keep the backend feeling “alive.”
+        </div>
+      </div>
+
+      <div class="statusbar" role="status" aria-live="polite">
+        <div class="dot" id="healthDot"></div>
+        <div class="statusText">
+          <strong id="healthLabel">Backend</strong>
+          <span id="healthDetail">Not checked yet</span>
+        </div>
+        <button id="btnHealth" class="primary" type="button">Check</button>
       </div>
     </header>
 
-    <div class="section">
-      <h2>Happy Path · Signal → Vibe</h2>
-      <button id="runDemo">Run demo flow</button>
-    </div>
+    <div class="grid">
+      <!-- LEFT: Controls -->
+      <section class="card">
+        <div class="cardHeader">
+          <h2>Controls</h2>
+          <div class="tiny">Keep it simple. Paste keys. Run flows.</div>
+        </div>
 
-    <div class="section">
-      <h2>Execution</h2>
-      <div id="log" class="log"></div>
-    </div>
+        <div class="cardBody">
+          <div class="row">
+            <div>
+              <label for="baseUrl">Backend Base URL</label>
+              <input id="baseUrl" placeholder="https://off-backend.onrender.com" />
+            </div>
+            <div>
+              <label for="demoSpeed">Demo Speed</label>
+              <select id="demoSpeed">
+                <option value="fast">Fast (snappy)</option>
+                <option value="demo" selected>Demo (animated)</option>
+                <option value="slow">Slow (extra theatrical)</option>
+              </select>
+            </div>
+          </div>
 
-    <footer>
-      Internal demo · OFF v0.45x
-    </footer>
+          <div class="row">
+            <div>
+              <label for="adminKey">Admin API Key</label>
+              <input id="adminKey" placeholder="Bearer token (admin)" />
+            </div>
+            <div>
+              <label for="guestKey">Guest API Key</label>
+              <input id="guestKey" placeholder="Bearer token (guest)" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="concKey">Concierge API Key</label>
+              <input id="concKey" placeholder="Bearer token (concierge)" />
+            </div>
+            <div>
+              <label for="actorId">Actor ID (optional)</label>
+              <input id="actorId" placeholder="e.g., guest_seed / conc_seed" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="guestId">Guest ID (for seeding + signal)</label>
+              <input id="guestId" placeholder="guest_seed" />
+            </div>
+            <div>
+              <label for="conciergeId">Concierge ID (for offer)</label>
+              <input id="conciergeId" placeholder="conc_seed" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="intent">Signal Intent</label>
+              <input id="intent" placeholder="Coffee reset near Fellini" />
+            </div>
+            <div>
+              <label for="location">Location</label>
+              <input id="location" placeholder="NYC" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="offerMsg">Offer Message</label>
+              <input id="offerMsg" placeholder="I can meet you for a calm coffee + walk." />
+            </div>
+            <div>
+              <label for="offerPrice">Offer Price</label>
+              <input id="offerPrice" inputmode="numeric" placeholder="20" />
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button id="btnSave" type="button">Save</button>
+            <button id="btnLoad" type="button">Load</button>
+            <button id="btnClear" class="danger" type="button">Clear</button>
+          </div>
+
+          <div class="btnRow" style="margin-top:12px;">
+            <button id="btnSeed" class="primary" type="button">Seed Happy Path</button>
+            <button id="btnRun" class="primary" type="button">Run Happy Path</button>
+            <button id="btnReplay" type="button">Replay (Idempotency)</button>
+          </div>
+
+          <div class="chips" id="chips"></div>
+
+          <div class="footerNote">
+            Tip: set <span class="kbd">Actor ID</span> to <span class="kbd">guest_seed</span> or <span class="kbd">conc_seed</span> to keep idempotency namespacing clean.
+            The console sends <span class="kbd">X-Actor-Id</span> when provided.
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Terminal -->
+      <section class="card">
+        <div class="cardHeader">
+          <h2>Happy Path Runner</h2>
+          <div class="tiny">
+            From Signal to Vibe <span class="muted">•</span> with “code fly-by”
+          </div>
+        </div>
+
+        <div class="cardBody">
+          <div class="terminal">
+            <div class="terminalTop">
+              <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="terminalMeta">
+                <span id="runState">idle</span>
+                <span class="muted">•</span>
+                <span id="lastReq">—</span>
+              </div>
+              <button id="btnCopyLog" type="button">Copy Log</button>
+            </div>
+            <div class="log" id="log" aria-label="demo log"></div>
+          </div>
+
+          <div class="footerNote">
+            This is “demo-first” instrumentation — small, readable, and intentionally theatrical.
+            If you ever want to hide the log for a more “consumer” feel, we can add a toggle.
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 
-  <script>
-    const BASE = "https://off-backend.onrender.com";
-    const ADMIN = "PASTE_ADMIN_KEY";
-    const GUEST = "PASTE_GUEST_KEY";
+<script>
+(function(){
+  // ---------- Utilities ----------
+  const $ = (id) => document.getElementById(id);
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-    const logEl = document.getElementById("log");
-    const dot = document.getElementById("healthDot");
-    const healthText = document.getElementById("healthText");
+  function nowIso() {
+    return new Date().toISOString();
+  }
 
-    function log(msg, cls = "") {
-      const line = document.createElement("div");
-      line.className = "log-line " + cls;
-      line.textContent = msg;
-      logEl.appendChild(line);
-      if (logEl.children.length > 200) logEl.removeChild(logEl.firstChild);
-      logEl.scrollTop = logEl.scrollHeight;
+  function safeJsonParse(s, fallback=null){
+    try { return JSON.parse(s); } catch { return fallback; }
+  }
+
+  function setDot(state){
+    const dot = $("healthDot");
+    dot.classList.remove("good","warn","bad");
+    if (state === "good") dot.classList.add("good");
+    else if (state === "warn") dot.classList.add("warn");
+    else if (state === "bad") dot.classList.add("bad");
+  }
+
+  function logLine(text, cls="muted"){
+    const el = $("log");
+    const span = document.createElement("span");
+    span.className = cls;
+    span.textContent = text + "\n";
+    el.appendChild(span);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function clearLog(){
+    $("log").innerHTML = "";
+  }
+
+  function updateRunState(state){
+    $("runState").textContent = state;
+  }
+
+  function setLastReq(s){
+    $("lastReq").textContent = s || "—";
+  }
+
+  function normalizeBaseUrl(url){
+    const u = (url || "").trim();
+    if (!u) return "https://off-backend.onrender.com";
+    return u.replace(/\/+$/,"");
+  }
+
+  function bearerHeader(token){
+    const t = (token || "").trim();
+    if (!t) return null;
+    // Allow user to paste either raw key or full "Bearer ..."
+    return t.toLowerCase().startsWith("bearer ") ? t : ("Bearer " + t);
+  }
+
+  function demoDelayMode(){
+    const mode = $("demoSpeed").value;
+    if (mode === "fast") return { step: 120, between: 140, pretty: 80 };
+    if (mode === "slow") return { step: 520, between: 520, pretty: 240 };
+    return { step: 280, between: 260, pretty: 140 }; // demo
+  }
+
+  function renderChips(state){
+    const chips = $("chips");
+    chips.innerHTML = "";
+
+    const add = (k, v) => {
+      if (!v) return;
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.innerHTML = `<b>${k}</b><span class="val">${String(v)}</span>`;
+      chips.appendChild(chip);
+    };
+
+    add("SIG", state.sig);
+    add("OFF", state.off);
+    add("VIB", state.vib);
+    add("req_id", state.request_id);
+  }
+
+  function saveState(){
+    const state = readInputs();
+    localStorage.setItem("off_demo_state_v1", JSON.stringify(state));
+    logLine(`[ui] saved local state (${nowIso()})`, "accent");
+  }
+
+  function loadState(){
+    const raw = localStorage.getItem("off_demo_state_v1");
+    const st = safeJsonParse(raw, null);
+    if (!st) {
+      logLine("[ui] nothing saved yet", "warn");
+      return;
+    }
+    applyInputs(st);
+    logLine(`[ui] loaded local state (${nowIso()})`, "accent");
+  }
+
+  function clearState(){
+    localStorage.removeItem("off_demo_state_v1");
+    applyInputs(defaultState());
+    logLine(`[ui] cleared local state (${nowIso()})`, "warn");
+  }
+
+  function defaultState(){
+    return {
+      baseUrl: "https://off-backend.onrender.com",
+      adminKey: "",
+      guestKey: "",
+      concKey: "",
+      actorId: "",
+      guestId: "guest_seed",
+      conciergeId: "conc_seed",
+      intent: "Coffee reset near Fellini",
+      location: "NYC",
+      offerMsg: "I can meet you for a calm coffee + walk.",
+      offerPrice: "20"
+    };
+  }
+
+  function readInputs(){
+    return {
+      baseUrl: $("baseUrl").value,
+      adminKey: $("adminKey").value,
+      guestKey: $("guestKey").value,
+      concKey: $("concKey").value,
+      actorId: $("actorId").value,
+      guestId: $("guestId").value,
+      conciergeId: $("conciergeId").value,
+      intent: $("intent").value,
+      location: $("location").value,
+      offerMsg: $("offerMsg").value,
+      offerPrice: $("offerPrice").value
+    };
+  }
+
+  function applyInputs(st){
+    $("baseUrl").value = st.baseUrl ?? "";
+    $("adminKey").value = st.adminKey ?? "";
+    $("guestKey").value = st.guestKey ?? "";
+    $("concKey").value  = st.concKey ?? "";
+    $("actorId").value  = st.actorId ?? "";
+    $("guestId").value  = st.guestId ?? "";
+    $("conciergeId").value = st.conciergeId ?? "";
+    $("intent").value = st.intent ?? "";
+    $("location").value = st.location ?? "";
+    $("offerMsg").value = st.offerMsg ?? "";
+    $("offerPrice").value = st.offerPrice ?? "";
+  }
+
+  // ---------- Fetch helpers ----------
+  async function apiFetch(path, { token, method="GET", body=null, idemKey=null, actorId=null } = {}){
+    const baseUrl = normalizeBaseUrl($("baseUrl").value);
+    const url = baseUrl + path;
+
+    const headers = {
+      "Accept": "application/json",
+    };
+
+    const auth = bearerHeader(token);
+    if (auth) headers["Authorization"] = auth;
+    if (idemKey) headers["Idempotency-Key"] = idemKey;
+    if (actorId) headers["X-Actor-Id"] = actorId;
+
+    if (body !== null){
+      headers["Content-Type"] = "application/json";
     }
 
-    async function checkHealth() {
-      try {
-        const res = await fetch(BASE + "/health");
-        if (!res.ok) throw new Error();
-        dot.classList.add("ok");
-        healthText.textContent = "Backend healthy";
-        log("[health] backend OK", "ok");
-      } catch {
-        dot.classList.add("bad");
-        healthText.textContent = "Backend unreachable";
-        log("[health] backend ERROR", "err");
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: body !== null ? JSON.stringify(body) : undefined
+    });
+
+    const replay = res.headers.get("idempotency-replay");
+    const reqId = res.headers.get("x-request-id");
+    const ct = res.headers.get("content-type") || "";
+
+    let data = null;
+    if (ct.includes("application/json")){
+      data = await res.json().catch(() => null);
+    } else {
+      const txt = await res.text().catch(()=> "");
+      data = { raw: txt };
+    }
+
+    return { ok: res.ok, status: res.status, replay, reqId, data, url };
+  }
+
+  // ---------- Flowy “code fly-by” ----------
+  function flybyLine(step, details=""){
+    const ts = new Date().toISOString().split("T")[1].replace("Z","");
+    const base = `[${ts}]`;
+    const pad = (s) => (s + " ".repeat(22)).slice(0, 22);
+    return `${base} ${pad(step)} ${details}`.trimEnd();
+  }
+
+  async function flybyBlock(lines, cls="muted"){
+    const { pretty } = demoDelayMode();
+    for (const l of lines){
+      logLine(l, cls);
+      await sleep(pretty);
+    }
+  }
+
+  // ---------- Health ----------
+  async function checkHealth(){
+    $("healthLabel").textContent = "Backend";
+    $("healthDetail").textContent = "Checking…";
+    setDot("warn");
+
+    const st = readInputs();
+    const baseUrl = normalizeBaseUrl(st.baseUrl);
+    const started = performance.now();
+
+    try {
+      const res = await fetch(baseUrl + "/health", { method:"GET" });
+      const ms = Math.round(performance.now() - started);
+      if (!res.ok) {
+        setDot("bad");
+        $("healthDetail").textContent = `HTTP ${res.status} • ${ms}ms`;
+        return;
       }
+      const data = await res.json().catch(()=> ({}));
+      setDot("good");
+      $("healthDetail").textContent = `ok • ${ms}ms • uptime ${Math.round(data.uptime || 0)}s`;
+    } catch (e){
+      setDot("bad");
+      $("healthDetail").textContent = "unreachable";
+    }
+  }
+
+  // ---------- Happy Path ----------
+  const runState = {
+    sig: null,
+    off: null,
+    vib: null,
+    request_id: null
+  };
+
+  function lockUi(lock){
+    const ids = ["btnSeed","btnRun","btnReplay","btnHealth"];
+    ids.forEach(i => { $(i).disabled = lock; });
+  }
+
+  async function seedHappyPath(){
+    clearLog();
+    updateRunState("seeding");
+    lockUi(true);
+
+    const st = readInputs();
+    const actorId = (st.actorId || "").trim() || null;
+
+    logLine(flybyLine("POST /debug/seed", "admin + idempotency"), "accent");
+    await flybyBlock([
+      flybyLine("middleware: requestId()", "attach x-request-id"),
+      flybyLine("middleware: auth", "requireRole(admin)"),
+      flybyLine("middleware: idempotency", "storeKey = role:actor:route:key"),
+      flybyLine("handler: debugSeed()", "reset store → insert scene"),
+      flybyLine("return 200", "{ ids, summary, next_steps }"),
+    ], "muted");
+
+    const resp = await apiFetch("/debug/seed", {
+      token: st.adminKey,
+      method: "POST",
+      idemKey: "ui-seed-001",
+      actorId
+    });
+
+    setLastReq(resp.reqId || "—");
+    if (!resp.ok){
+      updateRunState("error");
+      logLine(flybyLine("seed failed", `HTTP ${resp.status}`), "bad");
+      logLine(JSON.stringify(resp.data, null, 2), "bad");
+      lockUi(false);
+      return;
     }
 
-    async function runDemo() {
-      log("— starting happy path —");
-      await delay(400);
+    runState.sig = resp.data?.ids?.signal_id || null;
+    runState.off = resp.data?.ids?.offer_id || null;
+    runState.vib = resp.data?.ids?.vibe_id || null;
+    runState.request_id = resp.data?.request_id || resp.reqId || null;
+    renderChips(runState);
 
-      await step("seeding environment", () =>
-        fetch(BASE + "/debug/seed", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + ADMIN,
-            "Idempotency-Key": "ui-seed"
-          }
-        })
-      );
+    logLine(flybyLine("seed ok", `replay=${resp.replay || "?"}`), resp.replay === "true" ? "warn" : "good");
+    logLine(flybyLine("signal_id", runState.sig || "—"), "muted");
+    logLine(flybyLine("offer_id", runState.off || "—"), "muted");
+    logLine(flybyLine("vibe_id", runState.vib || "—"), "muted");
 
-      await step("posting guest message", () =>
-        fetch(BASE + "/messages", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + GUEST,
-            "Content-Type": "application/json",
-            "Idempotency-Key": "ui-msg"
-          },
-          body: JSON.stringify({
-            vibe_id: "vib_seed_001",
-            from_role: "guest",
-            from_id: "guest_seed",
-            text: "Hey — nice to meet you."
-          })
-        })
-      );
+    updateRunState("ready");
+    lockUi(false);
+  }
 
-      log("— demo complete —", "ok");
-    }
+  async function runHappyPath(){
+    clearLog();
+    updateRunState("running");
+    lockUi(true);
 
-    async function step(label, fn) {
-      log("> " + label + "…");
-      await delay(500);
-      try {
-        const res = await fn();
-        if (!res.ok) throw new Error();
-        log("✓ " + label, "ok");
-      } catch {
-        log("✗ " + label, "err");
+    const st = readInputs();
+    const actorId = (st.actorId || "").trim() || null;
+    const { step, between } = demoDelayMode();
+
+    // Step 1: Create signal
+    logLine(flybyLine("POST /signals", "guest creates signal"), "accent");
+    await flybyBlock([
+      flybyLine("validate", "guest_id + intent required"),
+      flybyLine("assign id", "sig_<ts>_<rand>"),
+      flybyLine("store", "signals.unshift(signal)"),
+      flybyLine("return 201", "{ signal }"),
+    ]);
+
+    const sigResp = await apiFetch("/signals", {
+      token: st.guestKey,
+      method:"POST",
+      idemKey: "ui-signal-001",
+      actorId,
+      body: {
+        guest_id: (st.guestId || "guest_seed").trim(),
+        intent: (st.intent || "Coffee reset").trim(),
+        location: (st.location || "NYC").trim()
       }
-      await delay(400);
+    });
+
+    setLastReq(sigResp.reqId || "—");
+    if (!sigResp.ok){
+      updateRunState("error");
+      logLine(flybyLine("signal failed", `HTTP ${sigResp.status}`), "bad");
+      logLine(JSON.stringify(sigResp.data, null, 2), "bad");
+      lockUi(false);
+      return;
+    }
+    runState.sig = sigResp.data?.signal?.id || null;
+    runState.request_id = sigResp.data?.request_id || sigResp.reqId || null;
+    renderChips(runState);
+    logLine(flybyLine("signal ok", `id=${runState.sig} replay=${sigResp.replay || "?"}`), sigResp.replay === "true" ? "warn" : "good");
+
+    await sleep(between);
+
+    // Step 2: Create offer
+    logLine(flybyLine("POST /offers", "concierge proposes offer"), "accent");
+    await flybyBlock([
+      flybyLine("auth", "requireRole(concierge|admin)"),
+      flybyLine("validate", "signal_id + concierge_id + message"),
+      flybyLine("store", "offers.unshift(offer)"),
+      flybyLine("return 201", "{ offer }"),
+    ]);
+
+    const price = Number((st.offerPrice || "20").trim());
+    const offResp = await apiFetch("/offers", {
+      token: st.concKey,
+      method:"POST",
+      idemKey: "ui-offer-001",
+      actorId,
+      body: {
+        signal_id: runState.sig,
+        concierge_id: (st.conciergeId || "conc_seed").trim(),
+        message: (st.offerMsg || "I can meet you.").trim(),
+        price: Number.isFinite(price) ? price : 20
+      }
+    });
+
+    setLastReq(offResp.reqId || "—");
+    if (!offResp.ok){
+      updateRunState("error");
+      logLine(flybyLine("offer failed", `HTTP ${offResp.status}`), "bad");
+      logLine(JSON.stringify(offResp.data, null, 2), "bad");
+      lockUi(false);
+      return;
+    }
+    runState.off = offResp.data?.offer?.id || null;
+    runState.request_id = offResp.data?.request_id || offResp.reqId || null;
+    renderChips(runState);
+    logLine(flybyLine("offer ok", `id=${runState.off} replay=${offResp.replay || "?"}`), offResp.replay === "true" ? "warn" : "good");
+
+    await sleep(between);
+
+    // Step 3: Accept offer -> vibe
+    logLine(flybyLine("POST /offers/:id/accept", "guest accepts offer"), "accent");
+    await flybyBlock([
+      flybyLine("auth", "requireRole(guest|admin)"),
+      flybyLine("guardrail", "only 1 active vibe per signal"),
+      flybyLine("transition", "offer accepted, competing rejected"),
+      flybyLine("create", "vibe.active"),
+      flybyLine("return 201", "{ vibe }"),
+    ]);
+
+    const accResp = await apiFetch(`/offers/${encodeURIComponent(runState.off)}/accept`, {
+      token: st.guestKey,
+      method:"POST",
+      idemKey: "ui-accept-001",
+      actorId,
+      body: { guest_id: (st.guestId || "guest_seed").trim() }
+    });
+
+    setLastReq(accResp.reqId || "—");
+    if (!accResp.ok){
+      updateRunState("error");
+      logLine(flybyLine("accept failed", `HTTP ${accResp.status}`), "bad");
+      logLine(JSON.stringify(accResp.data, null, 2), "bad");
+      lockUi(false);
+      return;
     }
 
-    function delay(ms) {
-      return new Promise(r => setTimeout(r, ms));
+    runState.vib = accResp.data?.vibe?.id || null;
+    runState.request_id = accResp.data?.request_id || accResp.reqId || null;
+    renderChips(runState);
+    logLine(flybyLine("vibe ok", `id=${runState.vib} replay=${accResp.replay || "?"}`), accResp.replay === "true" ? "warn" : "good");
+
+    await sleep(step);
+
+    updateRunState("done");
+    logLine(flybyLine("happy path complete", "Signal → Offer → Vibe"), "good");
+    lockUi(false);
+  }
+
+  async function replayIdempotency(){
+    // replays seed + message posting style behavior using same Idempotency-Key
+    updateRunState("replay");
+    lockUi(true);
+
+    const st = readInputs();
+    const actorId = (st.actorId || "").trim() || null;
+
+    logLine(flybyLine("REPLAY", "same key, same payload"), "accent");
+    await flybyBlock([
+      flybyLine("idempotency lookup", "storeKey hit → replay"),
+      flybyLine("return", "Idempotency-Replay: true"),
+    ]);
+
+    // Try replaying seed (same key)
+    const resp = await apiFetch("/debug/seed", {
+      token: st.adminKey,
+      method: "POST",
+      idemKey: "ui-seed-001",
+      actorId
+    });
+
+    setLastReq(resp.reqId || "—");
+    if (!resp.ok){
+      updateRunState("error");
+      logLine(flybyLine("replay failed", `HTTP ${resp.status}`), "bad");
+      logLine(JSON.stringify(resp.data, null, 2), "bad");
+      lockUi(false);
+      return;
     }
+    logLine(flybyLine("replay ok", `replay=${resp.replay || "?"}`), resp.replay === "true" ? "good" : "warn");
+    updateRunState("ready");
+    lockUi(false);
+  }
 
-    document.getElementById("runDemo").onclick = runDemo;
+  // ---------- Wire up ----------
+  function init(){
+    applyInputs(defaultState());
+    loadState(); // auto-load if exists
 
+    // defaults
+    $("baseUrl").value = normalizeBaseUrl($("baseUrl").value);
+
+    $("btnHealth").addEventListener("click", checkHealth);
+    $("btnSeed").addEventListener("click", seedHappyPath);
+    $("btnRun").addEventListener("click", runHappyPath);
+    $("btnReplay").addEventListener("click", replayIdempotency);
+
+    $("btnSave").addEventListener("click", saveState);
+    $("btnLoad").addEventListener("click", loadState);
+    $("btnClear").addEventListener("click", clearState);
+
+    $("btnCopyLog").addEventListener("click", async () => {
+      const txt = $("log").innerText || "";
+      try{
+        await navigator.clipboard.writeText(txt);
+        logLine("[ui] copied log to clipboard", "good");
+      } catch {
+        logLine("[ui] clipboard blocked by browser", "warn");
+      }
+    });
+
+    // Periodic health pulse (alive feeling) – light touch:
+    // only if baseUrl is set AND page is visible.
+    setInterval(() => {
+      if (document.hidden) return;
+      const baseUrl = normalizeBaseUrl($("baseUrl").value);
+      if (!baseUrl) return;
+      // passive check every 30s; don’t spam the log
+      checkHealth();
+    }, 30000);
+
+    // initial health check
     checkHealth();
-  </script>
+
+    logLine(flybyLine("ready", "paste keys → seed/run"), "muted");
+  }
+
+  init();
+})();
+</script>
 </body>
 </html>

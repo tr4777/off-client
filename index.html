@@ -1,1200 +1,325 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OFF / Tangent — Demo</title>
-  <meta name="description" content="OFF / Tangent demo: Signal → Offer → Vibe" />
+  <meta charset="UTF-8" />
+  <title>OFF / Tangent — Happy Path Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    :root{
-      --bg:#0b0f14;
-      --panel:#0f1620;
-      --panel2:#0c131c;
-      --text:#e8eef7;
-      --muted:#9aa8bb;
-      --line:#1b2636;
-
-      --accent:#7dd3fc;
-      --good:#34d399;
-      --warn:#fbbf24;
-      --bad:#fb7185;
-
-      --shadow: 0 12px 40px rgba(0,0,0,.45);
-      --radius: 18px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    :root {
+      --bg: #0b0f14;
+      --panel: #121823;
+      --panel-soft: #161d2b;
+      --text: #e6e9ef;
+      --muted: #9aa4b2;
+      --accent: #5eead4;
+      --ok: #22c55e;
+      --warn: #facc15;
+      --err: #ef4444;
+      --border: #1f2937;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      background:
-        radial-gradient(1200px 700px at 20% -10%, rgba(125,211,252,.10), transparent 60%),
-        radial-gradient(900px 600px at 90% 0%, rgba(52,211,153,.08), transparent 55%),
-        radial-gradient(1200px 700px at 50% 110%, rgba(251,113,133,.06), transparent 60%),
-        var(--bg);
-      color:var(--text);
-      font-family: var(--sans);
-    }
-
-    .wrap{
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 18px 16px 80px;
-    }
-
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      margin: 6px 0 14px;
-    }
-
-    .brand{ display:flex; flex-direction:column; gap:6px; }
-    .title{ display:flex; align-items:center; gap:10px; font-weight: 800; font-size: 18px; letter-spacing: .2px; }
-    .tag{
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 5px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(27,38,54,.9);
-      background: rgba(17,26,38,.7);
-      color: rgba(232,238,247,.85);
-    }
-    .subtitle{ color: var(--muted); font-size: 12px; line-height: 1.35; max-width: 760px; }
-
-    .statusbar{
-      display:flex; align-items:center; gap:10px;
-      padding: 10px 12px;
-      background: rgba(15,22,32,.7);
-      border: 1px solid rgba(27,38,54,.8);
-      border-radius: 999px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-      backdrop-filter: blur(10px);
-      white-space: nowrap;
-    }
-    .dot{ width:10px;height:10px;border-radius:999px; background: rgba(154,168,187,.55); box-shadow: 0 0 0 0 rgba(152,166,184,.0); }
-    .dot.good{ background: var(--good); box-shadow: 0 0 0 6px rgba(52,211,153,.10); }
-    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 6px rgba(251,191,36,.10); }
-    .dot.bad{  background: var(--bad);  box-shadow: 0 0 0 6px rgba(251,113,133,.10); }
-
-    .statusText{ display:flex; flex-direction:column; gap:2px; line-height:1.1; }
-    .statusText strong{ font-size: 12px; }
-    .statusText span{ font-size: 11px; color: var(--muted); }
-
-    button{
-      border: 1px solid rgba(27,38,54,.95);
-      background: rgba(17,26,38,.85);
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 10% -10%, #162036, transparent),
+                  radial-gradient(1000px 500px at 90% -20%, #0f2a22, transparent),
+                  var(--bg);
       color: var(--text);
-      padding: 10px 12px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .badge {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    .backend {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel);
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--warn);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 20px;
+      padding: 24px;
+    }
+
+    section {
+      background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+      border: 1px solid var(--border);
       border-radius: 14px;
-      cursor: pointer;
-      font-weight: 750;
-      font-size: 12px;
-      letter-spacing: .2px;
-      transition: transform .06s ease, border-color .15s ease, background .15s ease, opacity .15s ease;
-    }
-    button:hover{ transform: translateY(-1px); border-color: rgba(125,211,252,.35); }
-    button:active{ transform: translateY(0px); }
-    button.primary{ background: rgba(125,211,252,.12); border-color: rgba(125,211,252,.35); }
-    button.danger{  background: rgba(251,113,133,.10); border-color: rgba(251,113,133,.35); }
-    button:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
-      margin-top: 12px;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      header{ flex-direction: column; align-items: stretch; }
-      .statusbar{ justify-content: space-between; }
+      padding: 18px;
     }
 
-    .card{
-      background: linear-gradient(180deg, rgba(15,22,32,.92), rgba(12,19,28,.92));
-      border: 1px solid rgba(27,38,54,.92);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .cardHeader{
-      padding: 12px 12px 10px;
-      border-bottom: 1px solid rgba(27,38,54,.85);
-      display:flex; align-items:center; justify-content:space-between; gap: 10px;
-    }
-    .cardHeader h2{
-      margin:0;
-      font-size: 12px;
-      letter-spacing: .25px;
+    section h2 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin: 0 0 12px 0;
       text-transform: uppercase;
-      color: rgba(232,238,247,.9);
-    }
-    .cardBody{ padding: 12px; }
-    .tiny{ font-size: 11px; color: var(--muted); line-height: 1.35; }
-
-    /* Story lane */
-    .lane{ display:flex; flex-direction:column; gap: 10px; min-height: 560px; }
-    .stageTitle{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 6px; }
-    .stageTitle .pill{
-      font-family: var(--mono);
-      font-size: 10px;
-      color: rgba(232,238,247,.8);
-      background: rgba(17,26,38,.55);
-      border: 1px solid rgba(27,38,54,.85);
-      padding: 5px 8px;
-      border-radius: 999px;
     }
 
-    .storyCard{
-      border: 1px solid rgba(27,38,54,.9);
-      background: rgba(11,15,20,.55);
-      border-radius: 16px;
-      padding: 12px;
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-      position: relative;
-      overflow:hidden;
-      transform: translateY(6px);
-      opacity: 0;
-      animation: popIn .35s ease forwards;
-    }
-    @keyframes popIn{ from{ transform: translateY(10px); opacity: 0; } to{ transform: translateY(0px); opacity: 1; } }
-
-    .storyCard::before{
-      content:"";
-      position:absolute;
-      left:0; top:0; bottom:0;
-      width: 3px;
-      background: rgba(125,211,252,.35);
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 360px;
     }
 
-    .storyTop{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .storyTop strong{ font-size: 13px; letter-spacing: .2px; }
-
-    .badge{
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(27,38,54,.85);
-      background: rgba(17,26,38,.65);
-      color: rgba(232,238,247,.85);
-    }
-    .badge.good{ border-color: rgba(52,211,153,.35); background: rgba(52,211,153,.08); }
-    .badge.warn{ border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.08); }
-    .badge.bad{  border-color: rgba(251,113,133,.35); background: rgba(251,113,133,.08); }
-
-    .kv{
-      display:grid;
-      grid-template-columns: 120px 1fr;
-      gap: 6px 10px;
-      font-size: 12px;
-      line-height: 1.3;
-    }
-    .kv b{ color: var(--muted); font-weight: 700; }
-
-    .conciergeRow{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
-    .concierge{
-      min-width: 165px;
-      flex: 1;
-      border: 1px solid rgba(27,38,54,.85);
-      background: rgba(17,26,38,.45);
-      border-radius: 14px;
-      padding: 10px;
-      display:flex; flex-direction:column; gap: 6px;
-      position: relative;
-      overflow:hidden;
-    }
-    .concierge .name{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight: 800; font-size: 12px; }
-    .concierge .meta{ font-size: 11px; color: var(--muted); line-height:1.25; }
-    .typing{ display:flex; gap: 4px; align-items:center; opacity:.85; }
-    .typing span{
-      width: 5px; height: 5px;
-      background: rgba(232,238,247,.55);
-      border-radius: 999px;
-      animation: bounce 1.2s infinite;
-    }
-    .typing span:nth-child(2){ animation-delay: .12s; }
-    .typing span:nth-child(3){ animation-delay: .24s; }
-    @keyframes bounce{
-      0%, 60%, 100%{ transform: translateY(0); opacity: .55; }
-      30%{ transform: translateY(-4px); opacity: 1; }
-    }
-
-    .offerStack{ display:flex; flex-direction:column; gap: 8px; }
-    .offer{
-      border: 1px solid rgba(27,38,54,.85);
-      background: rgba(17,26,38,.42);
-      border-radius: 14px;
-      padding: 10px;
-      display:flex; flex-direction:column; gap: 6px;
-      position: relative;
-      overflow:hidden;
-    }
-    .offer .top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .offer .top strong{ font-size: 12px; }
-    .offer .msg{ font-size: 12px; color: rgba(232,238,247,.92); line-height: 1.35; }
-    .offer .sub{ font-size: 11px; color: var(--muted); line-height: 1.25; }
-
-    .acceptRow{
-      display:flex;
-      gap:10px;
-      flex-wrap: wrap;
-      align-items:center;
-      justify-content:flex-end;
-      margin-top: 6px;
-    }
-
-    .notice{ font-size: 10px; color: rgba(154,168,187,.9); margin-top: 4px; }
-
-    /* Right panel controls */
-    .row2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    @media (max-width: 540px){ .row2{ grid-template-columns:1fr; } }
-
-    label{ display:block; font-size: 11px; color: var(--muted); margin: 0 0 6px; }
-    input, select{
-      width:100%;
-      padding: 10px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(27,38,54,.95);
-      background: rgba(11,15,20,.65);
-      color: var(--text);
-      outline: none;
-    }
-
-    .terminal{
-      margin-top: 10px;
-      background: rgba(8,11,16,.70);
-      border: 1px solid rgba(27,38,54,.85);
-      border-radius: 16px;
-      padding: 10px 10px 8px;
-      overflow:hidden;
-    }
-    .terminalTop{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 8px;
-    }
-    .dots{ display:flex; gap:6px; align-items:center; }
-    .dots span{ width: 9px; height: 9px; border-radius: 999px; background: rgba(152,166,184,.35); }
-    .dots span:nth-child(1){ background: rgba(251,113,133,.55); }
-    .dots span:nth-child(2){ background: rgba(251,191,36,.55); }
-    .dots span:nth-child(3){ background: rgba(52,211,153,.55); }
-
-    .terminalMeta{ display:flex; align-items:center; gap: 8px; color: var(--muted); font-size: 11px; }
-    .log{
-      font-family: var(--mono);
-      font-size: 8px;
-      line-height: 1.45;
-      color: rgba(232,238,247,.82);
-      height: 240px;
-      overflow:auto;
-      padding-right: 6px;
-      white-space: pre-wrap;
-    }
-    .log .muted{ color: rgba(152,166,184,.78); }
-    .log .good{ color: rgba(52,211,153,.92); }
-    .log .warn{ color: rgba(251,191,36,.92); }
-    .log .bad{ color: rgba(251,113,133,.92); }
-    .log .accent{ color: rgba(125,211,252,.92); }
-
-    .divider{ height:1px; background: rgba(27,38,54,.85); margin: 10px 0; }
-    .kbd{
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 8px;
-      border: 1px solid rgba(27,38,54,.9);
-      background: rgba(17,26,38,.7);
-      color: rgba(232,238,247,.85);
-    }
-
-    /* Chat bubbles */
-    .chat{
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .bubble{
-      max-width: 85%;
+    .event {
+      border-left: 3px solid var(--accent);
       padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(27,38,54,.85);
-      background: rgba(17,26,38,.42);
-      line-height: 1.35;
-      font-size: 12px;
-      color: rgba(232,238,247,.95);
+      background: rgba(255,255,255,0.02);
+      border-radius: 6px;
+      font-size: 13px;
     }
-    .bubble.guest{
-      margin-right:auto;
-      border-top-left-radius: 8px;
-      background: rgba(125,211,252,.10);
-      border-color: rgba(125,211,252,.28);
-    }
-    .bubble.concierge{
-      margin-left:auto;
-      border-top-right-radius: 8px;
-      background: rgba(52,211,153,.08);
-      border-color: rgba(52,211,153,.22);
-    }
-    .bubbleMeta{
-      font-size: 10px;
-      color: rgba(154,168,187,.95);
+
+    .event small {
+      color: var(--muted);
+      display: block;
       margin-top: 4px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: linear-gradient(180deg, #1f2937, #0f172a);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button.warn {
+      border-color: var(--warn);
+      color: var(--warn);
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .field label {
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warn);
+    }
+
+    input {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .log {
+      margin-top: 14px;
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      height: 140px;
+      overflow: auto;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #a5b4fc;
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="title">
-          OFF / Tangent — “Happy Path” Demo
-          <span class="tag">v0.451.1</span>
-        </div>
-        <div class="subtitle">
-          Visual demo: guest creates a signal → concierges consider → offers appear → guest accepts → vibe starts → messages appear (real API).
-        </div>
-      </div>
-
-      <div class="statusbar" role="status" aria-live="polite">
-        <div class="dot" id="healthDot"></div>
-        <div class="statusText">
-          <strong id="healthLabel">Backend</strong>
-          <span id="healthDetail">Not checked yet</span>
-        </div>
-        <button id="btnHealth" class="primary" type="button">Check</button>
-      </div>
-    </header>
-
-    <div class="grid">
-      <!-- LEFT: Story -->
-      <section class="card">
-        <div class="cardHeader">
-          <h2>From Signal to Vibe</h2>
-          <div class="tiny">Run the flow. Watch it happen.</div>
-        </div>
-        <div class="cardBody">
-          <div class="stageTitle">
-            <div class="pill" id="stagePill">idle</div>
-            <div class="tiny" id="stageMeta">—</div>
-          </div>
-
-          <div class="lane" id="lane"></div>
-
-          <div class="acceptRow">
-            <button id="btnSeed" class="primary" type="button">Seed Happy Path</button>
-            <button id="btnRun" class="primary" type="button">Run Happy Path (visual)</button>
-            <button id="btnReset" class="danger" type="button">Reset UI</button>
-            <button id="btnUnlock" type="button">Unlock UI</button>
-          </div>
-
-          <div class="notice">
-            “Concierges considering” + extra offers can be simulated for demo energy. Signal/offer/accept/messages are real API calls when keys permit.
-          </div>
-        </div>
-      </section>
-
-      <!-- RIGHT: Config + Telemetry -->
-      <section class="card">
-        <div class="cardHeader">
-          <h2>Config & Telemetry</h2>
-          <div class="tiny">Paste keys. Save. Ship demos.</div>
-        </div>
-        <div class="cardBody">
-          <div class="row2">
-            <div>
-              <label for="baseUrl">Backend Base URL</label>
-              <input id="baseUrl" placeholder="https://off-backend.onrender.com" />
-            </div>
-            <div>
-              <label for="demoSpeed">Demo Speed</label>
-              <select id="demoSpeed">
-                <option value="fast">Fast</option>
-                <option value="demo" selected>Demo</option>
-                <option value="slow">Slow</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label for="adminKey">Admin API Key</label>
-              <input id="adminKey" placeholder="admin token (Bearer… optional)" />
-            </div>
-            <div>
-              <label for="guestKey">Guest API Key</label>
-              <input id="guestKey" placeholder="guest token (Bearer… optional)" />
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label for="concKey">Concierge API Key</label>
-              <input id="concKey" placeholder="concierge token (Bearer… optional)" />
-            </div>
-            <div>
-              <label for="actorId">Actor ID (optional)</label>
-              <input id="actorId" placeholder="guest_seed / conc_seed" />
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label for="guestId">Guest ID</label>
-              <input id="guestId" placeholder="guest_seed" />
-            </div>
-            <div>
-              <label for="conciergeId">Concierge ID</label>
-              <input id="conciergeId" placeholder="conc_seed" />
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label for="intent">Signal intent</label>
-              <input id="intent" placeholder="Coffee reset near Fellini" />
-            </div>
-            <div>
-              <label for="location">Location</label>
-              <input id="location" placeholder="Upper West Side" />
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label for="noGo">No-go topics (comma separated)</label>
-              <input id="noGo" placeholder="politics, religion, economy" />
-            </div>
-            <div>
-              <label for="timeWindow">Time window</label>
-              <input id="timeWindow" placeholder="12:00 → 13:30" />
-            </div>
-          </div>
-
-          <div class="row2">
-            <div>
-              <label for="offerMsg">Offer message</label>
-              <input id="offerMsg" placeholder="Calm coffee + short walk. 45 min." />
-            </div>
-            <div>
-              <label for="offerPrice">Offer bounty ($)</label>
-              <input id="offerPrice" inputmode="numeric" placeholder="20" />
-            </div>
-          </div>
-
-          <div class="acceptRow" style="justify-content:flex-start;">
-            <button id="btnSave" type="button">Save</button>
-            <button id="btnLoad" type="button">Load</button>
-            <button id="btnClear" class="danger" type="button">Clear</button>
-            <button id="btnCopyLog" type="button">Copy Log</button>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="terminal">
-            <div class="terminalTop">
-              <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
-              <div class="terminalMeta">
-                <span id="runState">idle</span>
-                <span>•</span>
-                <span id="lastReq">—</span>
-              </div>
-            </div>
-            <div class="log" id="log"></div>
-          </div>
-
-          <div class="tiny" style="margin-top:10px;">
-            If buttons ever look “stuck”, hit <span class="kbd">Unlock UI</span> — but they shouldn’t anymore.
-          </div>
-        </div>
-      </section>
+  <header>
+    <h1>OFF / Tangent — “Happy Path” Demo <span class="badge">v0.451.1</span></h1>
+    <div class="backend">
+      <div class="dot" id="backendDot"></div>
+      <span id="backendStatus">Backend: checking…</span>
+      <button onclick="checkBackend()">Check</button>
     </div>
-  </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>From Signal → Vibe</h2>
+
+      <div class="flow" id="flow">
+        <div class="event">Waiting for action…</div>
+      </div>
+
+      <div class="controls">
+        <button class="primary" onclick="seed()">Seed Happy Path</button>
+        <button class="primary" onclick="run()">Run Happy Path (visual)</button>
+        <button onclick="reset()">Reset UI</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Config & Telemetry</h2>
+
+      <div class="config-grid">
+        <div class="field">
+          <label>Backend Base URL</label>
+          <input id="baseUrl" value="https://off-backend.onrender.com" />
+        </div>
+
+        <div class="field">
+          <label><span class="status" id="adminDot"></span> Admin API Key</label>
+          <input id="adminKey" type="password" placeholder="••••••••" />
+        </div>
+
+        <div class="field">
+          <label><span class="status" id="guestDot"></span> Guest API Key</label>
+          <input id="guestKey" type="password" placeholder="••••••••" />
+        </div>
+
+        <div class="field">
+          <label><span class="status" id="conciergeDot"></span> Concierge API Key</label>
+          <input id="conciergeKey" type="password" placeholder="••••••••" />
+        </div>
+      </div>
+
+      <div class="log" id="log"></div>
+    </section>
+  </main>
 
 <script>
-(function(){
-  // ---------- helpers ----------
-  const $ = (id) => document.getElementById(id);
-  const lane = $("lane");
-  const logEl = $("log");
+  const flow = document.getElementById("flow");
+  const log = document.getElementById("log");
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const nowIso = () => new Date().toISOString();
-
-  function demoDelayMode(){
-    const mode = $("demoSpeed").value;
-    if (mode === "fast") return { step: 140, between: 200 };
-    if (mode === "slow") return { step: 520, between: 560 };
-    return { step: 280, between: 320 }; // demo
-  }
-
-  function setDot(state){
-    const dot = $("healthDot");
-    dot.classList.remove("good","warn","bad");
-    if (state === "good") dot.classList.add("good");
-    else if (state === "warn") dot.classList.add("warn");
-    else if (state === "bad") dot.classList.add("bad");
-  }
-
-  function logLine(text, cls="muted"){
-    const span = document.createElement("span");
-    span.className = cls;
-    span.textContent = text + "\n";
-    logEl.appendChild(span);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-
-  function clearLog(){ logEl.innerHTML = ""; }
-  function clearLane(){ lane.innerHTML = ""; }
-
-  function setStage(stage, meta=""){
-    $("stagePill").textContent = stage;
-    $("stageMeta").textContent = meta || "—";
-  }
-
-  function updateRunState(s){ $("runState").textContent = s; }
-
-  function normalizeBaseUrl(url){
-    const u = (url || "").trim();
-    if (!u) return "https://off-backend.onrender.com";
-    return u.replace(/\/+$/,"");
-  }
-
-  function bearerHeader(token){
-    const t = (token || "").trim();
-    if (!t) return null;
-    return t.toLowerCase().startsWith("bearer ") ? t : ("Bearer " + t);
-  }
-
-  async function apiFetch(path, { token, method="GET", body=null, idemKey=null, actorId=null } = {}){
-    const baseUrl = normalizeBaseUrl($("baseUrl").value);
-    const url = baseUrl + path;
-
-    const headers = { "Accept":"application/json" };
-    const auth = bearerHeader(token);
-    if (auth) headers["Authorization"] = auth;
-    if (idemKey) headers["Idempotency-Key"] = idemKey;
-    if (actorId) headers["X-Actor-Id"] = actorId;
-    if (body !== null) headers["Content-Type"] = "application/json";
-
-    const res = await fetch(url, { method, headers, body: body !== null ? JSON.stringify(body) : undefined });
-    const replay = res.headers.get("idempotency-replay");
-    const reqId = res.headers.get("x-request-id");
-    const ct = res.headers.get("content-type") || "";
-
-    let data = null;
-    if (ct.includes("application/json")) data = await res.json().catch(()=>null);
-    else data = { raw: await res.text().catch(()=> "") };
-
-    return { ok: res.ok, status: res.status, replay, reqId, data, url };
-  }
-
-  // ---------- UI cards ----------
-  function mkStoryCard(title, badgeText, badgeClass, innerHtml){
+  function addEvent(text, meta = "") {
     const div = document.createElement("div");
-    div.className = "storyCard";
-    div.innerHTML = `
-      <div class="storyTop">
-        <strong>${title}</strong>
-        <span class="badge ${badgeClass || ""}">${badgeText || ""}</span>
-      </div>
-      <div>${innerHtml}</div>
-    `;
-    lane.appendChild(div);
-    lane.scrollTop = lane.scrollHeight;
-    return div;
+    div.className = "event";
+    div.innerHTML = `${text}${meta ? `<small>${meta}</small>` : ""}`;
+    flow.appendChild(div);
+    flow.scrollTop = flow.scrollHeight;
   }
 
-  function kvHtml(pairs){
-    return `
-      <div class="kv">
-        ${pairs.map(([k,v]) => `<b>${k}</b><div>${v}</div>`).join("")}
-      </div>
-    `;
+  function logLine(text) {
+    log.textContent += text + "\n";
+    log.scrollTop = log.scrollHeight;
   }
 
-  function conciergeTile({ name, eta, vibe, status="considering", note="" }){
-    const typing = status === "considering"
-      ? `<div class="typing" aria-label="typing"><span></span><span></span><span></span></div>`
-      : ``;
-    const badge = status === "offered"
-      ? `<span class="badge good">offering</span>`
-      : status === "passed"
-      ? `<span class="badge">passed</span>`
-      : `<span class="badge warn">considering</span>`;
-
-    return `
-      <div class="concierge">
-        <div class="name">
-          <span>${escapeHtml(name)}</span>
-          ${badge}
-        </div>
-        <div class="meta">${escapeHtml(eta)}</div>
-        <div class="meta">${escapeHtml(vibe)}</div>
-        ${typing}
-        ${note ? `<div class="meta">“${escapeHtml(note)}”</div>` : ``}
-      </div>
-    `;
-  }
-
-  function offerHtml({ who, price, msg, simulated=false }){
-    return `
-      <div class="offer">
-        <div class="top">
-          <strong>${escapeHtml(who)}</strong>
-          <span class="badge ${simulated ? "warn" : "good"}">${simulated ? "demo-sim" : "real"}</span>
-        </div>
-        <div class="msg">${escapeHtml(msg)}</div>
-        <div class="sub">bounty: <b>$${escapeHtml(price)}</b> • ${simulated ? "simulated offer for demo energy" : "created via API"}</div>
-      </div>
-    `;
-  }
-
-  function chatBubbles(messages){
-    const items = (messages || []).map(m => {
-      const role = (m.from_role === "concierge") ? "concierge" : "guest";
-      const who = m.from_role || "guest";
-      const time = m.created_at ? new Date(m.created_at).toLocaleTimeString() : "";
-      return `
-        <div class="bubble ${role}">
-          ${escapeHtml(m.text || "")}
-          <div class="bubbleMeta">${escapeHtml(who)} ${time ? "• " + escapeHtml(time) : ""}</div>
-        </div>
-      `;
-    }).join("");
-    return `<div class="chat">${items || `<div class="tiny">No messages yet.</div>`}</div>`;
-  }
-
-  // ---------- state ----------
-  let uiLocked = false;
-  const run = { signal:null, offer:null, vibe:null };
-
-  function readInputs(){
-    return {
-      baseUrl: $("baseUrl").value,
-      adminKey: $("adminKey").value,
-      guestKey: $("guestKey").value,
-      concKey: $("concKey").value,
-      actorId: $("actorId").value,
-      guestId: $("guestId").value || "guest_seed",
-      conciergeId: $("conciergeId").value || "conc_seed",
-      intent: $("intent").value || "Coffee reset",
-      location: $("location").value || "NYC",
-      noGo: $("noGo").value || "politics, religion, economy",
-      timeWindow: $("timeWindow").value || "12:00 → 13:30",
-      offerMsg: $("offerMsg").value || "Calm coffee + short walk.",
-      offerPrice: $("offerPrice").value || "20"
-    };
-  }
-
-  function defaultState(){
-    return {
-      baseUrl: "https://off-backend.onrender.com",
-      adminKey: "",
-      guestKey: "",
-      concKey: "",
-      actorId: "",
-      guestId: "guest_seed",
-      conciergeId: "conc_seed",
-      intent: "Coffee reset near Fellini",
-      location: "Upper West Side",
-      noGo: "politics, religion, economy",
-      timeWindow: "12:00 → 13:30",
-      offerMsg: "Calm coffee + short walk. 45 min.",
-      offerPrice: "20"
-    };
-  }
-
-  function applyInputs(st){
-    $("baseUrl").value = st.baseUrl ?? "";
-    $("adminKey").value = st.adminKey ?? "";
-    $("guestKey").value = st.guestKey ?? "";
-    $("concKey").value  = st.concKey ?? "";
-    $("actorId").value  = st.actorId ?? "";
-    $("guestId").value  = st.guestId ?? "";
-    $("conciergeId").value = st.conciergeId ?? "";
-    $("intent").value = st.intent ?? "";
-    $("location").value = st.location ?? "";
-    $("noGo").value = st.noGo ?? "";
-    $("timeWindow").value = st.timeWindow ?? "";
-    $("offerMsg").value = st.offerMsg ?? "";
-    $("offerPrice").value = st.offerPrice ?? "";
-  }
-
-  function saveState(){
-    localStorage.setItem("off_demo_state_v3", JSON.stringify(readInputs()));
-    logLine(`[ui] saved (${nowIso()})`, "accent");
-  }
-  function loadState(){
-    const raw = localStorage.getItem("off_demo_state_v3");
-    if (!raw) { logLine("[ui] nothing saved yet", "warn"); return; }
-    try { applyInputs(JSON.parse(raw)); logLine(`[ui] loaded (${nowIso()})`, "accent"); }
-    catch { logLine("[ui] save corrupt", "bad"); }
-  }
-  function clearState(){
-    localStorage.removeItem("off_demo_state_v3");
-    applyInputs(defaultState());
-    logLine(`[ui] cleared (${nowIso()})`, "warn");
-  }
-
-  function lockUi(lock){
-    uiLocked = !!lock;
-    ["btnSeed","btnRun","btnReset","btnHealth"].forEach(id => { $(id).disabled = uiLocked; });
-  }
-  function hardUnlock(){
-    lockUi(false);
-    setStage("idle", "Unlocked");
-    updateRunState("idle");
-    logLine("[ui] hard unlock", "warn");
-  }
-
-  function fmtId(id){
-    if (!id) return "—";
-    return id.length > 26 ? (id.slice(0, 12) + "…" + id.slice(-10)) : id;
-  }
-
-  // escape helper
-  function escapeHtml(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  // ---------- health ----------
-  async function checkHealth(){
-    $("healthDetail").textContent = "Checking…";
-    setDot("warn");
-    const baseUrl = normalizeBaseUrl($("baseUrl").value);
-    const started = performance.now();
-    try{
-      const res = await fetch(baseUrl + "/health", { method:"GET" });
-      const ms = Math.round(performance.now() - started);
-      if (!res.ok){
-        setDot("bad");
-        $("healthDetail").textContent = `HTTP ${res.status} • ${ms}ms`;
-        return;
-      }
-      const data = await res.json().catch(()=> ({}));
-      setDot("good");
-      $("healthDetail").textContent = `ok • ${ms}ms • uptime ${Math.round(data.uptime||0)}s`;
+  async function checkBackend() {
+    const dot = document.getElementById("backendDot");
+    const label = document.getElementById("backendStatus");
+    try {
+      const res = await fetch(`${baseUrl.value}/health`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      dot.style.background = "var(--ok)";
+      label.textContent = `Backend OK • uptime ${Math.floor(data.uptime)}s`;
     } catch {
-      setDot("bad");
-      $("healthDetail").textContent = "unreachable";
+      dot.style.background = "var(--err)";
+      label.textContent = "Backend unreachable";
     }
   }
 
-  // ---------- reset ----------
-  function resetUi(){
-    clearLane();
-    clearLog();
-    run.signal = run.offer = run.vibe = null;
-    setStage("idle", "Seed or Run");
-    updateRunState("idle");
-    logLine("[ui] reset", "warn");
-  }
-
-  // ---------- API: messages ----------
-  async function createMessage({ vibe_id, from_role, from_id, text, token, actorId }){
-    const idemKey = `ui-msg-${from_role}-${Date.now()}`;
-    logLine(`POST /messages (${from_role})`, "accent");
-    const resp = await apiFetch("/messages", {
-      token,
-      method:"POST",
-      body: { vibe_id, from_role, from_id, text },
-      idemKey,
-      actorId
-    });
-    $("lastReq").textContent = resp.reqId || "—";
-    if (!resp.ok) logLine(JSON.stringify(resp.data, null, 2), "bad");
-    return resp;
-  }
-
-  async function listMessages({ vibe_id, token, actorId }){
-    logLine(`GET /messages?vibe_id=${vibe_id}`, "accent");
-    const resp = await apiFetch(`/messages?vibe_id=${encodeURIComponent(vibe_id)}`, {
-      token,
-      method:"GET",
-      actorId
-    });
-    $("lastReq").textContent = resp.reqId || "—";
-    if (!resp.ok) logLine(JSON.stringify(resp.data, null, 2), "bad");
-    return resp;
-  }
-
-  // ---------- flow ----------
-  async function seedHappyPath(){
-    clearLane(); clearLog();
-    setStage("seeding", "Reset store + insert scene");
-    updateRunState("seeding");
-    lockUi(true);
-
-    const st = readInputs();
-    const actorId = (st.actorId || "").trim() || null;
-
-    try{
-      logLine("POST /debug/seed", "accent");
-      const resp = await apiFetch("/debug/seed", {
-        token: st.adminKey,
-        method: "POST",
-        idemKey: "ui-seed-001",
-        actorId
-      });
-
-      $("lastReq").textContent = resp.reqId || "—";
-
-      if (!resp.ok){
-        setStage("error", `seed failed (HTTP ${resp.status})`);
-        updateRunState("error");
-        logLine(JSON.stringify(resp.data, null, 2), "bad");
-        mkStoryCard("Seed failed", "error", "bad",
-          `<div class="tiny">HTTP ${resp.status}. Check admin key + CORS + base URL.</div>`
-        );
-        return;
+  async function seed() {
+    addEvent("Seeding happy path…");
+    logLine("POST /debug/seed");
+    const res = await fetch(`${baseUrl.value}/debug/seed`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${adminKey.value}`
       }
-
-      run.signal = { id: resp.data?.ids?.signal_id || null };
-      run.offer  = { id: resp.data?.ids?.offer_id || null };
-      run.vibe   = { id: resp.data?.ids?.vibe_id || null };
-
-      mkStoryCard("Store seeded", "ok", "good",
-        kvHtml([
-          ["signal_id", `<span class="kbd">${escapeHtml(fmtId(run.signal.id))}</span>`],
-          ["offer_id", `<span class="kbd">${escapeHtml(fmtId(run.offer.id))}</span>`],
-          ["vibe_id", `<span class="kbd">${escapeHtml(fmtId(run.vibe.id))}</span>`]
-        ])
-      );
-
-      setStage("ready", "Try: Run Happy Path (visual)");
-      updateRunState("ready");
-    } catch (e){
-      setStage("error", "seed exception");
-      updateRunState("error");
-      logLine(`[exception] ${String(e?.message || e)}`, "bad");
-    } finally {
-      lockUi(false);
+    });
+    if (!res.ok) {
+      addEvent("Seed failed", "Check admin key");
+      logLine("❌ Seed failed");
+      return;
     }
+    addEvent("Seed complete", "Guest + Concierge + Signal created");
+    logLine("✅ Seed success");
+    adminDot.style.background = "var(--ok)";
   }
 
-  async function runHappyPathVisual(){
-    clearLane(); clearLog();
-    lockUi(true);
-
-    const st = readInputs();
-    const actorId = (st.actorId || "").trim() || null;
-    const { step, between } = demoDelayMode();
-
-    setStage("running", "Signal → Concierge consideration → Offers → Vibe → Messages");
-    updateRunState("running");
-
-    try{
-      // 1) Create signal (real)
-      logLine("POST /signals", "accent");
-      const sigResp = await apiFetch("/signals", {
-        token: st.guestKey,
-        method:"POST",
-        idemKey: "ui-signal-001",
-        actorId,
-        body: {
-          guest_id: st.guestId.trim(),
-          intent: st.intent.trim(),
-          location: st.location.trim(),
-          metadata: {
-            time_window: st.timeWindow.trim(),
-            no_go_topics: st.noGo.split(",").map(s=>s.trim()).filter(Boolean)
-          }
-        }
-      });
-      $("lastReq").textContent = sigResp.reqId || "—";
-
-      if (!sigResp.ok){
-        setStage("error", `signal failed (HTTP ${sigResp.status})`);
-        updateRunState("error");
-        logLine(JSON.stringify(sigResp.data, null, 2), "bad");
-        mkStoryCard("Signal creation failed", "error", "bad",
-          `<div class="tiny">HTTP ${sigResp.status}. Check guest key + request body.</div>`
-        );
-        return;
-      }
-
-      run.signal = sigResp.data?.signal || null;
-
-      mkStoryCard("Signal created", "real", "good",
-        kvHtml([
-          ["intent", `<b>${escapeHtml(run.signal.intent || "")}</b>`],
-          ["location", escapeHtml(run.signal.location || "—")],
-          ["time", escapeHtml(st.timeWindow)],
-          ["no-go", escapeHtml(st.noGo)]
-        ]) +
-        `<div class="tiny">signal_id: <span class="kbd">${escapeHtml(run.signal.id)}</span></div>`
-      );
-
-      await sleep(between);
-
-      // 2) Concierge consideration (demo-sim)
-      const concNames = [
-        { name:"Maya (UWS)", eta:"ETA: 6 min", vibe:"calm + premium", note:"I know a quiet corner spot." },
-        { name:"Jordan (Runner)", eta:"ETA: 9 min", vibe:"active + grounded", note:"Short walk after coffee?" },
-        { name:"Eli (Insider)", eta:"ETA: 7 min", vibe:"local tips", note:"Knows the fast ordering flow." },
-        { name:"Sam (Low-key)", eta:"ETA: 11 min", vibe:"gentle reset", note:"Can keep it simple." }
-      ];
-
-      const concCard = mkStoryCard("Concierges considering", "demo-sim", "warn",
-        `<div class="conciergeRow" id="concRow"></div>
-         <div class="tiny">Simulated presence so the marketplace feels alive.</div>`
-      );
-      const concRow = concCard.querySelector("#concRow");
-      concNames.slice(0, 3).forEach((c)=> {
-        const wrap = document.createElement("div");
-        wrap.innerHTML = conciergeTile({ ...c, status:"considering" });
-        concRow.appendChild(wrap.firstElementChild);
-      });
-
-      await sleep(step);
-      concRow.children[1].innerHTML = conciergeTile({ ...concNames[1], status:"offered" });
-      await sleep(step);
-
-      const wrap4 = document.createElement("div");
-      wrap4.innerHTML = conciergeTile({ ...concNames[3], status:"considering" });
-      concRow.appendChild(wrap4.firstElementChild);
-
-      await sleep(between);
-
-      // 3) Offers appear (1 real + 1–2 simulated)
-      const offerCard = mkStoryCard("Offers received", "mixed", "warn",
-        `<div class="offerStack" id="offerStack"></div>
-         <div class="tiny">Real offer created via API; others may be simulated for demo richness.</div>`
-      );
-      const offerStack = offerCard.querySelector("#offerStack");
-
-      // Create real offer via API
-      const price = Number(st.offerPrice.trim());
-      logLine("POST /offers", "accent");
-      const offResp = await apiFetch("/offers", {
-        token: st.concKey,
-        method:"POST",
-        idemKey: "ui-offer-001",
-        actorId,
-        body: {
-          signal_id: run.signal.id,
-          concierge_id: st.conciergeId.trim(),
-          message: st.offerMsg.trim(),
-          price: Number.isFinite(price) ? price : 20
-        }
-      });
-      $("lastReq").textContent = offResp.reqId || "—";
-
-      if (!offResp.ok){
-        setStage("error", `offer failed (HTTP ${offResp.status})`);
-        updateRunState("error");
-        logLine(JSON.stringify(offResp.data, null, 2), "bad");
-        mkStoryCard("Offer creation failed", "error", "bad",
-          `<div class="tiny">HTTP ${offResp.status}. Check concierge key + concierge_id.</div>`
-        );
-        return;
-      }
-
-      run.offer = offResp.data?.offer || null;
-
-      offerStack.insertAdjacentHTML("beforeend",
-        offerHtml({ who:"Maya (UWS)", price: 18, msg:"Quiet table + fast flow. 45 minutes. Keep it light.", simulated:true })
-      );
-      await sleep(step);
-
-      offerStack.insertAdjacentHTML("beforeend",
-        offerHtml({ who:`${st.conciergeId.trim()} (you)`, price: Number.isFinite(price)? price : 20, msg: st.offerMsg.trim(), simulated:false })
-      );
-      await sleep(step);
-
-      offerStack.insertAdjacentHTML("beforeend",
-        offerHtml({ who:"Eli (Insider)", price: 22, msg:"Best-order hack + calm corner. I’ll guide the flow.", simulated:true })
-      );
-
-      await sleep(between);
-
-      // 4) Accept (real) – button in-story
-      const chooseCard = mkStoryCard("Guest chooses", "action", "warn",
-        `<div class="tiny">Accept creates a vibe (real API), then posts messages and renders chat.</div>
-         <div class="acceptRow" style="justify-content:flex-end;">
-           <button id="acceptBtn" class="primary" type="button">Accept offer → Create vibe</button>
-         </div>`
-      );
-
-      const acceptBtn = chooseCard.querySelector("#acceptBtn");
-      acceptBtn.addEventListener("click", async () => {
-        acceptBtn.disabled = true;
-        lockUi(true);
-
-        try{
-          setStage("accepting", "Creating vibe…");
-          updateRunState("accepting");
-          logLine("POST /offers/:id/accept", "accent");
-
-          const accResp = await apiFetch(`/offers/${encodeURIComponent(run.offer.id)}/accept`, {
-            token: st.guestKey,
-            method:"POST",
-            idemKey: "ui-accept-001",
-            actorId,
-            body: { guest_id: st.guestId.trim() }
-          });
-          $("lastReq").textContent = accResp.reqId || "—";
-
-          if (!accResp.ok){
-            setStage("error", `accept failed (HTTP ${accResp.status})`);
-            updateRunState("error");
-            logLine(JSON.stringify(accResp.data, null, 2), "bad");
-            mkStoryCard("Accept failed", "error", "bad",
-              `<div class="tiny">HTTP ${accResp.status}. Likely guest_id mismatch, or offer already accepted.</div>`
-            );
-            return;
-          }
-
-          run.vibe = accResp.data?.vibe || null;
-
-          mkStoryCard("Vibe created", "real", "good",
-            kvHtml([
-              ["vibe_id", `<span class="kbd">${escapeHtml(run.vibe.id)}</span>`],
-              ["guest", escapeHtml(run.vibe.guest_id || st.guestId)],
-              ["concierge", escapeHtml(run.vibe.concierge_id || st.conciergeId)],
-              ["status", `<b>${escapeHtml(run.vibe.status || "active")}</b>`]
-            ])
-          );
-
-          await sleep(step);
-
-          // 5) Create real messages (best-effort)
-          setStage("messaging", "Posting messages…");
-          updateRunState("messaging");
-
-          const guestText = "Perfect. Let’s keep it calm — no heavy topics.";
-          const concText  = "Done. I’ll meet you out front in 6 minutes.";
-
-          // If no keys, we still render simulated chat (but we try real first)
-          const canPost = !!(st.guestKey || st.concKey);
-
-          let postOk = true;
-          if (canPost){
-            const m1 = await createMessage({
-              vibe_id: run.vibe.id,
-              from_role: "guest",
-              from_id: st.guestId.trim(),
-              text: guestText,
-              token: st.guestKey,
-              actorId
-            });
-            if (!m1.ok) postOk = false;
-
-            await sleep(120);
-
-            const m2 = await createMessage({
-              vibe_id: run.vibe.id,
-              from_role: "concierge",
-              from_id: st.conciergeId.trim(),
-              text: concText,
-              token: st.concKey || st.guestKey, // fallback if only one key exists
-              actorId
-            });
-            if (!m2.ok) postOk = false;
-          } else {
-            postOk = false;
-          }
-
-          await sleep(step);
-
-          // 6) List messages (real) and render bubbles; fallback to simulated if listing fails
-          setStage("rendering", "Loading messages…");
-          updateRunState("rendering");
-
-          const listResp = await listMessages({
-            vibe_id: run.vibe.id,
-            token: st.guestKey || st.adminKey || st.concKey,
-            actorId
-          });
-
-          if (listResp.ok && Array.isArray(listResp.data?.items)){
-            mkStoryCard("Conversation", postOk ? "real" : "partial", postOk ? "good" : "warn",
-              chatBubbles(listResp.data.items)
-            );
-          } else {
-            // fallback “looks real” chat if permissions/keys prevent listing
-            mkStoryCard("Conversation", "demo-fallback", "warn",
-              `<div class="tiny">Messages could not be loaded from API (keys/permissions). Showing demo chat.</div>
-               <div class="chat">
-                 <div class="bubble guest">${escapeHtml(guestText)}<div class="bubbleMeta">guest • now</div></div>
-                 <div class="bubble concierge">${escapeHtml(concText)}<div class="bubbleMeta">concierge • now</div></div>
-               </div>`
-            );
-          }
-
-          setStage("done", "Happy Path complete");
-          updateRunState("done");
-        } catch(e){
-          setStage("error", "accept/messaging exception");
-          updateRunState("error");
-          logLine(`[exception] ${String(e?.message || e)}`, "bad");
-        } finally {
-          lockUi(false);
-        }
-      });
-
-      setStage("ready", "Review offers → Accept to create vibe");
-      updateRunState("ready");
-    } catch (e){
-      setStage("error", "run exception");
-      updateRunState("error");
-      logLine(`[exception] ${String(e?.message || e)}`, "bad");
-    } finally {
-      lockUi(false);
-    }
+  async function run() {
+    flow.innerHTML = "";
+    addEvent("Guest creates signal", "Coffee reset near Fellini");
+    await delay();
+    addEvent("Concierges reviewing signal");
+    await delay();
+    addEvent("Offer submitted", "$20 • calm coffee + walk");
+    await delay();
+    addEvent("Guest accepts offer");
+    await delay();
+    addEvent("Vibe started 🎉");
   }
 
-  // ---------- init ----------
-  function init(){
-    applyInputs(defaultState());
-    loadState();
-    $("baseUrl").value = normalizeBaseUrl($("baseUrl").value);
-
-    $("btnHealth").addEventListener("click", checkHealth);
-    $("btnSeed").addEventListener("click", seedHappyPath);
-    $("btnRun").addEventListener("click", runHappyPathVisual);
-    $("btnReset").addEventListener("click", resetUi);
-    $("btnUnlock").addEventListener("click", hardUnlock);
-
-    $("btnSave").addEventListener("click", saveState);
-    $("btnLoad").addEventListener("click", loadState);
-    $("btnClear").addEventListener("click", clearState);
-
-    $("btnCopyLog").addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(logEl.innerText || "");
-        logLine("[ui] copied log", "good");
-      } catch {
-        logLine("[ui] clipboard blocked", "warn");
-      }
-    });
-
-    // periodic health check
-    setInterval(() => { if (!document.hidden) checkHealth(); }, 30000);
-
-    checkHealth();
-    setStage("idle", "Seed or Run");
-    updateRunState("idle");
-    logLine("[ui] ready", "muted");
-    lockUi(false);
+  function reset() {
+    flow.innerHTML = `<div class="event">Waiting for action…</div>`;
+    log.textContent = "";
   }
 
-  init();
-})();
+  function delay(ms = 500) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  // Initial check
+  checkBackend();
 </script>
 </body>
 </html>

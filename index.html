@@ -1,709 +1,763 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OFF / Tangent — Demo UI</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OFF — From Signal → Vibe</title>
+  <meta name="description" content="OFF demo UI: From Signal → Vibe (Happy Path)" />
   <style>
-    :root{--bg:#0b0e14;--panel:#111827;--panel2:#0f172a;--text:#e5e7eb;--muted:#9ca3af;--line:#243244;--good:#34d399;--bad:#fb7185;--warn:#fbbf24;--btn:#1f2937;--btn2:#111827;--accent:#60a5fa}
+    :root{
+      --bg: #0b0f14;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --faint: rgba(255,255,255,.46);
+      --ok: #38d39f;
+      --warn: #ffcc66;
+      --bad: #ff6b6b;
+      --accent: #8ab4ff;
+      --shadow: 0 12px 34px rgba(0,0,0,.42);
+      --radius: 18px;
+      --radius2: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto; background:linear-gradient(180deg,#070a10, #0b0e14 35%); color:var(--text)}
-    a{color:var(--accent);text-decoration:none}
-    .wrap{max-width:1100px;margin:0 auto;padding:22px}
-    .top{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
-    .card{background:rgba(17,24,39,.75);border:1px solid var(--line);border-radius:14px;padding:14px;backdrop-filter: blur(8px)}
-    .grow{flex:1;min-width:320px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .row > *{flex:1;min-width:160px}
-    label{display:block;font-size:12px;color:var(--muted);margin:2px 0 6px}
-    input,select,textarea{width:100%;padding:10px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(15,23,42,.65);color:var(--text);outline:none}
-    textarea{min-height:110px;resize:vertical}
-    .btns{display:flex;gap:10px;flex-wrap:wrap}
-    button{cursor:pointer;border:1px solid var(--line);background:rgba(31,41,55,.7);color:var(--text);padding:10px 12px;border-radius:12px;font-weight:600}
-    button:hover{border-color:#38516d}
-    button.primary{background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.45)}
-    button.danger{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.45)}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(15,23,42,.6);color:var(--muted);font-size:12px}
-    .status-dot{width:8px;height:8px;border-radius:50%}
-    .dot-good{background:var(--good)}
-    .dot-bad{background:var(--bad)}
-    .dot-warn{background:var(--warn)}
-    h1{margin:0 0 6px;font-size:20px}
-    .sub{color:var(--muted);font-size:13px;line-height:1.45}
-    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
-    .tab{padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(15,23,42,.55);color:var(--muted);cursor:pointer;font-weight:700;font-size:12px}
-    .tab.active{color:var(--text);border-color:rgba(96,165,250,.5);background:rgba(96,165,250,.10)}
-    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:14px}
-    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-    .log{white-space:pre-wrap;word-break:break-word;line-height:1.35;font-size:12px;color:#cbd5e1;background:rgba(2,6,23,.65);border:1px solid var(--line);border-radius:14px;padding:12px;min-height:280px;max-height:520px;overflow:auto}
-    .mini{font-size:11px;color:var(--muted)}
-    .split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media (max-width: 680px){.split{grid-template-columns:1fr}}
-    .hr{height:1px;background:var(--line);margin:12px 0}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(138,180,255,.16), transparent 55%),
+        radial-gradient(900px 450px at 90% 10%, rgba(56,211,159,.12), transparent 55%),
+        radial-gradient(700px 400px at 40% 120%, rgba(255,204,102,.10), transparent 60%),
+        var(--bg);
+      letter-spacing: .2px;
+    }
+    a{color: var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 44px;
+    }
+    header{
+      display:flex; gap:16px; align-items:flex-start; justify-content:space-between;
+      margin-bottom: 18px;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:38px; height:38px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(138,180,255,.9), rgba(56,211,159,.9));
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+    }
+    h1{
+      font-size: 22px;
+      margin: 0;
+      line-height: 1.1;
+    }
+    .sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+      font-size: 12px;
+      user-select:none;
+    }
+    .pill b{color: var(--text); font-weight: 650}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 14px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .card .hd h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing: .25px;
+    }
+    .card .bd{padding: 14px}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      flex: 1 1 240px;
+      min-width: 210px;
+    }
+    label{
+      font-size: 12px;
+      color: var(--muted);
+    }
+    input, textarea, select{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+    }
+    input::placeholder, textarea::placeholder{color: rgba(255,255,255,.36)}
+    textarea{min-height: 90px; resize: vertical; font-family: var(--mono); font-size: 12px; line-height: 1.35}
+    .btns{display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px}
+    button{
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .08s ease, background .12s ease, border-color .12s ease;
+      font-weight: 650;
+      letter-spacing:.2px;
+    }
+    button:hover{background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.22)}
+    button:active{transform: translateY(1px)}
+    button.primary{
+      background: linear-gradient(135deg, rgba(138,180,255,.34), rgba(56,211,159,.22));
+      border-color: rgba(138,180,255,.35);
+    }
+    button.primary:hover{background: linear-gradient(135deg, rgba(138,180,255,.40), rgba(56,211,159,.26))}
+    button.ghost{
+      background: transparent;
+    }
+    .hint{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    .muted{color: var(--muted)}
+    .tiny{font-size: 12px}
+    .mono{font-family: var(--mono)}
+    .divider{
+      height:1px; background: rgba(255,255,255,.09);
+      margin: 12px 0;
+    }
+    .timeline{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .step{
+      border: 1px solid rgba(255,255,255,.11);
+      background: rgba(255,255,255,.05);
+      border-radius: var(--radius2);
+      padding: 12px 12px 10px;
+      position: relative;
+    }
+    .step .top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom: 8px;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .dot{
+      width: 9px; height: 9px; border-radius: 50%;
+      background: rgba(255,255,255,.25);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+    .dot.ok{background: var(--ok); box-shadow: 0 0 0 4px rgba(56,211,159,.12)}
+    .dot.warn{background: var(--warn); box-shadow: 0 0 0 4px rgba(255,204,102,.12)}
+    .dot.bad{background: var(--bad); box-shadow: 0 0 0 4px rgba(255,107,107,.12)}
+    .kvs{
+      display:grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 6px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .kvs .k{color: rgba(255,255,255,.48)}
+    .kvs .v{color: rgba(255,255,255,.86)}
+    .kvs .v code{font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,.84)}
+    .log{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      background: rgba(0,0,0,.20);
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: rgba(255,255,255,.78);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 320px;
+      overflow:auto;
+    }
+    .foot{
+      margin-top: 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
+      color: var(--faint);
+      font-size: 12px;
+    }
+    .mini{
+      display:inline-flex; gap:8px; align-items:center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <div class="top">
-      <div class="card grow">
-        <h1>OFF / Tangent — Demo UI</h1>
-        <div class="sub">Single-file UI to seed, create signals/offers, accept, message, and log idempotency. Stores keys locally in your browser (localStorage). For prototype use only.</div>
-        <div class="tabs" id="tabs">
-          <div class="tab active" data-tab="happy">Happy Path</div>
-          <div class="tab" data-tab="signals">Signals</div>
-          <div class="tab" data-tab="offers">Offers</div>
-          <div class="tab" data-tab="messages">Messages</div>
-          <div class="tab" data-tab="trust">Trust Events</div>
-          <div class="tab" data-tab="debug">Debug</div>
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>From Signal → Vibe</h1>
+          <p class="sub">
+            A live <span class="mono">Happy Path</span> walkthrough for OFF / Tangent — built for simple, human demos.
+          </p>
         </div>
       </div>
 
-      <div class="card" style="min-width:320px;max-width:420px">
-        <div class="row">
-          <div style="flex:1;min-width:220px">
-            <label>Base URL</label>
-            <input id="baseUrl" placeholder="https://off-backend.onrender.com" />
-          </div>
-          <div style="flex:0.9;min-width:160px">
-            <label>Idempotency key prefix</label>
-            <input id="idemPrefix" placeholder="demo" />
-          </div>
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>Admin key</label>
-            <input id="kAdmin" placeholder="Bearer …" class="mono" />
-          </div>
-          <div>
-            <label>Concierge key</label>
-            <input id="kConc" placeholder="Bearer …" class="mono" />
-          </div>
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>Guest key</label>
-            <input id="kGuest" placeholder="Bearer …" class="mono" />
-          </div>
-          <div>
-            <label>Actor ID header (optional)</label>
-            <input id="actorId" placeholder="guest_seed" />
-          </div>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="row">
-          <div class="pill" id="healthPill" title="Health status">
-            <span class="status-dot dot-warn" id="healthDot"></span>
-            <span id="healthText">Not checked</span>
-          </div>
-          <div class="btns" style="justify-content:flex-end">
-            <button id="btnSave" class="primary">Save</button>
-            <button id="btnHealth">/health</button>
-            <button id="btnClear" class="danger">Clear UI cache</button>
-          </div>
-        </div>
-        <div class="mini" style="margin-top:8px">Tip: paste the raw token (not including “Bearer”) — the UI adds <span class="mono">Authorization: Bearer …</span> automatically.</div>
+      <div class="pill" title="This UI is intentionally tiny and safe to ship.">
+        <span>Mode:</span> <b>Demo</b>
+        <span class="mono" id="ver">v0.451.1</span>
       </div>
-    </div>
+    </header>
 
     <div class="grid">
-      <div class="card" id="panelLeft"></div>
-      <div class="card">
-        <div class="row" style="align-items:flex-end">
-          <div style="flex:1">
-            <label>Quick actions</label>
-            <div class="btns">
-              <button class="primary" id="btnSeed">Seed happy-path</button>
-              <button id="btnGuestOverview">Guest overview</button>
-              <button id="btnConcOverview">Concierge overview</button>
-              <button id="btnStore">Debug store</button>
+      <!-- Left: Controls -->
+      <section class="card">
+        <div class="hd">
+          <h2>Controls</h2>
+          <span class="muted tiny">No build tools. One file. Ship fast.</span>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div class="field">
+              <label for="baseUrl">Backend Base URL</label>
+              <input id="baseUrl" placeholder="https://off-backend.onrender.com" />
+              <div class="hint">Tip: keep this pointed at Render. You can swap to localhost later.</div>
             </div>
           </div>
-          <div style="flex:0.6;min-width:200px">
-            <label>Selected IDs</label>
-            <div class="pill mono" id="selPill">sig: —  • off: —  • vib: —</div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div class="field">
+              <label for="adminKey">Admin Key (for /debug/*)</label>
+              <input id="adminKey" placeholder="Bearer token…" />
+            </div>
+            <div class="field">
+              <label for="guestKey">Guest Key</label>
+              <input id="guestKey" placeholder="Bearer token…" />
+            </div>
+            <div class="field">
+              <label for="concKey">Concierge Key</label>
+              <input id="concKey" placeholder="Bearer token…" />
+            </div>
+          </div>
+
+          <div class="hint">
+            Keys are stored in your browser <span class="mono">localStorage</span> (this device only).
+            No keys are logged unless you copy/paste them into the console yourself.
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btns">
+            <button class="primary" id="btnSeed">Seed Happy Path (From Signal → Vibe)</button>
+            <button class="ghost" id="btnRefresh">Refresh Timeline</button>
+            <button class="ghost" id="btnReset">Reset UI State</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>Quick Actions (safe + idempotent)</label>
+              <div class="btns">
+                <button id="btnGuestMsg">Send Guest Message</button>
+                <button id="btnConcMsg">Send Concierge Message</button>
+                <button id="btnTrust">Add Trust Check-In</button>
+              </div>
+              <div class="hint">
+                Uses fixed Idempotency-Keys so repeated clicks replay cleanly.
+                This is intentional: demos shouldn’t break when humans double-click.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Right: Timeline -->
+      <section class="card">
+        <div class="hd">
+          <h2>Timeline</h2>
+          <span class="muted tiny" id="statusLine">Waiting for seed…</span>
+        </div>
+        <div class="bd">
+          <div class="timeline" id="timeline">
+            <!-- Steps injected by JS -->
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="mini">
+            <span class="muted">Last IDs:</span>
+            <span class="mono" id="idsLine">—</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="muted tiny">Raw Responses (latest first)</div>
+          <div class="log" id="log">(empty)</div>
+
+          <div class="foot">
+            <span>OFF / Tangent — tiny demo UI</span>
+            <span>“Simplicity is the ultimate sophistication.”</span>
           </div>
         </div>
-        <div class="hr"></div>
-        <label>Response log</label>
-        <div class="log mono" id="log"></div>
-      </div>
+      </section>
     </div>
   </div>
 
 <script>
-  // --------- tiny client ---------
+(() => {
+  // ---------- tiny helpers ----------
   const $ = (id) => document.getElementById(id);
-  const logEl = $("log");
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  const state = {
-    tab: "happy",
-    selected: { signal_id: null, offer_id: null, vibe_id: null },
-    seed: { guest_handle: "guest_seed", concierge_handle: "conc_seed", guest_id: "guest_seed", concierge_id: "conc_seed" }
-  };
+  function nowIso(){ return new Date().toISOString(); }
 
-  function nowIdem(prefix){
-    const ts = new Date().toISOString().replace(/[:.]/g,"-");
-    return `${prefix}-${state.tab}-${ts}`;
+  function normalizeBase(url){
+    let u = (url || "").trim();
+    if (!u) u = "https://off-backend.onrender.com";
+    u = u.replace(/\/+$/, "");
+    return u;
   }
 
-  function setHealth(status, msg){
-    const dot = $("healthDot");
-    const text = $("healthText");
-    text.textContent = msg;
-    dot.className = "status-dot " + (status === "ok" ? "dot-good" : status === "bad" ? "dot-bad" : "dot-warn");
+  function headerAuth(token){
+    const t = (token || "").trim();
+    if (!t) return {};
+    return { "Authorization": `Bearer ${t}` };
   }
 
-  function writeLog(title, obj){
-    const t = `\n\n=== ${title} ===\n`;
-    const body = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
-    logEl.textContent = (t + body + "\n" + logEl.textContent).slice(0, 25000);
+  function idem(key){
+    return { "Idempotency-Key": key };
   }
 
-  function getCfg(){
-    const baseUrl = $("baseUrl").value.trim().replace(/\/$/,"") || "https://off-backend.onrender.com";
-    const idemPrefix = $("idemPrefix").value.trim() || "demo";
-    const admin = $("kAdmin").value.trim();
-    const conc = $("kConc").value.trim();
-    const guest = $("kGuest").value.trim();
-    const actorId = $("actorId").value.trim();
-    return { baseUrl, idemPrefix, keys: { admin, conc, guest }, actorId };
+  function addLog(obj){
+    const el = $("log");
+    const stamp = nowIso();
+    const s = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+    el.textContent = `# ${stamp}\n${s}\n\n` + el.textContent;
   }
 
-  function authHeader(role){
-    const { keys } = getCfg();
-    const token = (role === "admin" ? keys.admin : role === "conc" ? keys.conc : keys.guest) || "";
-    const raw = token.startsWith("Bearer ") ? token.slice(7).trim() : token;
-    return raw ? { "Authorization": `Bearer ${raw}` } : {};
+  function setStatus(msg){
+    $("statusLine").textContent = msg;
   }
 
-  async function api(path, { method="GET", role=null, idemKey=null, json=null, headers={} } = {}){
-    const cfg = getCfg();
-    const url = cfg.baseUrl + path;
-
-    const h = { ...headers };
-    if (role) Object.assign(h, authHeader(role));
-    if (idemKey) h["Idempotency-Key"] = idemKey;
-    if (cfg.actorId) h["X-Actor-Id"] = cfg.actorId;
-    if (json) h["Content-Type"] = "application/json";
-
-    const res = await fetch(url, {
-      method,
-      headers: h,
-      body: json ? JSON.stringify(json) : undefined
-    });
-
-    const text = await res.text();
-    let data = null;
-    try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
-
-    return {
-      ok: res.ok,
-      status: res.status,
-      headers: Object.fromEntries(res.headers.entries()),
-      data
-    };
+  function setIdsLine(state){
+    const parts = [];
+    if (state.guest_handle) parts.push(`guest=${state.guest_handle}`);
+    if (state.concierge_handle) parts.push(`conc=${state.concierge_handle}`);
+    if (state.signal_id) parts.push(`sig=${state.signal_id}`);
+    if (state.offer_id) parts.push(`off=${state.offer_id}`);
+    if (state.vibe_id) parts.push(`vib=${state.vibe_id}`);
+    $("idsLine").textContent = parts.length ? parts.join("  •  ") : "—";
   }
 
-  function setSelected({ signal_id=null, offer_id=null, vibe_id=null } = {}){
-    if (signal_id !== null) state.selected.signal_id = signal_id;
-    if (offer_id !== null) state.selected.offer_id = offer_id;
-    if (vibe_id !== null) state.selected.vibe_id = vibe_id;
-    $("selPill").textContent = `sig: ${state.selected.signal_id || "—"}  • off: ${state.selected.offer_id || "—"}  • vib: ${state.selected.vibe_id || "—"}`;
+  function dotClass(status){
+    if (!status) return "";
+    const s = String(status).toLowerCase();
+    if (["ok","active","success","true"].includes(s)) return "ok";
+    if (["warn","pending","proposed","offered"].includes(s)) return "warn";
+    if (["error","bad","false","canceled","rejected"].includes(s)) return "bad";
+    return "";
   }
 
-  // --------- UI panels ---------
-  function render(){
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === state.tab));
-    const left = $("panelLeft");
-
-    if (state.tab === "happy"){
-      left.innerHTML = `
-        <h2 style="margin:0 0 10px;font-size:16px">Happy Path</h2>
-        <div class="sub">One-click-ish demo: seed → create new signal → create offer → accept → message → trust event.</div>
-        <div class="hr"></div>
-        <div class="split">
-          <div>
-            <label>Guest id (body)</label>
-            <input id="hpGuestId" value="guest_seed" />
-          </div>
-          <div>
-            <label>Concierge id (body)</label>
-            <input id="hpConcId" value="conc_seed" />
-          </div>
+  function step(title, status, kvPairs){
+    const el = document.createElement("div");
+    el.className = "step";
+    el.innerHTML = `
+      <div class="top">
+        <div class="badge">
+          <span class="dot ${dotClass(status)}"></span>
+          <span>${title}</span>
         </div>
-        <div style="margin-top:10px">
-          <label>Signal intent</label>
-          <input id="hpIntent" value="Sunrise balcony coffee" />
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>Location</label>
-            <input id="hpLoc" value="NYC" />
-          </div>
-          <div>
-            <label>Offer price</label>
-            <input id="hpPrice" type="number" value="20" />
-          </div>
-        </div>
-        <div style="margin-top:10px">
-          <label>Offer message</label>
-          <input id="hpOfferMsg" value="I can meet you at 7:30 near Riverside." />
-        </div>
-        <div style="margin-top:10px" class="btns">
-          <button class="primary" id="hpRun">Run happy-path (no-seed)</button>
-          <button id="hpMsg">Post message (selected vibe)</button>
-          <button id="hpTev">Post trust event (selected vibe)</button>
-        </div>
-        <div class="mini" style="margin-top:10px">This uses:<span class="mono"> POST /signals → POST /offers → POST /offers/:id/accept</span>. It sets Selected IDs when it succeeds.</div>
-      `;
-
-      $("hpRun").onclick = async () => {
-        const cfg = getCfg();
-        const guest_id = $("hpGuestId").value.trim();
-        const concierge_id = $("hpConcId").value.trim();
-        const intent = $("hpIntent").value.trim();
-        const location = $("hpLoc").value.trim();
-        const price = Number($("hpPrice").value || 0);
-        const message = $("hpOfferMsg").value.trim();
-
-        // create signal
-        const r1 = await api(`/signals`, { method:"POST", role:"guest", idemKey: `${cfg.idemPrefix}-sig-001`, json:{ guest_id, intent, location } });
-        writeLog(`POST /signals (${r1.status})`, { headers: pick(r1.headers, ["idempotency-replay","x-request-id"]), body: r1.data });
-        const signal_id = r1.data?.signal?.id || null;
-        if (!signal_id) return;
-        setSelected({ signal_id, offer_id:null, vibe_id:null });
-
-        // create offer
-        const r2 = await api(`/offers`, { method:"POST", role:"conc", idemKey: `${cfg.idemPrefix}-off-001`, json:{ signal_id, concierge_id, message, price } });
-        writeLog(`POST /offers (${r2.status})`, { headers: pick(r2.headers, ["idempotency-replay","x-request-id"]), body: r2.data });
-        const offer_id = r2.data?.offer?.id || null;
-        if (!offer_id) return;
-        setSelected({ offer_id });
-
-        // accept offer
-        const r3 = await api(`/offers/${offer_id}/accept`, { method:"POST", role:"guest", idemKey: `${cfg.idemPrefix}-acc-001`, json:{ guest_id } });
-        writeLog(`POST /offers/${offer_id}/accept (${r3.status})`, { headers: pick(r3.headers, ["idempotency-replay","x-request-id"]), body: r3.data });
-        const vibe_id = r3.data?.vibe?.id || r3.data?.details?.vibe_id || null;
-        if (vibe_id) setSelected({ vibe_id });
-      };
-
-      $("hpMsg").onclick = async () => {
-        const cfg = getCfg();
-        const vibe_id = state.selected.vibe_id || "vib_seed_001";
-        const from_role = "guest";
-        const from_id = $("hpGuestId")?.value?.trim() || "guest_seed";
-        const r = await api(`/messages`, { method:"POST", role:"guest", idemKey: nowIdem(cfg.idemPrefix), json:{ vibe_id, from_role, from_id, text:"Hello from UI" } });
-        writeLog(`POST /messages (${r.status})`, { headers: pick(r.headers, ["idempotency-replay","x-request-id"]), body: r.data });
-      };
-
-      $("hpTev").onclick = async () => {
-        const cfg = getCfg();
-        const vibe_id = state.selected.vibe_id || "vib_seed_001";
-        const actor_id = $("hpGuestId")?.value?.trim() || "guest_seed";
-        const r = await api(`/trustevents`, { method:"POST", role:"guest", idemKey: nowIdem(cfg.idemPrefix), json:{ vibe_id, event_type:"checkin", actor_role:"guest", actor_id, payload:{ note:"Arrived" } } });
-        writeLog(`POST /trustevents (${r.status})`, { headers: pick(r.headers, ["idempotency-replay","x-request-id"]), body: r.data });
-      };
-
-      return;
-    }
-
-    if (state.tab === "signals"){
-      left.innerHTML = `
-        <h2 style="margin:0 0 10px;font-size:16px">Signals</h2>
-        <div class="split">
-          <div>
-            <label>guest_id (filter)</label>
-            <input id="sigGuest" value="guest_seed" />
-          </div>
-          <div>
-            <label>status (filter)</label>
-            <select id="sigStatus">
-              <option value="">(any)</option>
-              <option>pending</option>
-              <option>offered</option>
-              <option>matched</option>
-              <option>completed</option>
-              <option>canceled</option>
-            </select>
-          </div>
-        </div>
-        <div class="btns" style="margin-top:10px">
-          <button class="primary" id="sigList">List</button>
-          <button id="sigCreate">Create</button>
-        </div>
-        <div style="margin-top:10px">
-          <label>Create intent</label>
-          <input id="sigIntent" value="Micro-break walk" />
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>Create location</label>
-            <input id="sigLoc" value="NYC" />
-          </div>
-          <div>
-            <label>Idempotency key (optional)</label>
-            <input id="sigIdem" placeholder="leave blank to auto" />
-          </div>
-        </div>
-      `;
-
-      $("sigList").onclick = async () => {
-        const guest_id = $("sigGuest").value.trim();
-        const status = $("sigStatus").value.trim();
-        const q = new URLSearchParams();
-        if (guest_id) q.set("guest_id", guest_id);
-        if (status) q.set("status", status);
-        const r = await api(`/signals?${q.toString()}`, { role:"guest" });
-        writeLog(`GET /signals (${r.status})`, r.data);
-        const first = r.data?.items?.[0]?.id || null;
-        if (first) setSelected({ signal_id:first });
-      };
-
-      $("sigCreate").onclick = async () => {
-        const cfg = getCfg();
-        const guest_id = $("sigGuest").value.trim() || "guest_seed";
-        const intent = $("sigIntent").value.trim();
-        const location = $("sigLoc").value.trim();
-        const idem = $("sigIdem").value.trim() || nowIdem(cfg.idemPrefix);
-        const r = await api(`/signals`, { method:"POST", role:"guest", idemKey: idem, json:{ guest_id, intent, location } });
-        writeLog(`POST /signals (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-        const id = r.data?.signal?.id || null;
-        if (id) setSelected({ signal_id:id });
-      };
-
-      return;
-    }
-
-    if (state.tab === "offers"){
-      left.innerHTML = `
-        <h2 style="margin:0 0 10px;font-size:16px">Offers</h2>
-        <div class="split">
-          <div>
-            <label>signal_id (filter)</label>
-            <input id="offSignal" placeholder="sig_..." value="${state.selected.signal_id || "sig_seed_001"}" />
-          </div>
-          <div>
-            <label>concierge_id (filter)</label>
-            <input id="offConc" value="conc_seed" />
-          </div>
-        </div>
-        <div class="btns" style="margin-top:10px">
-          <button class="primary" id="offList">List</button>
-          <button id="offCreate">Create</button>
-          <button id="offAccept">Accept selected offer</button>
-        </div>
-        <div class="hr"></div>
-        <div class="split">
-          <div>
-            <label>Create offer: message</label>
-            <input id="offMsg" value="Offer from UI" />
-          </div>
-          <div>
-            <label>Create offer: price</label>
-            <input id="offPrice" type="number" value="20" />
-          </div>
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>Create offer: concierge_id (body)</label>
-            <input id="offConcBody" value="conc_seed" />
-          </div>
-          <div>
-            <label>Idempotency key (optional)</label>
-            <input id="offIdem" placeholder="leave blank to auto" />
-          </div>
-        </div>
-        <div style="margin-top:10px">
-          <label>Accept offer: guest_id (body)</label>
-          <input id="accGuest" value="guest_seed" />
-        </div>
-      `;
-
-      $("offList").onclick = async () => {
-        const q = new URLSearchParams();
-        const signal_id = $("offSignal").value.trim();
-        const concierge_id = $("offConc").value.trim();
-        if (signal_id) q.set("signal_id", signal_id);
-        if (concierge_id) q.set("concierge_id", concierge_id);
-        const r = await api(`/offers?${q.toString()}`, { role:"conc" });
-        writeLog(`GET /offers (${r.status})`, r.data);
-        const first = r.data?.items?.[0]?.id || null;
-        if (first) setSelected({ offer_id:first });
-      };
-
-      $("offCreate").onclick = async () => {
-        const cfg = getCfg();
-        const signal_id = $("offSignal").value.trim();
-        const concierge_id = $("offConcBody").value.trim();
-        const message = $("offMsg").value.trim();
-        const price = Number($("offPrice").value || 0);
-        const idem = $("offIdem").value.trim() || nowIdem(cfg.idemPrefix);
-        const r = await api(`/offers`, { method:"POST", role:"conc", idemKey: idem, json:{ signal_id, concierge_id, message, price } });
-        writeLog(`POST /offers (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-        const id = r.data?.offer?.id || null;
-        if (id) setSelected({ offer_id:id });
-      };
-
-      $("offAccept").onclick = async () => {
-        const cfg = getCfg();
-        const offer_id = state.selected.offer_id;
-        if (!offer_id) return writeLog("Accept offer", "No selected offer_id. List offers first.");
-        const guest_id = $("accGuest").value.trim();
-        const r = await api(`/offers/${offer_id}/accept`, { method:"POST", role:"guest", idemKey: nowIdem(cfg.idemPrefix), json:{ guest_id } });
-        writeLog(`POST /offers/${offer_id}/accept (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-        const vibe_id = r.data?.vibe?.id || r.data?.details?.vibe_id || null;
-        if (vibe_id) setSelected({ vibe_id });
-      };
-
-      return;
-    }
-
-    if (state.tab === "messages"){
-      left.innerHTML = `
-        <h2 style="margin:0 0 10px;font-size:16px">Messages</h2>
-        <div class="split">
-          <div>
-            <label>vibe_id</label>
-            <input id="mVibe" value="${state.selected.vibe_id || "vib_seed_001"}" />
-          </div>
-          <div>
-            <label>actor_id (query)</label>
-            <input id="mActor" value="guest_seed" />
-          </div>
-        </div>
-        <div class="btns" style="margin-top:10px">
-          <button class="primary" id="mList">List</button>
-          <button id="mPost">Post</button>
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>from_role</label>
-            <select id="mRole"><option>guest</option><option>concierge</option></select>
-          </div>
-          <div>
-            <label>from_id</label>
-            <input id="mFrom" value="guest_seed" />
-          </div>
-        </div>
-        <div style="margin-top:10px">
-          <label>text</label>
-          <input id="mText" value="hello from UI" />
-        </div>
-      `;
-
-      $("mList").onclick = async () => {
-        const vibe_id = $("mVibe").value.trim();
-        const actor_id = $("mActor").value.trim();
-        const q = new URLSearchParams({ vibe_id, actor_id });
-        const r = await api(`/messages?${q.toString()}`, { role: ( $("mRole").value === "concierge" ? "conc" : "guest" ) });
-        writeLog(`GET /messages (${r.status})`, r.data);
-      };
-
-      $("mPost").onclick = async () => {
-        const cfg = getCfg();
-        const vibe_id = $("mVibe").value.trim();
-        const from_role = $("mRole").value;
-        const from_id = $("mFrom").value.trim();
-        const text = $("mText").value.trim();
-        const role = from_role === "concierge" ? "conc" : "guest";
-        const r = await api(`/messages`, { method:"POST", role, idemKey: nowIdem(cfg.idemPrefix), json:{ vibe_id, from_role, from_id, text } });
-        writeLog(`POST /messages (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-      };
-
-      return;
-    }
-
-    if (state.tab === "trust"){
-      left.innerHTML = `
-        <h2 style="margin:0 0 10px;font-size:16px">Trust Events</h2>
-        <div class="split">
-          <div>
-            <label>vibe_id</label>
-            <input id="tVibe" value="${state.selected.vibe_id || "vib_seed_001"}" />
-          </div>
-          <div>
-            <label>actor_id (query)</label>
-            <input id="tActor" value="guest_seed" />
-          </div>
-        </div>
-        <div class="btns" style="margin-top:10px">
-          <button class="primary" id="tList">List</button>
-          <button id="tPost">Post</button>
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>event_type</label>
-            <select id="tType"><option>checkin</option><option>checkout</option><option>flag</option><option>note</option></select>
-          </div>
-          <div>
-            <label>actor_role</label>
-            <select id="tRole"><option>guest</option><option>concierge</option></select>
-          </div>
-        </div>
-        <div class="split" style="margin-top:10px">
-          <div>
-            <label>actor_id (body)</label>
-            <input id="tActorBody" value="guest_seed" />
-          </div>
-          <div>
-            <label>payload.note</label>
-            <input id="tNote" value="Arrived" />
-          </div>
-        </div>
-      `;
-
-      $("tList").onclick = async () => {
-        const vibe_id = $("tVibe").value.trim();
-        const actor_id = $("tActor").value.trim();
-        const role = $("tRole").value === "concierge" ? "conc" : "guest";
-        const q = new URLSearchParams({ vibe_id, actor_id });
-        const r = await api(`/trustevents?${q.toString()}`, { role });
-        writeLog(`GET /trustevents (${r.status})`, r.data);
-      };
-
-      $("tPost").onclick = async () => {
-        const cfg = getCfg();
-        const vibe_id = $("tVibe").value.trim();
-        const event_type = $("tType").value;
-        const actor_role = $("tRole").value;
-        const actor_id = $("tActorBody").value.trim();
-        const payload = { note: $("tNote").value.trim() };
-        const role = actor_role === "concierge" ? "conc" : "guest";
-        const r = await api(`/trustevents`, { method:"POST", role, idemKey: nowIdem(cfg.idemPrefix), json:{ vibe_id, event_type, actor_role, actor_id, payload } });
-        writeLog(`POST /trustevents (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-      };
-
-      return;
-    }
-
-    // debug
-    left.innerHTML = `
-      <h2 style="margin:0 0 10px;font-size:16px">Debug</h2>
-      <div class="sub">Admin-only helpers. These endpoints should be disabled behind a flag before any real launch.</div>
-      <div class="hr"></div>
-      <div class="btns">
-        <button class="primary" id="dSeed">POST /debug/seed</button>
-        <button id="dReset" class="danger">POST /debug/reset</button>
-        <button id="dStore">GET /debug/store</button>
+        <span class="mono tiny muted">${status || ""}</span>
       </div>
-      <div style="margin-top:10px">
-        <label>Idempotency key (seed/reset)</label>
-        <input id="dIdem" placeholder="leave blank to auto" />
+      <div class="kvs">
+        ${(kvPairs || []).map(([k,v]) => `
+          <div class="k">${escapeHtml(k)}</div>
+          <div class="v">${formatVal(v)}</div>
+        `).join("")}
       </div>
     `;
-
-    $("dSeed").onclick = async () => {
-      const cfg = getCfg();
-      const idem = $("dIdem").value.trim() || nowIdem(cfg.idemPrefix);
-      const r = await api(`/debug/seed`, { method:"POST", role:"admin", idemKey: idem });
-      writeLog(`POST /debug/seed (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-      // best-effort set selection
-      if (r.data?.ids?.signal_id) setSelected({ signal_id: r.data.ids.signal_id, offer_id:r.data.ids.offer_id, vibe_id:r.data.ids.vibe_id });
-    };
-
-    $("dReset").onclick = async () => {
-      const cfg = getCfg();
-      const idem = $("dIdem").value.trim() || nowIdem(cfg.idemPrefix);
-      const r = await api(`/debug/reset`, { method:"POST", role:"admin", idemKey: idem });
-      writeLog(`POST /debug/reset (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-      setSelected({ signal_id:null, offer_id:null, vibe_id:null });
-    };
-
-    $("dStore").onclick = async () => {
-      const r = await api(`/debug/store`, { role:"admin" });
-      writeLog(`GET /debug/store (${r.status})`, r.data);
-    };
+    return el;
   }
 
-  function pick(obj, keys){
-    const out = {};
-    keys.forEach(k => { if (obj && obj[k] != null) out[k] = obj[k]; });
-    return out;
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
 
-  // --------- top actions ---------
-  $("tabs").addEventListener("click", (e) => {
-    const el = e.target.closest(".tab");
-    if (!el) return;
-    state.tab = el.dataset.tab;
-    render();
+  function formatVal(v){
+    if (v === null || v === undefined) return `<span class="muted">—</span>`;
+    const s = String(v);
+    if (s.length > 80) return `<code>${escapeHtml(s.slice(0, 80))}…</code>`;
+    return `<code>${escapeHtml(s)}</code>`;
+  }
+
+  async function fetchJson(url, opts){
+    const res = await fetch(url, opts);
+    const text = await res.text();
+    let data = null;
+    try { data = JSON.parse(text); } catch(_) {}
+    return { res, text, data };
+  }
+
+  // ---------- state ----------
+  const LS = {
+    baseUrl: "off_demo_baseUrl",
+    adminKey: "off_demo_adminKey",
+    guestKey: "off_demo_guestKey",
+    concKey: "off_demo_concKey",
+    demoState: "off_demo_state"
+  };
+
+  const state = {
+    // from debug/seed
+    guest_id: null,
+    guest_handle: null,
+    concierge_id: null,
+    concierge_handle: null,
+    signal_id: null,
+    offer_id: null,
+    vibe_id: null
+  };
+
+  function saveInputs(){
+    localStorage.setItem(LS.baseUrl, $("baseUrl").value.trim());
+    localStorage.setItem(LS.adminKey, $("adminKey").value.trim());
+    localStorage.setItem(LS.guestKey, $("guestKey").value.trim());
+    localStorage.setItem(LS.concKey, $("concKey").value.trim());
+  }
+  function loadInputs(){
+    $("baseUrl").value = localStorage.getItem(LS.baseUrl) || "https://off-backend.onrender.com";
+    $("adminKey").value = localStorage.getItem(LS.adminKey) || "";
+    $("guestKey").value = localStorage.getItem(LS.guestKey) || "";
+    $("concKey").value = localStorage.getItem(LS.concKey) || "";
+  }
+  function saveState(){
+    localStorage.setItem(LS.demoState, JSON.stringify(state));
+  }
+  function loadState(){
+    const raw = localStorage.getItem(LS.demoState);
+    if (!raw) return;
+    try{
+      const obj = JSON.parse(raw);
+      Object.assign(state, obj);
+    }catch(_){}
+  }
+  function resetState(){
+    for (const k of Object.keys(state)) state[k] = null;
+    localStorage.removeItem(LS.demoState);
+    $("timeline").innerHTML = "";
+    $("idsLine").textContent = "—";
+    setStatus("Waiting for seed…");
+    addLog("UI state reset.");
+  }
+
+  // ---------- API calls ----------
+  function cfg(){
+    saveInputs();
+    const base = normalizeBase($("baseUrl").value);
+    const admin = $("adminKey").value.trim();
+    const guest = $("guestKey").value.trim();
+    const conc = $("concKey").value.trim();
+    return { base, admin, guest, conc };
+  }
+
+  async function seedHappyPath(){
+    const { base, admin } = cfg();
+    if (!admin){
+      addLog("Missing Admin Key. Add it, then click Seed again.");
+      setStatus("Add Admin Key to seed.");
+      return;
+    }
+    setStatus("Seeding Happy Path…");
+    const url = `${base}/debug/seed`;
+    const { res, data, text } = await fetchJson(url, {
+      method: "POST",
+      headers: {
+        ...headerAuth(admin),
+        ...idem("seed-ui-001")
+      }
+    });
+    addLog({ request: { method:"POST", url }, status: res.status, idempotencyReplay: res.headers.get("idempotency-replay"), body: data ?? text });
+
+    if (!res.ok || !data || !data.success){
+      setStatus(`Seed failed (${res.status}).`);
+      return;
+    }
+
+    // capture IDs from response if present
+    const ids = data.ids || {};
+    state.guest_id = ids.guest_id || state.guest_id;
+    state.guest_handle = ids.guest_handle || state.guest_handle || "guest_seed";
+    state.concierge_id = ids.concierge_id || state.concierge_id;
+    state.concierge_handle = ids.concierge_handle || state.concierge_handle || "conc_seed";
+    state.signal_id = ids.signal_id || state.signal_id;
+    state.offer_id = ids.offer_id || state.offer_id;
+    state.vibe_id = ids.vibe_id || state.vibe_id;
+
+    saveState();
+    setIdsLine(state);
+    setStatus(`Seeded. Rendering timeline…`);
+    await refreshTimeline();
+  }
+
+  async function refreshTimeline(){
+    const { base, admin, guest, conc } = cfg();
+    loadState();
+    setIdsLine(state);
+
+    const t = $("timeline");
+    t.innerHTML = "";
+
+    const hasSeed = !!(state.signal_id && state.offer_id && state.vibe_id);
+    if (!hasSeed){
+      t.appendChild(step("Happy Path", "pending", [
+        ["state", "No seed IDs yet"],
+        ["next", "Click ‘Seed Happy Path’"],
+      ]));
+      setStatus("Waiting for seed…");
+      return;
+    }
+
+    // We’ll fetch lightweight read endpoints using whichever key exists.
+    // Prefer guest/conc keys for user-like reads; fall back to admin if needed.
+    const anyKey = guest || conc || admin || "";
+    const auth = anyKey ? headerAuth(anyKey) : {};
+
+    // Signals list (filter by guest_id)
+    const sigUrl = `${base}/signals?guest_id=${encodeURIComponent(state.guest_handle || "guest_seed")}&limit=20&offset=0`;
+    const sig = await fetchJson(sigUrl, { headers: { ...auth } });
+    addLog({ request:{method:"GET", url:sigUrl}, status:sig.res.status, body: sig.data ?? sig.text });
+
+    let signalObj = null;
+    if (sig.data && Array.isArray(sig.data.items)){
+      signalObj = sig.data.items.find(x => x.id === state.signal_id) || sig.data.items[0] || null;
+    }
+
+    // Offers list (filter by signal_id)
+    const offUrl = `${base}/offers?signal_id=${encodeURIComponent(state.signal_id)}&limit=50&offset=0`;
+    const off = await fetchJson(offUrl, { headers: { ...auth } });
+    addLog({ request:{method:"GET", url:offUrl}, status:off.res.status, body: off.data ?? off.text });
+
+    let offerObj = null;
+    if (off.data && Array.isArray(off.data.items)){
+      offerObj = off.data.items.find(x => x.id === state.offer_id) || off.data.items[0] || null;
+    }
+
+    // Vibes list (filter by signal_id)
+    const vibUrl = `${base}/vibes?signal_id=${encodeURIComponent(state.signal_id)}&limit=50&offset=0`;
+    const vib = await fetchJson(vibUrl, { headers: { ...auth } });
+    addLog({ request:{method:"GET", url:vibUrl}, status:vib.res.status, body: vib.data ?? vib.text });
+
+    let vibeObj = null;
+    if (vib.data && Array.isArray(vib.data.items)){
+      vibeObj = vib.data.items.find(x => x.id === state.vibe_id) || vib.data.items[0] || null;
+    }
+
+    // Messages list (needs vibe_id + actor_id per your backend behavior)
+    const actorId = state.guest_handle || "guest_seed";
+    const msgUrl = `${base}/messages?vibe_id=${encodeURIComponent(state.vibe_id)}&actor_id=${encodeURIComponent(actorId)}`;
+    const msg = await fetchJson(msgUrl, { headers: { ...headerAuth(guest || anyKey) } });
+    addLog({ request:{method:"GET", url:msgUrl}, status:msg.res.status, body: msg.data ?? msg.text });
+
+    // Trust events list (vibe_id + actor_id)
+    const tevUrl = `${base}/trustevents?vibe_id=${encodeURIComponent(state.vibe_id)}&actor_id=${encodeURIComponent(actorId)}`;
+    const tev = await fetchJson(tevUrl, { headers: { ...headerAuth(guest || anyKey) } });
+    addLog({ request:{method:"GET", url:tevUrl}, status:tev.res.status, body: tev.data ?? tev.text });
+
+    // render timeline
+    t.appendChild(step("Signal", signalObj?.status || (sig.res.ok ? "ok" : "warn"), [
+      ["signal_id", state.signal_id],
+      ["guest", signalObj?.guest_id ?? state.guest_handle],
+      ["intent", signalObj?.intent ?? "(unknown)"],
+      ["location", signalObj?.location ?? null],
+    ]));
+
+    t.appendChild(step("Offer", offerObj?.status || (off.res.ok ? "ok" : "warn"), [
+      ["offer_id", state.offer_id],
+      ["signal_id", offerObj?.signal_id ?? state.signal_id],
+      ["concierge", offerObj?.concierge_id ?? state.concierge_handle],
+      ["message", offerObj?.message ?? "(unknown)"],
+      ["price", offerObj?.price ?? null],
+    ]));
+
+    t.appendChild(step("Vibe", vibeObj?.status || (vib.res.ok ? "ok" : "warn"), [
+      ["vibe_id", state.vibe_id],
+      ["status", vibeObj?.status ?? "(unknown)"],
+      ["guest", vibeObj?.guest_id ?? state.guest_handle],
+      ["concierge", vibeObj?.concierge_id ?? state.concierge_handle],
+    ]));
+
+    const msgCount = msg.data?.count ?? (Array.isArray(msg.data?.items) ? msg.data.items.length : null);
+    const lastMsg = Array.isArray(msg.data?.items) && msg.data.items.length ? msg.data.items[msg.data.items.length - 1] : null;
+    t.appendChild(step("Messages", msg.res.ok ? "ok" : "warn", [
+      ["count", msgCount],
+      ["last_from", lastMsg ? `${lastMsg.from_role}:${lastMsg.from_id}` : null],
+      ["last_text", lastMsg?.text ?? null],
+    ]));
+
+    const tevCount = tev.data?.count ?? (Array.isArray(tev.data?.items) ? tev.data.items.length : null);
+    const lastTev = Array.isArray(tev.data?.items) && tev.data.items.length ? tev.data.items[tev.data.items.length - 1] : null;
+    t.appendChild(step("Trust Event", tev.res.ok ? "ok" : "warn", [
+      ["count", tevCount],
+      ["last_type", lastTev?.event_type ?? null],
+      ["last_actor", lastTev ? `${lastTev.actor_role}:${lastTev.actor_id}` : null],
+      ["note", lastTev?.payload?.note ?? null],
+    ]));
+
+    setStatus("Timeline refreshed.");
+  }
+
+  async function sendGuestMessage(){
+    const { base, guest } = cfg();
+    loadState();
+    if (!guest){ addLog("Missing Guest Key. Add it, then try again."); return; }
+    if (!state.vibe_id){ addLog("No vibe_id in state. Seed first."); return; }
+
+    const url = `${base}/messages`;
+    const body = {
+      vibe_id: state.vibe_id,
+      from_role: "guest",
+      from_id: state.guest_handle || "guest_seed",
+      text: "Hi — quick demo message from guest 👋"
+    };
+
+    const { res, data, text } = await fetchJson(url, {
+      method: "POST",
+      headers: {
+        ...headerAuth(guest),
+        ...idem("ui-guest-msg-001"),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    addLog({ request:{method:"POST", url, body}, status: res.status, idempotencyReplay: res.headers.get("idempotency-replay"), body: data ?? text });
+
+    await refreshTimeline();
+  }
+
+  async function sendConciergeMessage(){
+    const { base, conc } = cfg();
+    loadState();
+    if (!conc){ addLog("Missing Concierge Key. Add it, then try again."); return; }
+    if (!state.vibe_id){ addLog("No vibe_id in state. Seed first."); return; }
+
+    const url = `${base}/messages`;
+    const body = {
+      vibe_id: state.vibe_id,
+      from_role: "concierge",
+      from_id: state.concierge_handle || "conc_seed",
+      text: "On it. I’ll meet you there — love this idea ✨"
+    };
+
+    const { res, data, text } = await fetchJson(url, {
+      method: "POST",
+      headers: {
+        ...headerAuth(conc),
+        ...idem("ui-conc-msg-001"),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    addLog({ request:{method:"POST", url, body}, status: res.status, idempotencyReplay: res.headers.get("idempotency-replay"), body: data ?? text });
+
+    await refreshTimeline();
+  }
+
+  async function addTrustCheckin(){
+    const { base, guest } = cfg();
+    loadState();
+    if (!guest){ addLog("Missing Guest Key. Add it, then try again."); return; }
+    if (!state.vibe_id){ addLog("No vibe_id in state. Seed first."); return; }
+
+    const url = `${base}/trustevents`;
+    const body = {
+      vibe_id: state.vibe_id,
+      event_type: "checkin",
+      actor_role: "guest",
+      actor_id: state.guest_handle || "guest_seed",
+      payload: { note: "Arrived (demo)" }
+    };
+
+    const { res, data, text } = await fetchJson(url, {
+      method: "POST",
+      headers: {
+        ...headerAuth(guest),
+        ...idem("ui-tev-001"),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    addLog({ request:{method:"POST", url, body}, status: res.status, idempotencyReplay: res.headers.get("idempotency-replay"), body: data ?? text });
+
+    await refreshTimeline();
+  }
+
+  // ---------- wire up ----------
+  loadInputs();
+  loadState();
+  setIdsLine(state);
+  refreshTimeline();
+
+  // save on input changes
+  ["baseUrl","adminKey","guestKey","concKey"].forEach(id => {
+    $(id).addEventListener("input", saveInputs);
   });
 
-  $("btnSave").onclick = () => {
-    const cfg = getCfg();
-    localStorage.setItem("off_demo_cfg", JSON.stringify({
-      baseUrl: cfg.baseUrl,
-      idemPrefix: cfg.idemPrefix,
-      keys: cfg.keys,
-      actorId: cfg.actorId
-    }));
-    writeLog("Saved", { baseUrl: cfg.baseUrl, idemPrefix: cfg.idemPrefix, actorId: cfg.actorId, keys: { admin: !!cfg.keys.admin, conc: !!cfg.keys.conc, guest: !!cfg.keys.guest } });
-  };
+  $("btnSeed").addEventListener("click", seedHappyPath);
+  $("btnRefresh").addEventListener("click", refreshTimeline);
+  $("btnReset").addEventListener("click", resetState);
 
-  $("btnClear").onclick = () => {
-    localStorage.removeItem("off_demo_cfg");
-    logEl.textContent = "";
-    setHealth("warn","Not checked");
-    writeLog("Cleared", "localStorage + log cleared.");
-  };
-
-  $("btnHealth").onclick = async () => {
-    try{
-      const r = await api(`/health`);
-      setHealth(r.ok ? "ok" : "bad", r.ok ? "OK" : `HTTP ${r.status}`);
-      writeLog(`GET /health (${r.status})`, r.data);
-    }catch(err){
-      setHealth("bad","Network error");
-      writeLog("GET /health (error)", String(err));
-    }
-  };
-
-  $("btnSeed").onclick = async () => {
-    const cfg = getCfg();
-    const r = await api(`/debug/seed`, { method:"POST", role:"admin", idemKey: `${cfg.idemPrefix}-seed-001` });
-    writeLog(`POST /debug/seed (${r.status})`, { headers: pick(r.headers,["idempotency-replay","x-request-id"]), body:r.data });
-    if (r.data?.ids?.signal_id) setSelected({ signal_id: r.data.ids.signal_id, offer_id:r.data.ids.offer_id, vibe_id:r.data.ids.vibe_id });
-  };
-
-  $("btnGuestOverview").onclick = async () => {
-    const guest = "guest_seed";
-    const r = await api(`/guests/${guest}/overview`, { role:"guest" });
-    writeLog(`GET /guests/${guest}/overview (${r.status})`, r.data);
-  };
-
-  $("btnConcOverview").onclick = async () => {
-    const conc = "conc_seed";
-    const r = await api(`/concierges/${conc}/overview`, { role:"conc" });
-    writeLog(`GET /concierges/${conc}/overview (${r.status})`, r.data);
-  };
-
-  $("btnStore").onclick = async () => {
-    const r = await api(`/debug/store`, { role:"admin" });
-    writeLog(`GET /debug/store (${r.status})`, r.data);
-  };
-
-  // --------- init ---------
-  (function init(){
-    const raw = localStorage.getItem("off_demo_cfg");
-    if (raw){
-      try{
-        const cfg = JSON.parse(raw);
-        $("baseUrl").value = cfg.baseUrl || "https://off-backend.onrender.com";
-        $("idemPrefix").value = cfg.idemPrefix || "demo";
-        $("kAdmin").value = cfg.keys?.admin || "";
-        $("kConc").value = cfg.keys?.conc || "";
-        $("kGuest").value = cfg.keys?.guest || "";
-        $("actorId").value = cfg.actorId || "";
-      }catch{}
-    }else{
-      $("baseUrl").value = "https://off-backend.onrender.com";
-      $("idemPrefix").value = "demo";
-    }
-    render();
-  })();
+  $("btnGuestMsg").addEventListener("click", sendGuestMessage);
+  $("btnConcMsg").addEventListener("click", sendConciergeMessage);
+  $("btnTrust").addEventListener("click", addTrustCheckin);
+})();
 </script>
 </body>
 </html>

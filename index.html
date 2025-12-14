@@ -1,3 +1,4 @@
+<!-- PART 1/2 — OFF / Tangent Demo UI v0.452 (with key auto-mask + per-key readiness dots) -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -101,6 +102,13 @@
     button:active{ transform: translateY(0px); }
     button.primary{ background: rgba(125,211,252,.12); border-color: rgba(125,211,252,.35); }
     button.danger{  background: rgba(251,113,133,.10); border-color: rgba(251,113,133,.35); }
+    button.ghost{
+      background: rgba(17,26,38,.45);
+      border-color: rgba(27,38,54,.85);
+      padding: 9px 10px;
+      border-radius: 12px;
+      font-weight: 800;
+    }
     button:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
 
     .grid{
@@ -118,8 +126,8 @@
     .card{
       background: linear-gradient(180deg, rgba(15,22,32,.92), rgba(12,19,28,.92));
       border: 1px solid rgba(27,38,54,.92);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.45);
       overflow:hidden;
     }
     .cardHeader{
@@ -258,6 +266,29 @@
     @media (max-width: 540px){ .row2{ grid-template-columns:1fr; } }
 
     label{ display:block; font-size: 11px; color: var(--muted); margin: 0 0 6px; }
+
+    .labelRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .labelLeft{
+      display:flex; align-items:center; gap:8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .keyDot{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: rgba(154,168,187,.55);
+      box-shadow: 0 0 0 0 rgba(152,166,184,.0);
+    }
+    .keyDot.good{ background: var(--good); box-shadow: 0 0 0 5px rgba(52,211,153,.10); }
+    .keyDot.warn{ background: var(--warn); box-shadow: 0 0 0 5px rgba(251,191,36,.10); }
+    .keyDot.bad{  background: var(--bad);  box-shadow: 0 0 0 5px rgba(251,113,133,.10); }
+
     input, select{
       width:100%;
       padding: 10px 10px;
@@ -357,7 +388,7 @@
       <div class="brand">
         <div class="title">
           OFF / Tangent — “Happy Path” Demo
-          <span class="tag">v0.451.1</span>
+          <span class="tag">v0.452</span>
         </div>
         <div class="subtitle">
           Visual demo: guest creates a signal → concierges consider → offers appear → guest accepts → vibe starts → messages appear (real API).
@@ -426,20 +457,41 @@
 
           <div class="row2">
             <div>
-              <label for="adminKey">Admin API Key</label>
-              <input id="adminKey" placeholder="admin token (Bearer… optional)" />
+              <div class="labelRow">
+                <div class="labelLeft">
+                  <span class="keyDot warn" id="dotAdmin" title="Admin key readiness"></span>
+                  <span>Admin API Key</span>
+                </div>
+                <button id="toggleAdmin" class="ghost" type="button" title="Temporarily reveal/hide">Show</button>
+              </div>
+              <input id="adminKey" type="password" placeholder="admin token (Bearer… optional)" autocomplete="off" />
             </div>
+
             <div>
-              <label for="guestKey">Guest API Key</label>
-              <input id="guestKey" placeholder="guest token (Bearer… optional)" />
+              <div class="labelRow">
+                <div class="labelLeft">
+                  <span class="keyDot warn" id="dotGuest" title="Guest key readiness"></span>
+                  <span>Guest API Key</span>
+                </div>
+                <button id="toggleGuest" class="ghost" type="button" title="Temporarily reveal/hide">Show</button>
+              </div>
+              <input id="guestKey" type="password" placeholder="guest token (Bearer… optional)" autocomplete="off" />
             </div>
           </div>
 
           <div class="row2">
             <div>
-              <label for="concKey">Concierge API Key</label>
-              <input id="concKey" placeholder="concierge token (Bearer… optional)" />
+              <div class="labelRow">
+                <div class="labelLeft">
+                  <span class="keyDot warn" id="dotConc" title="Concierge key readiness"></span>
+                  <span>Concierge API Key</span>
+                </div>
+                <button id="toggleConc" class="ghost" type="button" title="Temporarily reveal/hide">Show</button>
+              </div>
+              <input id="concKey" type="password" placeholder="concierge token (Bearer… optional)" autocomplete="off" />
+              <div class="tiny" style="margin-top:6px;">Keys auto-mask on save/load so screenshares are safe.</div>
             </div>
+
             <div>
               <label for="actorId">Actor ID (optional)</label>
               <input id="actorId" placeholder="guest_seed / conc_seed" />
@@ -519,6 +571,7 @@
     </div>
   </div>
 
+  <!-- PART 2 continues with the full <script>…</script> and closing tags -->
 <script>
 (function(){
   // ---------- helpers ----------
@@ -542,6 +595,50 @@
     if (state === "good") dot.classList.add("good");
     else if (state === "warn") dot.classList.add("warn");
     else if (state === "bad") dot.classList.add("bad");
+  }
+
+  function setKeyDot(which, state){
+    const el = $(which);
+    if (!el) return;
+    el.classList.remove("good","warn","bad");
+    if (state === "good") el.classList.add("good");
+    else if (state === "warn") el.classList.add("warn");
+    else if (state === "bad") el.classList.add("bad");
+  }
+
+  function keyHasValue(v){
+    return !!String(v || "").trim();
+  }
+
+  function refreshKeyDots(){
+    // Yellow = missing, Green = present. (We keep it simple + screen-share safe.)
+    setKeyDot("dotAdmin", keyHasValue($("adminKey").value) ? "good" : "warn");
+    setKeyDot("dotGuest", keyHasValue($("guestKey").value) ? "good" : "warn");
+    setKeyDot("dotConc",  keyHasValue($("concKey").value)  ? "good" : "warn");
+  }
+
+  function forceMaskKeys(){
+    ["adminKey","guestKey","concKey"].forEach(id => {
+      const input = $(id);
+      if (input) input.type = "password";
+    });
+    ["toggleAdmin","toggleGuest","toggleConc"].forEach(id => {
+      const btn = $(id);
+      if (btn) btn.textContent = "Show";
+    });
+  }
+
+  function toggleReveal(inputId, btnId){
+    const input = $(inputId);
+    const btn = $(btnId);
+    if (!input || !btn) return;
+    if (input.type === "password"){
+      input.type = "text";
+      btn.textContent = "Hide";
+    } else {
+      input.type = "password";
+      btn.textContent = "Show";
+    }
   }
 
   function logLine(text, cls="muted"){
@@ -691,7 +788,8 @@
       noGo: $("noGo").value || "politics, religion, economy",
       timeWindow: $("timeWindow").value || "12:00 → 13:30",
       offerMsg: $("offerMsg").value || "Calm coffee + short walk.",
-      offerPrice: $("offerPrice").value || "20"
+      offerPrice: $("offerPrice").value || "20",
+      demoSpeed: $("demoSpeed").value || "demo"
     };
   }
 
@@ -709,7 +807,8 @@
       noGo: "politics, religion, economy",
       timeWindow: "12:00 → 13:30",
       offerMsg: "Calm coffee + short walk. 45 min.",
-      offerPrice: "20"
+      offerPrice: "20",
+      demoSpeed: "demo"
     };
   }
 
@@ -727,21 +826,30 @@
     $("timeWindow").value = st.timeWindow ?? "";
     $("offerMsg").value = st.offerMsg ?? "";
     $("offerPrice").value = st.offerPrice ?? "";
+    if ($("demoSpeed")) $("demoSpeed").value = st.demoSpeed ?? "demo";
+    refreshKeyDots();
+    forceMaskKeys();
   }
 
   function saveState(){
-    localStorage.setItem("off_demo_state_v3", JSON.stringify(readInputs()));
+    localStorage.setItem("off_demo_state_v452", JSON.stringify(readInputs()));
+    forceMaskKeys();           // auto-mask once saved (screen-share safe)
+    refreshKeyDots();
     logLine(`[ui] saved (${nowIso()})`, "accent");
   }
+
   function loadState(){
-    const raw = localStorage.getItem("off_demo_state_v3");
-    if (!raw) { logLine("[ui] nothing saved yet", "warn"); return; }
+    const raw = localStorage.getItem("off_demo_state_v452");
+    if (!raw) { logLine("[ui] nothing saved yet", "warn"); refreshKeyDots(); return; }
     try { applyInputs(JSON.parse(raw)); logLine(`[ui] loaded (${nowIso()})`, "accent"); }
-    catch { logLine("[ui] save corrupt", "bad"); }
+    catch { logLine("[ui] save corrupt", "bad"); refreshKeyDots(); }
   }
+
   function clearState(){
-    localStorage.removeItem("off_demo_state_v3");
+    localStorage.removeItem("off_demo_state_v452");
     applyInputs(defaultState());
+    forceMaskKeys();
+    refreshKeyDots();
     logLine(`[ui] cleared (${nowIso()})`, "warn");
   }
 
@@ -749,6 +857,7 @@
     uiLocked = !!lock;
     ["btnSeed","btnRun","btnReset","btnHealth"].forEach(id => { $(id).disabled = uiLocked; });
   }
+
   function hardUnlock(){
     lockUi(false);
     setStage("idle", "Unlocked");
@@ -1144,6 +1253,7 @@
           logLine(`[exception] ${String(e?.message || e)}`, "bad");
         } finally {
           lockUi(false);
+          refreshKeyDots();
         }
       });
 
@@ -1155,6 +1265,7 @@
       logLine(`[exception] ${String(e?.message || e)}`, "bad");
     } finally {
       lockUi(false);
+      refreshKeyDots();
     }
   }
 
@@ -1163,6 +1274,17 @@
     applyInputs(defaultState());
     loadState();
     $("baseUrl").value = normalizeBaseUrl($("baseUrl").value);
+
+    // key toggle buttons (temporary reveal)
+    $("toggleAdmin").addEventListener("click", ()=>toggleReveal("adminKey","toggleAdmin"));
+    $("toggleGuest").addEventListener("click", ()=>toggleReveal("guestKey","toggleGuest"));
+    $("toggleConc").addEventListener("click",  ()=>toggleReveal("concKey","toggleConc"));
+
+    // refresh dots when typing keys
+    ["adminKey","guestKey","concKey"].forEach(id=>{
+      $(id).addEventListener("input", refreshKeyDots);
+      $(id).addEventListener("blur", refreshKeyDots);
+    });
 
     $("btnHealth").addEventListener("click", checkHealth);
     $("btnSeed").addEventListener("click", seedHappyPath);
@@ -1185,6 +1307,10 @@
 
     // periodic health check
     setInterval(() => { if (!document.hidden) checkHealth(); }, 30000);
+
+    // Ensure keys are masked on first paint
+    forceMaskKeys();
+    refreshKeyDots();
 
     checkHealth();
     setStage("idle", "Seed or Run");

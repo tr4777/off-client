@@ -1224,11 +1224,19 @@
           setStage("rendering", "Loading messages…");
           updateRunState("rendering");
 
+const effectiveActorId =
+  actorId ||
+  st.guestId?.trim() ||
+  st.conciergeId?.trim() ||
+  null;
+
+          
           const listResp = await listMessages({
-            vibe_id: run.vibe.id,
-            token: st.guestKey || st.adminKey || st.concKey,
-            actorId
-          });
+  vibe_id: run.vibe.id,
+  token: st.guestKey || st.adminKey || st.concKey,
+  actorId: effectiveActorId
+});
+
 
           if (listResp.ok && Array.isArray(listResp.data?.items)){
             mkStoryCard("Conversation", postOk ? "real" : "partial", postOk ? "good" : "warn",

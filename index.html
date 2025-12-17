@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OFF / Tangent — Demo v0.453.2</title>
+  <title>OFF / Tangent — Demo v0.453</title>
   <meta name="description" content="OFF / Tangent demo: Signal → Offer → Accept → Vibe → Messages (real API) with pillar status lights." />
 
   <style>
@@ -174,91 +174,7 @@
 
     /* Story lane */
     .lane{ display:flex; flex-direction:column; gap: 10px; min-height: 560px; }
-    
-
-    /* Marketplace (staged demo) */
-    .marketGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    @media (max-width: 560px){ .marketGrid{ grid-template-columns: 1fr; } }
-
-    .offerTile{
-      border: 1px solid rgba(27,38,54,.88);
-      background: rgba(17,26,38,.35);
-      border-radius: 16px;
-      padding: 10px 10px 9px;
-      cursor: pointer;
-      transition: transform .06s ease, border-color .15s ease, background .15s ease;
-      position: relative;
-      overflow:hidden;
-      user-select:none;
-    }
-    .offerTile:hover{ transform: translateY(-1px); border-color: rgba(125,211,252,.35); }
-    .offerTile:active{ transform: translateY(0px); }
-    .offerTile.selected{
-      border-color: rgba(52,211,153,.42);
-      background: rgba(52,211,153,.06);
-    }
-    .offerTile .type{
-      font-family: var(--mono);
-      font-size: 10px;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(27,38,54,.85);
-      background: rgba(17,26,38,.55);
-      color: rgba(232,238,247,.85);
-    }
-    .offerTile .type.human{ border-color: rgba(125,211,252,.35); background: rgba(125,211,252,.08); }
-    .offerTile .type.store{ border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.08); }
-    .offerTile .type.ai{    border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.08); }
-
-    .offerTile h3{
-      margin: 8px 0 4px;
-      font-size: 13px;
-      letter-spacing: .2px;
-    }
-    .offerTile p{
-      margin: 0;
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-    .offerTile .metaRow{
-      margin-top: 8px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      font-size: 11px;
-      color: rgba(232,238,247,.85);
-    }
-    .offerTile .price{
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 9px;
-      border: 1px solid rgba(27,38,54,.9);
-      background: rgba(11,15,20,.55);
-    }
-    .marketCta{
-      margin-top: 10px;
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    .marketNote{
-      font-size: 10px;
-      color: rgba(154,168,187,.95);
-      line-height: 1.3;
-    }
-.stageTitle{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 6px; }
+    .stageTitle{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 6px; }
     .stageTitle .pill{
       font-family: var(--mono);
       font-size: 10px;
@@ -436,7 +352,107 @@
       color: rgba(154,168,187,.95);
       margin-top: 4px;
     }
-  </style>
+  
+    /* Marketplace (staged + real offers) */
+    .marketplace{
+      margin-top: 12px;
+      border: 1px solid rgba(27,38,54,.85);
+      background: rgba(11,15,20,.45);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .marketTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .marketTitle{
+      font-weight: 700;
+      letter-spacing: .2px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .badge{
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56,189,248,.25);
+      background: rgba(56,189,248,.10);
+      color: rgba(226,232,240,.9);
+    }
+    .marketMeta{ text-align:right; display:flex; flex-direction:column; gap:6px; }
+    .marketSections{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 900px){ .marketSections{ grid-template-columns: 1fr; } }
+    .marketSection{
+      border: 1px solid rgba(27,38,54,.65);
+      background: rgba(7,11,16,.45);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .marketSectionTitle{ font-weight: 650; margin-bottom: 6px; }
+    .marketGrid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 10px; }
+    @media (max-width: 540px){ .marketGrid{ grid-template-columns: 1fr; } }
+    .offerTile{
+      position:relative;
+      border: 1px solid rgba(27,38,54,.8);
+      background: rgba(14,20,30,.45);
+      border-radius: 14px;
+      padding: 10px;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      user-select:none;
+      min-height: 92px;
+    }
+    .offerTile:hover{
+      transform: translateY(-1px);
+      border-color: rgba(125,211,252,.35);
+      background: rgba(14,20,30,.58);
+    }
+    .offerTile.selected{
+      border-color: rgba(34,211,238,.55);
+      box-shadow: 0 0 0 1px rgba(34,211,238,.25) inset;
+    }
+    .offerTile .kicker{
+      font-size: 11px;
+      opacity: .85;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .offerTile .title{ font-weight: 700; margin-bottom: 4px; }
+    .offerTile .desc{ font-size: 12px; opacity: .86; line-height: 1.25; }
+    .pillMini{
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(148,163,184,.08);
+      opacity: .95;
+      white-space:nowrap;
+    }
+    .pillMini.real{ border-color: rgba(34,211,238,.28); background: rgba(34,211,238,.10); }
+    .pillMini.staged{ border-color: rgba(244,114,182,.25); background: rgba(244,114,182,.08); }
+    .marketLegend{
+      display:flex;
+      align-items:center;
+      gap: 6px;
+      margin-top: 10px;
+      opacity: .9;
+      flex-wrap: wrap;
+    }
+    .legendDot{
+      width: 10px; height: 10px; border-radius: 999px; display:inline-block;
+      border: 1px solid rgba(148,163,184,.35);
+      background: rgba(148,163,184,.15);
+    }
+    .legendDot.real{ border-color: rgba(34,211,238,.45); background: rgba(34,211,238,.18); }
+    .legendDot.staged{ border-color: rgba(244,114,182,.38); background: rgba(244,114,182,.14); }
+</style>
 </head>
 
 <body>
@@ -445,10 +461,10 @@
       <div class="brand">
         <div class="title">
           OFF / Tangent — “Grand Victory Run” Demo
-          <span class="tag">v0.453.2</span>
+          <span class="tag">v0.453</span>
         </div>
         <div class="subtitle">
-          Real API flow with pillar lights: Health • Auth Spoof-Proof • Idempotency • Persistence. Offer marketplace selection is staged (demo), but the API calls are real.
+          Real API flow with pillar lights: Health • Auth Spoof-Proof • Idempotency • Persistence.
         </div>
       </div>
 
@@ -620,6 +636,44 @@
             </div>
           </div>
 
+
+          <div class="marketplace" id="marketplace">
+            <div class="marketTop">
+              <div>
+                <div class="marketTitle">Offer Marketplace <span class="badge">demo</span></div>
+                <div class="tiny">
+                  This selection UI is <b>staged</b> for demo. When real offers exist, we show them live from the backend.
+                </div>
+              </div>
+              <div class="marketMeta">
+                <div class="tiny"><span class="kbd">Real</span> = GET /offers • <span class="kbd">Staged</span> = demo tiles</div>
+                <div class="tiny">Selection: <span id="marketChoice" class="kbd">—</span></div>
+              </div>
+            </div>
+
+            <div class="marketSections">
+              <div class="marketSection">
+                <div class="marketSectionTitle">Real offers (backend)</div>
+                <div class="tiny">Loaded automatically during Run after the signal is created.</div>
+                <div class="marketGrid" id="realOffers"></div>
+              </div>
+
+              <div class="marketSection">
+                <div class="marketSectionTitle">Marketplace tiles (staged)</div>
+                <div class="tiny">Used as a fallback when no real offers exist (or to seed one with the Admin key).</div>
+                <div class="marketGrid" id="stagedOffers"></div>
+              </div>
+            </div>
+
+            <div class="marketLegend">
+              <span class="legendDot real"></span><span class="tiny">Real offer</span>
+              <span style="width:12px"></span>
+              <span class="legendDot staged"></span><span class="tiny">Staged offer</span>
+              <span style="width:12px"></span>
+              <span class="tiny">Tip: during Run, click a tile within 2.5s to override the auto-pick.</span>
+            </div>
+          </div>
+
           <div class="row2">
             <div>
               <label for="msgText">Message text</label>
@@ -701,157 +755,6 @@
     lane.scrollTop = lane.scrollHeight;
     return div;
   }
-
-  // --- Marketplace (staged) ---
-  function buildMarketplaceOffers(st){
-    const intent = (st.intent || "micro_break").trim();
-    const location = (st.location || "nearby").trim();
-
-    return [
-      {
-        id: "human_walkbuddy",
-        type: "human",
-        title: "Walk Buddy (15–30 min)",
-        desc: `A real local person joins you for a simple walk — calm, present, low-pressure.`,
-        price: 0,
-        message: `Human offer: Walk Buddy — 15–30 min in/near ${location}.`
-      },
-      {
-        id: "human_balcony_sunrise",
-        type: "human",
-        title: "Balcony Sunrise (micro-experience)",
-        desc: "A host shares a safe, cozy vantage point for a sunrise / golden-hour reset.",
-        price: 12,
-        message: `Human offer: Balcony Sunrise micro-experience • intent=${intent} • area=${location}.`
-      },
-      {
-        id: "store_coffee_pickup",
-        type: "store",
-        title: "Coffee + Pastry Pickup (reserved)",
-        desc: "A nearby spot reserves a pickup window so you can step out instantly.",
-        price: 8,
-        message: `Store offer: Coffee + pastry reserved pickup • area=${location}.`
-      },
-      {
-        id: "store_comfort_kit",
-        type: "store",
-        title: "Comfort Kit (same-day pickup)",
-        desc: "A small ‘reset kit’ (tea, candle, note) staged for pickup — tiny ritual, big effect.",
-        price: 18,
-        message: `Store offer: Comfort kit same-day pickup • area=${location}.`
-      },
-      {
-        id: "ai_microbreak_plan",
-        type: "ai",
-        title: "AI Micro‑Break Plan (2 minutes)",
-        desc: "A personalized micro‑script: breathe, move, and pick the simplest next step.",
-        price: 0,
-        message: `AI offer: Micro‑break plan generated for intent=${intent} in ${location}.`
-      },
-      {
-        id: "ai_safety_route",
-        type: "ai",
-        title: "AI ‘Safest Simple Route’ (10–20 min)",
-        desc: "A conservative walking loop suggestion based on ‘low friction’ + ‘high comfort’.",
-        price: 0,
-        message: `AI offer: Safest simple route suggestion • area=${location} • intent=${intent}.`
-      }
-    ];
-  }
-
-  function typeLabel(t){
-    if (t === "human") return { label:"HUMAN", cls:"human", icon:"🧑‍🤝‍🧑" };
-    if (t === "store") return { label:"STORE", cls:"store", icon:"🏪" };
-    return { label:"AI", cls:"ai", icon:"✨" };
-  }
-
-  async function marketplaceSelect(st, { autoPickId = "ai_microbreak_plan", timeoutMs = 3500 } = {}){
-    const offers = buildMarketplaceOffers(st);
-    let selected = offers.find(o => o.id === autoPickId) || offers[0];
-
-    setStage("offer-market","Staged selection (demo)");
-    logLine("", "muted");
-    logLine("== 2A) Offer marketplace (staged UI) ==", "accent");
-    logLine("[demo] selection UI is staged; backend offer creation is real", "warn");
-
-    const inner = document.createElement("div");
-    inner.innerHTML = `
-      <div class="tiny">
-        This marketplace selection is <b>staged for the demo</b> (no marketplace DB yet).
-        Your selection will be used to populate the <span class="kbd">real</span> <span class="kbd">POST /offers</span>.
-      </div>
-      <div class="marketGrid" id="marketGrid"></div>
-      <div class="marketCta">
-        <button class="primary" type="button" id="btnMarketContinue">Continue</button>
-        <button type="button" id="btnMarketAuto">Auto‑pick</button>
-        <span class="marketNote" id="marketNote">Auto‑picking in ${Math.round(timeoutMs/100)/10}s (unless you click)…</span>
-      </div>
-    `;
-
-    const card = mkStoryCard("Offer marketplace", "staged", "warn", inner.innerHTML);
-
-    // hydrate grid elements
-    const grid = card.querySelector("#marketGrid");
-    const note = card.querySelector("#marketNote");
-    const btnCont = card.querySelector("#btnMarketContinue");
-    const btnAuto = card.querySelector("#btnMarketAuto");
-
-    function render(){
-      grid.innerHTML = "";
-      for (const o of offers){
-        const t = typeLabel(o.type);
-        const tile = document.createElement("div");
-        tile.className = "offerTile" + (selected?.id === o.id ? " selected" : "");
-        tile.innerHTML = `
-          <div class="type ${t.cls}">${t.icon} ${t.label}</div>
-          <h3>${escapeHtml(o.title)}</h3>
-          <p>${escapeHtml(o.desc)}</p>
-          <div class="metaRow">
-            <span class="tiny">${escapeHtml(o.price ? "paid offer" : "free offer")}</span>
-            <span class="price">${escapeHtml(o.price ? "$" + o.price : "free")}</span>
-          </div>
-        `;
-        tile.addEventListener("click", () => {
-          selected = o;
-          note.textContent = "Selected — click Continue to proceed.";
-          render();
-        });
-        grid.appendChild(tile);
-      }
-    }
-
-    render();
-
-    return await new Promise(resolve => {
-      let done = false;
-      let timer = setTimeout(() => {
-        if (done) return;
-        done = true;
-        note.textContent = "Auto‑picked for demo pacing.";
-        // ensure selected matches autoPickId
-        selected = offers.find(o => o.id === autoPickId) || selected;
-        render();
-        resolve(selected);
-      }, timeoutMs);
-
-      function finish(which){
-        if (done) return;
-        done = true;
-        clearTimeout(timer);
-        note.textContent = which;
-        resolve(selected);
-      }
-
-      btnCont.addEventListener("click", () => finish("Continuing with selected offer."));
-      btnAuto.addEventListener("click", () => {
-        selected = offers.find(o => o.id === autoPickId) || selected;
-        render();
-        finish("Auto‑picked (manual).");
-      });
-    });
-  }
-
-
 
   function kvHtml(pairs){
     return `
@@ -1033,6 +936,172 @@
     return { ok: res.ok, status: res.status, replay, reqId, data, url };
   }
 
+
+  // --- Marketplace (staged + real offers) ---
+  const MARKET = {
+    choice: null, // { kind: "real", offer } or { kind:"staged", template }
+    resolver: null
+  };
+
+  function stagedOfferTemplates({ guestId, conciergeId, intent, location }){
+    const loc = (location || "nearby").trim() || "nearby";
+    const it = (intent || "a moment").trim() || "a moment";
+
+    return [
+      {
+        kind: "human",
+        title: "Human: Coffee walk + micro-reset",
+        description: `A calm 25–35 min walk in ${loc} with a concierge who keeps it simple. “Let’s get you back into the day.”`,
+        price: 0,
+        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Coffee walk + micro-reset" }
+      },
+      {
+        kind: "human",
+        title: "Human: Quiet museum loop",
+        description: `A low-stimulation loop: one room, one piece, one thought. Designed for rapid nervous-system downshift.`,
+        price: 12,
+        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Quiet museum loop" }
+      },
+      {
+        kind: "store",
+        title: "Store: Borrowed book + reading nook",
+        description: `A small “offline kit”: a library pickup + a mapped reading corner. Minimal friction, maximal calm.`,
+        price: 0,
+        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Borrowed book + reading nook" }
+      },
+      {
+        kind: "store",
+        title: "Store: Hot chocolate + window seat",
+        description: `A tiny ritual: hot drink + a “window seat” spot. Simple sensory reset.`,
+        price: 6,
+        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Hot chocolate + window seat" }
+      },
+      {
+        kind: "ai",
+        title: "AI: OFF itinerary (2 steps)",
+        description: `An AI-crafted two-step micro-plan for “${it}” near ${loc}, with an optional human add-on.`,
+        price: 0,
+        payload: { guest_id: guestId, concierge_id: conciergeId, message: "AI itinerary (2 steps) + optional human add-on" }
+      },
+      {
+        kind: "ai",
+        title: "AI: 10-minute reset protocol",
+        description: `A compact script: breathe + walk + notice. Think of it as “offline guidance in your pocket.”`,
+        price: 0,
+        payload: { guest_id: guestId, concierge_id: conciergeId, message: "AI 10-minute reset protocol" }
+      }
+    ];
+  }
+
+  function setMarketChoiceLabel(text){
+    const el = $("marketChoice");
+    if (el) el.textContent = text || "—";
+  }
+
+  function clearMarketSelection(){
+    MARKET.choice = null;
+    setMarketChoiceLabel("—");
+    document.querySelectorAll(".offerTile.selected").forEach(el => el.classList.remove("selected"));
+  }
+
+  function renderOfferTiles(containerId, items, kind){
+    const root = $(containerId);
+    root.innerHTML = "";
+
+    if (!items || items.length === 0){
+      root.innerHTML = `<div class="tiny" style="opacity:.8;">No ${kind === "real" ? "real offers yet." : "staged tiles loaded."}</div>`;
+      return;
+    }
+
+    items.forEach((item, idx) => {
+      const isReal = kind === "real";
+      const kickerLeft = isReal ? "REAL (backend)" : "STAGED (demo)";
+      const pill = isReal ? "real" : "staged";
+      const title = isReal ? (item.title || ("Offer " + (idx+1))) : item.title;
+      const desc  = isReal ? (item.description || item.message || "") : item.description;
+      const price = isReal ? (item.price ?? item.price_cents ?? item.price_cents_total ?? null) : item.price;
+      const priceTxt = (price === null || price === undefined || price === "") ? "" : (Number(price) === 0 ? "• $0" : `• $${Number(price)}`);
+
+      const el = document.createElement("div");
+      el.className = "offerTile";
+      el.dataset.kind = kind;
+      el.dataset.idx = String(idx);
+
+      el.innerHTML = `
+        <div class="kicker">
+          <span class="pillMini ${pill}">${kickerLeft}</span>
+          <span class="tiny" style="opacity:.85;">${isReal ? escapeHtml(item.id || "") : escapeHtml(item.kind.toUpperCase())} ${escapeHtml(priceTxt)}</span>
+        </div>
+        <div class="title">${escapeHtml(title)}</div>
+        <div class="desc">${escapeHtml(desc || "")}</div>
+      `;
+
+      el.addEventListener("click", () => {
+        document.querySelectorAll(`#${containerId} .offerTile`).forEach(x => x.classList.remove("selected"));
+        el.classList.add("selected");
+
+        if (isReal){
+          MARKET.choice = { kind: "real", offer: item };
+          setMarketChoiceLabel(item.id ? `real:${fmtId(item.id)}` : "real:selected");
+        } else {
+          MARKET.choice = { kind: "staged", template: item };
+          setMarketChoiceLabel(`staged:${item.kind}`);
+        }
+
+        if (MARKET.resolver){
+          const r = MARKET.resolver;
+          MARKET.resolver = null;
+          r(MARKET.choice);
+        }
+      });
+
+      root.appendChild(el);
+    });
+  }
+
+  async function fetchRealOffersForSignal(signalId, guestToken, actorId){
+    if (!signalId) return [];
+    const qs = encodeURIComponent(signalId);
+    const resp = await apiFetch(`/offers?signal_id=${qs}`, {
+      token: guestToken,
+      method: "GET",
+      actorId: actorId
+    });
+    if (!resp.ok) return [];
+    const items = resp.data?.items || [];
+    return Array.isArray(items) ? items : [];
+  }
+
+  async function awaitMarketplaceSelection({ realOffers, stagedOffers, timeoutMs=2500 }){
+    clearMarketSelection();
+    renderOfferTiles("realOffers", realOffers, "real");
+    renderOfferTiles("stagedOffers", stagedOffers, "staged");
+
+    if (realOffers && realOffers.length){
+      const first = realOffers[0];
+      MARKET.choice = { kind:"real", offer:first };
+      setMarketChoiceLabel(first.id ? `real:${fmtId(first.id)}` : "real:auto");
+      const firstEl = document.querySelector("#realOffers .offerTile");
+      if (firstEl) firstEl.classList.add("selected");
+    } else if (stagedOffers && stagedOffers.length){
+      const first = stagedOffers[0];
+      MARKET.choice = { kind:"staged", template:first };
+      setMarketChoiceLabel(`staged:${first.kind} (auto)`);
+      const firstEl = document.querySelector("#stagedOffers .offerTile");
+      if (firstEl) firstEl.classList.add("selected");
+    }
+
+    return await new Promise(resolve => {
+      MARKET.resolver = resolve;
+      setTimeout(() => {
+        if (MARKET.resolver){
+          MARKET.resolver = null;
+          resolve(MARKET.choice);
+        }
+      }, timeoutMs);
+    });
+  }
+
   // --- Health ---
   async function checkHealth(){
     $("healthDetail").textContent = "Checking…";
@@ -1163,61 +1232,93 @@
 
       await sleep(between);
 
-      // 2A) Offer marketplace selection (staged UI) — used to populate the real offer create
-      const chosen = await marketplaceSelect(st, { autoPickId: "ai_microbreak_plan", timeoutMs: (between * 2) });
-      const chosenMsg = (chosen?.message || st.offerMsg || "smoke offer").trim();
-      const chosenPrice = Number.isFinite(Number(chosen?.price)) ? Number(chosen.price) : null;
-      await sleep(step);
-
-      // 2) Create offer (admin) — ensures DB actor_id is set correctly server-side
-      setStage("offer","Creating offer…");
+      // 2) Offer marketplace (REAL if available; otherwise staged tiles)
+      setStage("offer","Selecting offer…");
       logLine("", "muted");
-      logLine("== 2) POST /offers (admin) ==", "accent");
+      logLine("== 2) OFFER MARKETPLACE ==", "accent");
 
-      const offerKey = "ui-offer-" + Date.now();
-      const offBody = {
-        signal_id: signal.id,
-        guest_id: guestId,
-        concierge_id: conciergeId,
-        message: chosenMsg
-      };
-      // Prefer staged marketplace price (if any), otherwise allow manual override from input.
-      if (Number.isFinite(Number(chosenPrice))) offBody.price = Number(chosenPrice);
-      const price = String(st.offerPrice || "").trim();
-      if (price !== "" && Number.isFinite(Number(price))) offBody.price = Number(price);
-const offerResp = await apiFetch("/offers", {
-        token: st.adminKey,
-        method: "POST",
-        idemKey: offerKey,
-        actorId: actorOverride,
-        body: offBody
-      });
+      const realOffers = await fetchRealOffersForSignal(signal.id, st.guestKey, actorOverride);
+      const staged = stagedOfferTemplates({ guestId, conciergeId, intent, location });
 
-      $("lastReq").textContent = offerResp.reqId || "—";
-      if (!offerResp.ok){
-        mkStoryCard("Offer failed", "error", "bad", `<div class="tiny">HTTP ${offerResp.status}</div><pre class="tiny">${escapeHtml(JSON.stringify(offerResp.data, null, 2))}</pre>`);
-        setStage("error","Offer failed");
-        updateRunState("error");
-        return;
-      }
+      const choice = await awaitMarketplaceSelection({ realOffers, stagedOffers: staged, timeoutMs: 2500 });
 
-      const offer = offerResp.data?.offer;
-      mkStoryCard("Offer created", "real", "good",
-        kvHtml([
-          ["offer_id", `<span class="kbd">${escapeHtml(fmtId(offer?.id))}</span>`],
-          ["signal_id", `<span class="kbd">${escapeHtml(fmtId(offer?.signal_id))}</span>`],
-          ["guest_id", escapeHtml(offer?.guest_id || guestId)],
-          ["concierge_id", escapeHtml(offer?.concierge_id || conciergeId)],
-          ["status", `<b>${escapeHtml(offer?.status || "proposed")}</b>`]
-        ])
-      );
+      let offer = null;
 
-      const persistedOffer = offerResp.data?.persisted === true;
-      if (persistedOffer){
-        setDot("pPersist","good"); $("pPersistTxt").textContent = "persisted=true observed";
+      if (choice?.kind === "real" && choice.offer?.id){
+        offer = choice.offer;
+        mkStoryCard("Offer selected", "pass", "good",
+          kvHtml([
+            ["mode", "<b>real (backend)</b>"],
+            ["offer_id", `<span class="kbd">${escapeHtml(String(offer.id))}</span>`],
+            ["status", `<b>${escapeHtml(offer.status || "proposed")}</b>`]
+          ])
+        );
+      } else {
+        if (!st.adminKey || String(st.adminKey).trim().length < 8){
+          mkStoryCard("Offer required", "error", "bad",
+            "No real offers exist for this signal yet, and the Admin API key is missing — so the demo cannot seed an offer. Add the Admin key and re-run."
+          );
+          throw new Error("ADMIN_KEY_REQUIRED_FOR_OFFER_SEED");
+        }
+
+        setStage("offer","Creating offer…");
+        logLine("", "muted");
+        logLine("== 2B) POST /offers (admin) — seed from staged selection ==", "accent");
+
+        const offerKey = "ui-offer-" + Date.now();
+        const tpl = choice?.template || staged[0];
+
+        const offBody = {
+          signal_id: signal.id,
+          guest_id: guestId,
+          concierge_id: conciergeId,
+          message: (tpl?.payload?.message || st.offerMsg || "").trim()
+        };
+
+        const price = (tpl?.price !== undefined && tpl?.price !== null) ? tpl.price : st.offerPrice;
+        if (String(price || "").trim() !== "" && Number.isFinite(Number(price))) offBody.price = Number(price);
+
+        const offerResp = await apiFetch("/offers", {
+          token: st.adminKey,
+          method: "POST",
+          idemKey: offerKey,
+          actorId: actorOverride,
+          body: offBody
+        });
+
+        $("lastReq").textContent = offerResp.reqId || "—";
+        if (!offerResp.ok){
+          mkStoryCard("Offer failed", "error", "bad",
+            (offerResp.data?.message || offerResp.data?.error || "Offer creation failed.")
+          );
+          throw new Error("OFFER_CREATE_FAILED");
+        }
+
+        offer = offerResp.data?.offer || offerResp.data?.item || offerResp.data?.data || offerResp.data?.result || null;
+
+        mkStoryCard("Offer created", "pass", "good",
+          kvHtml([
+            ["mode", "<b>staged (demo) → real POST</b>"],
+            ["offer_id", `<span class="kbd">${escapeHtml(String(offer?.id || ""))}</span>`],
+            ["signal_id", `<span class="kbd">${escapeHtml(String(signal.id))}</span>`]
+          ])
+        );
+
+        const persistedOffer = offerResp.data?.persisted === true;
+        if (persistedOffer){
+          setDot("pPersist","good"); $("pPersistTxt").textContent = "persisted=true observed";
+        }
+
+        await sleep(between);
+
+        // Refresh real offers list after seeding (nice for demo)
+        const after = await fetchRealOffersForSignal(signal.id, st.guestKey, actorOverride);
+        renderOfferTiles("realOffers", after, "real");
       }
 
       await sleep(between);
+
+      // 3) Accept offer (guest) — run twice with same idem key to verify replay
 
       // 3) Accept offer (guest) — run twice with same idem key to verify replay
       setStage("accept","Accepting offer…");
@@ -1483,7 +1584,7 @@ const offerResp = await apiFetch("/offers", {
 
     resetUi();
     checkHealth();
-    logLine("[ui] ready v0.453.2", "muted");
+    logLine("[ui] ready v0.453", "muted");
   }
 
   init();

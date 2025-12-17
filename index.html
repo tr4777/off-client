@@ -944,8 +944,8 @@
   };
 
   function stagedOfferTemplates({ guestId, conciergeId, intent, location }){
-    const loc = (location || "nearby").trim() || "nearby";
-    const it = (intent || "a moment").trim() || "a moment";
+    const loc = String(location ?? "nearby").trim() || "nearby";
+    const it = String(intent ?? "a moment").trim() || "a moment";
 
     return [
       {
@@ -1202,7 +1202,7 @@
         method: "POST",
         idemKey: sigKey,
         actorId: actorOverride,
-        body: { guest_id: guestId, intent: st.intent.trim(), location: st.location.trim() }
+        body: { guest_id: guestId, intent: String(st.intent ?? "").trim(), location: String(st.location ?? "").trim() }
       });
 
       $("lastReq").textContent = sigResp.reqId || "—";

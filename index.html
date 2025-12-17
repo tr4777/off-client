@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>OFF / Tangent — Demo v0.453</title>
+  <title>OFF / Tangent — Demo v0.453.2</title>
   <meta name="description" content="OFF / Tangent demo: Signal → Offer → Accept → Vibe → Messages (real API) with pillar status lights." />
 
   <style>
@@ -174,7 +174,91 @@
 
     /* Story lane */
     .lane{ display:flex; flex-direction:column; gap: 10px; min-height: 560px; }
-    .stageTitle{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 6px; }
+    
+
+    /* Marketplace (staged demo) */
+    .marketGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 560px){ .marketGrid{ grid-template-columns: 1fr; } }
+
+    .offerTile{
+      border: 1px solid rgba(27,38,54,.88);
+      background: rgba(17,26,38,.35);
+      border-radius: 16px;
+      padding: 10px 10px 9px;
+      cursor: pointer;
+      transition: transform .06s ease, border-color .15s ease, background .15s ease;
+      position: relative;
+      overflow:hidden;
+      user-select:none;
+    }
+    .offerTile:hover{ transform: translateY(-1px); border-color: rgba(125,211,252,.35); }
+    .offerTile:active{ transform: translateY(0px); }
+    .offerTile.selected{
+      border-color: rgba(52,211,153,.42);
+      background: rgba(52,211,153,.06);
+    }
+    .offerTile .type{
+      font-family: var(--mono);
+      font-size: 10px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(27,38,54,.85);
+      background: rgba(17,26,38,.55);
+      color: rgba(232,238,247,.85);
+    }
+    .offerTile .type.human{ border-color: rgba(125,211,252,.35); background: rgba(125,211,252,.08); }
+    .offerTile .type.store{ border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.08); }
+    .offerTile .type.ai{    border-color: rgba(167,139,250,.35); background: rgba(167,139,250,.08); }
+
+    .offerTile h3{
+      margin: 8px 0 4px;
+      font-size: 13px;
+      letter-spacing: .2px;
+    }
+    .offerTile p{
+      margin: 0;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .offerTile .metaRow{
+      margin-top: 8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      font-size: 11px;
+      color: rgba(232,238,247,.85);
+    }
+    .offerTile .price{
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 9px;
+      border: 1px solid rgba(27,38,54,.9);
+      background: rgba(11,15,20,.55);
+    }
+    .marketCta{
+      margin-top: 10px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .marketNote{
+      font-size: 10px;
+      color: rgba(154,168,187,.95);
+      line-height: 1.3;
+    }
+.stageTitle{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 6px; }
     .stageTitle .pill{
       font-family: var(--mono);
       font-size: 10px;
@@ -361,10 +445,10 @@
       <div class="brand">
         <div class="title">
           OFF / Tangent — “Grand Victory Run” Demo
-          <span class="tag">v0.453</span>
+          <span class="tag">v0.453.2</span>
         </div>
         <div class="subtitle">
-          Real API flow with pillar lights: Health • Auth Spoof-Proof • Idempotency • Persistence.
+          Real API flow with pillar lights: Health • Auth Spoof-Proof • Idempotency • Persistence. Offer marketplace selection is staged (demo), but the API calls are real.
         </div>
       </div>
 
@@ -617,6 +701,157 @@
     lane.scrollTop = lane.scrollHeight;
     return div;
   }
+
+  // --- Marketplace (staged) ---
+  function buildMarketplaceOffers(st){
+    const intent = (st.intent || "micro_break").trim();
+    const location = (st.location || "nearby").trim();
+
+    return [
+      {
+        id: "human_walkbuddy",
+        type: "human",
+        title: "Walk Buddy (15–30 min)",
+        desc: `A real local person joins you for a simple walk — calm, present, low-pressure.`,
+        price: 0,
+        message: `Human offer: Walk Buddy — 15–30 min in/near ${location}.`
+      },
+      {
+        id: "human_balcony_sunrise",
+        type: "human",
+        title: "Balcony Sunrise (micro-experience)",
+        desc: "A host shares a safe, cozy vantage point for a sunrise / golden-hour reset.",
+        price: 12,
+        message: `Human offer: Balcony Sunrise micro-experience • intent=${intent} • area=${location}.`
+      },
+      {
+        id: "store_coffee_pickup",
+        type: "store",
+        title: "Coffee + Pastry Pickup (reserved)",
+        desc: "A nearby spot reserves a pickup window so you can step out instantly.",
+        price: 8,
+        message: `Store offer: Coffee + pastry reserved pickup • area=${location}.`
+      },
+      {
+        id: "store_comfort_kit",
+        type: "store",
+        title: "Comfort Kit (same-day pickup)",
+        desc: "A small ‘reset kit’ (tea, candle, note) staged for pickup — tiny ritual, big effect.",
+        price: 18,
+        message: `Store offer: Comfort kit same-day pickup • area=${location}.`
+      },
+      {
+        id: "ai_microbreak_plan",
+        type: "ai",
+        title: "AI Micro‑Break Plan (2 minutes)",
+        desc: "A personalized micro‑script: breathe, move, and pick the simplest next step.",
+        price: 0,
+        message: `AI offer: Micro‑break plan generated for intent=${intent} in ${location}.`
+      },
+      {
+        id: "ai_safety_route",
+        type: "ai",
+        title: "AI ‘Safest Simple Route’ (10–20 min)",
+        desc: "A conservative walking loop suggestion based on ‘low friction’ + ‘high comfort’.",
+        price: 0,
+        message: `AI offer: Safest simple route suggestion • area=${location} • intent=${intent}.`
+      }
+    ];
+  }
+
+  function typeLabel(t){
+    if (t === "human") return { label:"HUMAN", cls:"human", icon:"🧑‍🤝‍🧑" };
+    if (t === "store") return { label:"STORE", cls:"store", icon:"🏪" };
+    return { label:"AI", cls:"ai", icon:"✨" };
+  }
+
+  async function marketplaceSelect(st, { autoPickId = "ai_microbreak_plan", timeoutMs = 3500 } = {}){
+    const offers = buildMarketplaceOffers(st);
+    let selected = offers.find(o => o.id === autoPickId) || offers[0];
+
+    setStage("offer-market","Staged selection (demo)");
+    logLine("", "muted");
+    logLine("== 2A) Offer marketplace (staged UI) ==", "accent");
+    logLine("[demo] selection UI is staged; backend offer creation is real", "warn");
+
+    const inner = document.createElement("div");
+    inner.innerHTML = `
+      <div class="tiny">
+        This marketplace selection is <b>staged for the demo</b> (no marketplace DB yet).
+        Your selection will be used to populate the <span class="kbd">real</span> <span class="kbd">POST /offers</span>.
+      </div>
+      <div class="marketGrid" id="marketGrid"></div>
+      <div class="marketCta">
+        <button class="primary" type="button" id="btnMarketContinue">Continue</button>
+        <button type="button" id="btnMarketAuto">Auto‑pick</button>
+        <span class="marketNote" id="marketNote">Auto‑picking in ${Math.round(timeoutMs/100)/10}s (unless you click)…</span>
+      </div>
+    `;
+
+    const card = mkStoryCard("Offer marketplace", "staged", "warn", inner.innerHTML);
+
+    // hydrate grid elements
+    const grid = card.querySelector("#marketGrid");
+    const note = card.querySelector("#marketNote");
+    const btnCont = card.querySelector("#btnMarketContinue");
+    const btnAuto = card.querySelector("#btnMarketAuto");
+
+    function render(){
+      grid.innerHTML = "";
+      for (const o of offers){
+        const t = typeLabel(o.type);
+        const tile = document.createElement("div");
+        tile.className = "offerTile" + (selected?.id === o.id ? " selected" : "");
+        tile.innerHTML = `
+          <div class="type ${t.cls}">${t.icon} ${t.label}</div>
+          <h3>${escapeHtml(o.title)}</h3>
+          <p>${escapeHtml(o.desc)}</p>
+          <div class="metaRow">
+            <span class="tiny">${escapeHtml(o.price ? "paid offer" : "free offer")}</span>
+            <span class="price">${escapeHtml(o.price ? "$" + o.price : "free")}</span>
+          </div>
+        `;
+        tile.addEventListener("click", () => {
+          selected = o;
+          note.textContent = "Selected — click Continue to proceed.";
+          render();
+        });
+        grid.appendChild(tile);
+      }
+    }
+
+    render();
+
+    return await new Promise(resolve => {
+      let done = false;
+      let timer = setTimeout(() => {
+        if (done) return;
+        done = true;
+        note.textContent = "Auto‑picked for demo pacing.";
+        // ensure selected matches autoPickId
+        selected = offers.find(o => o.id === autoPickId) || selected;
+        render();
+        resolve(selected);
+      }, timeoutMs);
+
+      function finish(which){
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        note.textContent = which;
+        resolve(selected);
+      }
+
+      btnCont.addEventListener("click", () => finish("Continuing with selected offer."));
+      btnAuto.addEventListener("click", () => {
+        selected = offers.find(o => o.id === autoPickId) || selected;
+        render();
+        finish("Auto‑picked (manual).");
+      });
+    });
+  }
+
+
 
   function kvHtml(pairs){
     return `
@@ -928,6 +1163,12 @@
 
       await sleep(between);
 
+      // 2A) Offer marketplace selection (staged UI) — used to populate the real offer create
+      const chosen = await marketplaceSelect(st, { autoPickId: "ai_microbreak_plan", timeoutMs: (between * 2) });
+      const chosenMsg = (chosen?.message || st.offerMsg || "smoke offer").trim();
+      const chosenPrice = Number.isFinite(Number(chosen?.price)) ? Number(chosen.price) : null;
+      await sleep(step);
+
       // 2) Create offer (admin) — ensures DB actor_id is set correctly server-side
       setStage("offer","Creating offer…");
       logLine("", "muted");
@@ -938,12 +1179,13 @@
         signal_id: signal.id,
         guest_id: guestId,
         concierge_id: conciergeId,
-        message: st.offerMsg.trim()
+        message: chosenMsg
       };
+      // Prefer staged marketplace price (if any), otherwise allow manual override from input.
+      if (Number.isFinite(Number(chosenPrice))) offBody.price = Number(chosenPrice);
       const price = String(st.offerPrice || "").trim();
       if (price !== "" && Number.isFinite(Number(price))) offBody.price = Number(price);
-
-      const offerResp = await apiFetch("/offers", {
+const offerResp = await apiFetch("/offers", {
         token: st.adminKey,
         method: "POST",
         idemKey: offerKey,
@@ -1241,7 +1483,7 @@
 
     resetUi();
     checkHealth();
-    logLine("[ui] ready v0.453", "muted");
+    logLine("[ui] ready v0.453.2", "muted");
   }
 
   init();

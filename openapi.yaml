@@ -1,0 +1,801 @@
+openapi: 3.0.3
+info:
+  title: OFF Backend API
+  version: 0.453.0
+  description: |
+    OFF is a backend system for enabling simple, meaningful offline experiences with explicit trust boundaries.
+    v0.453 establishes the persistence + trust baseline: durable state, safe retries, explicit attribution, and request tracing.
+
+    ## Trust & Safety (cross-cutting)
+    - Auth: `Authorization: Bearer <api_key>` (preferred) or `X-API-Key: <api_key>` (supported).
+    - Roles: permissions are enforced server-side from API keys; clients cannot self-assert privileges.
+    - Actor attribution: `X-Actor-Id` is **attribution**, not authentication.
+    - Traceability: `X-Request-Id` is propagated end-to-end (returned in responses).
+    - Idempotency: mutating operations require `Idempotency-Key` to make retries safe.
+
+servers:
+  - url: https://off-backend.onrender.com
+    description: Production (Render)
+
+tags:
+  - name: Health
+    description: Service health and basic connectivity checks.
+  - name: Signals
+    description: Guest intent events (the beginning of most flows).
+  - name: Offers
+    description: Proposed experiences responding to signals.
+  - name: Vibes
+    description: Session context that groups interaction and messages.
+  - name: Messages
+    description: Conversation events within a vibe.
+  - name: Trust Events
+    description: Append-only audit / trust-relevant events.
+  - name: Debug
+    description: Admin-only utilities for controlled test/demo workflows.
+  - name: Users
+    description: Legacy / placeholder endpoints (deprecated).
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns basic service health. Does not mutate state.
+      security: []  # health is intentionally unauthenticated for simple uptime checks
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+      responses:
+        '200':
+          description: Service is healthy
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  version:
+                    type: string
+                    example: "0.453.0"
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /signals:
+    post:
+      tags: [Signals]
+      summary: Create a signal
+      description: |
+        Creates a new signal representing a guest's intent.
+        The signal is persisted and safe to retry when using `Idempotency-Key`.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalCreate'
+      responses:
+        '201':
+          description: Signal created
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Signal'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /offers:
+    post:
+      tags: [Offers]
+      summary: Create an offer
+      description: |
+        Creates an offer proposed in response to a signal.
+        Safe to retry when using `Idempotency-Key`.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfferCreate'
+      responses:
+        '201':
+          description: Offer created
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /offers/{offer_id}/accept:
+    post:
+      tags: [Offers]
+      summary: Accept an offer
+      description: |
+        Accepts an offer and returns the resulting vibe context (if applicable).
+        This is a mutation and requires `Idempotency-Key`.
+      parameters:
+        - name: offer_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Offer accepted
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferAcceptResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /matches/accept:
+    post:
+      tags: [Offers]
+      summary: Accept a match (legacy)
+      description: |
+        Legacy endpoint retained for backward compatibility.
+        Prefer `POST /offers/{offer_id}/accept`.
+      deprecated: true
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                offer_id:
+                  type: string
+              required: [offer_id]
+      responses:
+        '200':
+          description: Match accepted (legacy)
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferAcceptResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /vibes:
+    get:
+      tags: [Vibes]
+      summary: List vibes
+      description: Returns vibes visible to the caller role. Does not mutate state.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - name: guest_id
+          in: query
+          required: false
+          description: Optional filter by guest_id.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of vibes
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  vibes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vibe'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /messages:
+    get:
+      tags: [Messages]
+      summary: List messages for a vibe
+      description: |
+        Returns messages for a given vibe. This is a read operation.
+        `X-Actor-Id` is accepted for attribution but is not authentication.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - name: vibe_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of messages
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [Messages]
+      summary: Create a message
+      description: |
+        Creates a message within a vibe. This is a mutation and requires `Idempotency-Key`.
+        Messages are append-only and immutable once created.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+      responses:
+        '201':
+          description: Message created
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /trustevents:
+    get:
+      tags: [Trust Events]
+      summary: List trust events
+      description: |
+        Returns trust events for audit and debugging.
+        Access is role-gated; this endpoint may be limited to privileged roles.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - name: vibe_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of trust events
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trust_events:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TrustEvent'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    post:
+      tags: [Trust Events]
+      summary: Create a trust event
+      description: |
+        Creates an append-only trust/audit event.
+        This is a mutation and requires `Idempotency-Key`.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrustEventCreate'
+      responses:
+        '201':
+          description: Trust event created
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustEvent'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /users:
+    get:
+      tags: [Users]
+      summary: List users (deprecated placeholder)
+      description: |
+        Legacy/placeholder endpoint retained for compatibility. OFF does not define a full user model in v0.453.
+      deprecated: true
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+      responses:
+        '200':
+          description: Placeholder response
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /debug/seed:
+    post:
+      tags: [Debug]
+      summary: Seed demo data (admin only)
+      description: |
+        Admin-only utility to seed deterministic demo/test data.
+        This endpoint may be disabled in some deployments.
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Seed completed
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /debug/store:
+    get:
+      tags: [Debug]
+      summary: Debug snapshot (legacy)
+      description: |
+        Legacy debug endpoint retained for compatibility.
+        v0.453 is database-backed; this endpoint may be disabled or return limited information.
+      deprecated: true
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+      responses:
+        '200':
+          description: Snapshot
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /debug/reset:
+    post:
+      tags: [Debug]
+      summary: Reset demo/test state (legacy)
+      description: |
+        Legacy debug endpoint retained for compatibility.
+        In v0.453, state is persisted; destructive reset behavior (if enabled) is admin-only and deployment-specific.
+      deprecated: true
+      parameters:
+        - $ref: '#/components/parameters/XRequestId'
+        - $ref: '#/components/parameters/XActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Reset completed
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/XRequestId'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: APIKey
+      description: |
+        Preferred auth header.
+        Example: `Authorization: Bearer off_guest_key_123`
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        Supported for tooling and compatibility.
+        Example: `X-API-Key: off_guest_key_123`
+
+  headers:
+    XRequestId:
+      description: Request correlation identifier (echoed or generated by the backend).
+      schema:
+        type: string
+
+  parameters:
+    XRequestId:
+      name: X-Request-Id
+      in: header
+      required: false
+      description: Optional request correlation identifier. If omitted, the backend generates one.
+      schema:
+        type: string
+
+    XActorId:
+      name: X-Actor-Id
+      in: header
+      required: false
+      description: |
+        Optional actor identifier for attribution/logging. Not authentication.
+        Spoofing this header must never grant additional access.
+      schema:
+        type: string
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: |
+        Required for mutating operations to make retries safe.
+        Reusing the same key for the same logical request must not create duplicates.
+      schema:
+        type: string
+
+  responses:
+    Error:
+      description: Error response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/XRequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Human-readable error message
+        request_id:
+          type: string
+          description: Mirrors X-Request-Id for correlation.
+      required: [error, message, request_id]
+
+    SignalCreate:
+      type: object
+      properties:
+        guest_id:
+          type: string
+        intent:
+          type: string
+        location:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+      required: [guest_id, intent, location]
+
+    Signal:
+      allOf:
+        - $ref: '#/components/schemas/SignalCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            actor_id:
+              type: string
+            request_id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+          required: [id, created_at]
+
+    OfferCreate:
+      type: object
+      properties:
+        signal_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price_cents:
+          type: integer
+          minimum: 0
+        currency:
+          type: string
+          example: USD
+        metadata:
+          type: object
+          additionalProperties: true
+      required: [signal_id, title]
+
+    Offer:
+      allOf:
+        - $ref: '#/components/schemas/OfferCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+              example: proposed
+            actor_id:
+              type: string
+            request_id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+          required: [id, created_at]
+
+    Vibe:
+      type: object
+      properties:
+        id:
+          type: string
+        guest_id:
+          type: string
+        concierge_id:
+          type: string
+          nullable: true
+        signal_id:
+          type: string
+          nullable: true
+        status:
+          type: string
+          example: active
+        actor_id:
+          type: string
+        request_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, guest_id, created_at]
+
+    MessageCreate:
+      type: object
+      properties:
+        vibe_id:
+          type: string
+        from_role:
+          type: string
+          enum: [guest, concierge, system]
+        from_id:
+          type: string
+        text:
+          type: string
+      required: [vibe_id, from_role, from_id, text]
+
+    Message:
+      allOf:
+        - $ref: '#/components/schemas/MessageCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            actor_id:
+              type: string
+            request_id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+          required: [id, created_at]
+
+    TrustEventCreate:
+      type: object
+      properties:
+        kind:
+          type: string
+          description: Short event type identifier.
+        vibe_id:
+          type: string
+          nullable: true
+        details:
+          type: object
+          additionalProperties: true
+      required: [kind]
+
+    TrustEvent:
+      allOf:
+        - $ref: '#/components/schemas/TrustEventCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            actor_id:
+              type: string
+            request_id:
+              type: string
+            created_at:
+              type: string
+              format: date-time
+          required: [id, created_at]
+
+    OfferAcceptResponse:
+      type: object
+      properties:
+        offer:
+          $ref: '#/components/schemas/Offer'
+        vibe:
+          $ref: '#/components/schemas/Vibe'
+        idempotency:
+          type: object
+          properties:
+            replayed:
+              type: boolean
+              example: false
+      required: [offer]

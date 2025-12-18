@@ -1,4 +1,3 @@
-<!-- index.html — OFF / Tangent Demo UI v0.453 (Grand Victory Run) -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -150,7 +149,6 @@
     .cardBody{ padding: 12px; }
     .tiny{ font-size: 11px; color: var(--muted); line-height: 1.35; }
 
-    /* Pillars */
     .pillars{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -172,8 +170,9 @@
     .pillar strong{ display:block; font-size: 12px; letter-spacing:.2px; }
     .pillar span{ display:block; font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.25; }
 
-    /* Story lane */
-    .lane{ display:flex; flex-direction:column; gap: 10px; min-height: 560px; }
+    .lane{ display:flex; flex-direction:column; gap: 10px; min-height: 420px; }
+    @media (max-width: 980px){ .lane{ min-height: unset; } }
+
     .stageTitle{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 6px; }
     .stageTitle .pill{
       font-family: var(--mono);
@@ -245,7 +244,6 @@
       color: rgba(232,238,247,.85);
     }
 
-    /* Right panel controls */
     .row2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     @media (max-width: 540px){ .row2{ grid-template-columns:1fr; } }
 
@@ -307,18 +305,22 @@
       font-size: 9px;
       line-height: 1.45;
       color: rgba(232,238,247,.82);
-      height: 255px;
+      height: 240px;
       overflow:auto;
       padding-right: 6px;
       white-space: pre-wrap;
     }
+    @media (max-width: 540px){
+      .log{ height: 180px; font-size: 10px; }
+      button{ padding: 12px 12px; }
+    }
+
     .log .muted{ color: rgba(152,166,184,.78); }
     .log .good{ color: rgba(52,211,153,.92); }
     .log .warn{ color: rgba(251,191,36,.92); }
     .log .bad{ color: rgba(251,113,133,.92); }
     .log .accent{ color: rgba(125,211,252,.92); }
 
-    /* Chat bubbles */
     .chat{
       display:flex;
       flex-direction:column;
@@ -352,59 +354,92 @@
       color: rgba(154,168,187,.95);
       margin-top: 4px;
     }
-  
-    /* Marketplace (staged + real offers) */
-    .marketplace{
-      margin-top: 12px;
+
+    details.collapsible{
       border: 1px solid rgba(27,38,54,.85);
       background: rgba(11,15,20,.45);
       border-radius: 16px;
-      padding: 12px;
+      padding: 10px;
+      margin-top: 12px;
     }
+    details.collapsible > summary{
+      cursor:pointer;
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      padding: 2px 2px;
+      user-select:none;
+    }
+    details.collapsible > summary::-webkit-details-marker{ display:none; }
+    .summaryRight{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .chev{
+      width: 10px; height: 10px;
+      border-right: 2px solid rgba(154,168,187,.9);
+      border-bottom: 2px solid rgba(154,168,187,.9);
+      transform: rotate(45deg);
+      margin-left: 4px;
+      transition: transform .15s ease;
+    }
+    details[open] .chev{ transform: rotate(-135deg); }
+
     .marketTop{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
       gap: 12px;
-      margin-bottom: 10px;
+      margin: 10px 0 10px;
     }
     .marketTitle{
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: .2px;
       display:flex;
       align-items:center;
       gap:8px;
     }
-    .badge{
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(56,189,248,.25);
-      background: rgba(56,189,248,.10);
-      color: rgba(226,232,240,.9);
-    }
     .marketMeta{ text-align:right; display:flex; flex-direction:column; gap:6px; }
-    .marketSections{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    @media (max-width: 900px){ .marketSections{ grid-template-columns: 1fr; } }
+    .marketSections{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 980px){ .marketSections{ grid-template-columns: 1fr; } }
     .marketSection{
       border: 1px solid rgba(27,38,54,.65);
       background: rgba(7,11,16,.45);
       border-radius: 14px;
       padding: 10px;
     }
-    .marketSectionTitle{ font-weight: 650; margin-bottom: 6px; }
-    .marketGrid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 10px; }
-    @media (max-width: 540px){ .marketGrid{ grid-template-columns: 1fr; } }
+    .marketSectionTitle{ font-weight: 750; margin-bottom: 6px; }
+
+    .marketGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 700px){ .marketGrid{ grid-template-columns: 1fr; } }
+
     .offerTile{
       position:relative;
       border: 1px solid rgba(27,38,54,.8);
       background: rgba(14,20,30,.45);
       border-radius: 14px;
-      padding: 10px;
+      padding: 12px;
       cursor:pointer;
       transition: transform .12s ease, border-color .12s ease, background .12s ease;
       user-select:none;
-      min-height: 92px;
+      min-height: 88px;
     }
     .offerTile:hover{
       transform: translateY(-1px);
@@ -417,15 +452,29 @@
     }
     .offerTile .kicker{
       font-size: 11px;
-      opacity: .85;
+      opacity: .9;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap: 8px;
       margin-bottom: 6px;
     }
-    .offerTile .title{ font-weight: 700; margin-bottom: 4px; }
-    .offerTile .desc{ font-size: 12px; opacity: .86; line-height: 1.25; }
+    .offerTile .title{
+      font-weight: 820;
+      margin-bottom: 4px;
+      font-size: 13px;
+      line-height: 1.15;
+    }
+    .offerTile .desc{
+      font-size: 12px;
+      opacity: .86;
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow:hidden;
+    }
+
     .pillMini{
       font-size: 10px;
       padding: 2px 8px;
@@ -437,6 +486,7 @@
     }
     .pillMini.real{ border-color: rgba(34,211,238,.28); background: rgba(34,211,238,.10); }
     .pillMini.staged{ border-color: rgba(244,114,182,.25); background: rgba(244,114,182,.08); }
+
     .marketLegend{
       display:flex;
       align-items:center;
@@ -452,7 +502,11 @@
     }
     .legendDot.real{ border-color: rgba(34,211,238,.45); background: rgba(34,211,238,.18); }
     .legendDot.staged{ border-color: rgba(244,114,182,.38); background: rgba(244,114,182,.14); }
-</style>
+
+    @media (max-width: 980px){
+      .configHint{ display:none; }
+    }
+  </style>
 </head>
 
 <body>
@@ -485,7 +539,6 @@
     </header>
 
     <div class="grid">
-      <!-- LEFT: Story -->
       <section class="card">
         <div class="cardHeader">
           <h2>Run Lane</h2>
@@ -532,17 +585,84 @@
 
           <div class="lane" id="lane"></div>
 
+          <details class="collapsible" id="marketDetails" open>
+            <summary>
+              <span class="marketTitle">Offer Marketplace <span class="badge">demo</span></span>
+              <span class="summaryRight">
+                <span>Selection:</span> <span id="marketChoice" class="kbd">—</span>
+                <span class="chev" aria-hidden="true"></span>
+              </span>
+            </summary>
+
+            <div class="marketTop">
+              <div class="tiny">
+                This selection UI is <b>staged</b> for demo. When real offers exist, we show them live from the backend.
+              </div>
+              <div class="marketMeta">
+                <div class="tiny"><span class="kbd">Real</span> = GET /offers • <span class="kbd">Staged</span> = demo tiles</div>
+              </div>
+            </div>
+
+            <div class="marketSections">
+              <div class="marketSection">
+                <div class="marketSectionTitle">Real offers (backend)</div>
+                <div class="tiny">Loaded automatically during Run after the signal is created.</div>
+                <div class="marketGrid" id="realOffers"></div>
+              </div>
+
+              <div class="marketSection">
+                <div class="marketSectionTitle">Marketplace tiles (staged)</div>
+                <div class="tiny">Fallback when no real offers exist (or to seed one with the Admin key).</div>
+                <div class="marketGrid" id="stagedOffers"></div>
+              </div>
+            </div>
+
+            <div class="marketLegend">
+              <span class="legendDot real"></span><span class="tiny">Real offer</span>
+              <span style="width:12px"></span>
+              <span class="legendDot staged"></span><span class="tiny">Staged offer</span>
+              <span style="width:12px"></span>
+              <span class="tiny">Tip: during Run, click a tile within 2.5s to override the auto-pick.</span>
+            </div>
+          </details>
+
+          <details class="collapsible" id="logDetails" open>
+            <summary>
+              <span>Run Log</span>
+              <span class="summaryRight">
+                <span id="runState">idle</span>
+                <span>•</span>
+                <span id="lastReq">—</span>
+                <span class="chev" aria-hidden="true"></span>
+              </span>
+            </summary>
+
+            <div class="terminal" style="margin-top:10px;">
+              <div class="terminalTop">
+                <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <div class="terminalMeta">
+                  <span class="tiny">Terminal-style log (real requests, request IDs)</span>
+                </div>
+              </div>
+              <div class="log" id="log"></div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                <button id="btnCopyLog" type="button">Copy Log</button>
+                <button id="btnUnlock2" type="button">Unlock UI</button>
+              </div>
+            </div>
+          </details>
+
           <div class="notice tiny" style="margin-top:10px;">
             Tip: leave “Actor ID” blank — auth should derive it from the key now. Spoof header is injected during the run to prove it’s ignored.
           </div>
         </div>
       </section>
 
-      <!-- RIGHT: Config + Telemetry -->
       <section class="card">
         <div class="cardHeader">
           <h2>Config & Telemetry</h2>
-          <div class="tiny">Paste keys. Save. Demo safely.</div>
+          <div class="tiny configHint">Paste keys. Save. Demo safely.</div>
         </div>
         <div class="cardBody">
           <div class="row2">
@@ -636,44 +756,6 @@
             </div>
           </div>
 
-
-          <div class="marketplace" id="marketplace">
-            <div class="marketTop">
-              <div>
-                <div class="marketTitle">Offer Marketplace <span class="badge">demo</span></div>
-                <div class="tiny">
-                  This selection UI is <b>staged</b> for demo. When real offers exist, we show them live from the backend.
-                </div>
-              </div>
-              <div class="marketMeta">
-                <div class="tiny"><span class="kbd">Real</span> = GET /offers • <span class="kbd">Staged</span> = demo tiles</div>
-                <div class="tiny">Selection: <span id="marketChoice" class="kbd">—</span></div>
-              </div>
-            </div>
-
-            <div class="marketSections">
-              <div class="marketSection">
-                <div class="marketSectionTitle">Real offers (backend)</div>
-                <div class="tiny">Loaded automatically during Run after the signal is created.</div>
-                <div class="marketGrid" id="realOffers"></div>
-              </div>
-
-              <div class="marketSection">
-                <div class="marketSectionTitle">Marketplace tiles (staged)</div>
-                <div class="tiny">Used as a fallback when no real offers exist (or to seed one with the Admin key).</div>
-                <div class="marketGrid" id="stagedOffers"></div>
-              </div>
-            </div>
-
-            <div class="marketLegend">
-              <span class="legendDot real"></span><span class="tiny">Real offer</span>
-              <span style="width:12px"></span>
-              <span class="legendDot staged"></span><span class="tiny">Staged offer</span>
-              <span style="width:12px"></span>
-              <span class="tiny">Tip: during Run, click a tile within 2.5s to override the auto-pick.</span>
-            </div>
-          </div>
-
           <div class="row2">
             <div>
               <label for="msgText">Message text</label>
@@ -689,22 +771,9 @@
             <button id="btnSave" type="button">Save</button>
             <button id="btnLoad" type="button">Load</button>
             <button id="btnClear" class="danger" type="button">Clear</button>
-            <button id="btnCopyLog" type="button">Copy Log</button>
           </div>
 
           <div class="divider"></div>
-
-          <div class="terminal">
-            <div class="terminalTop">
-              <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
-              <div class="terminalMeta">
-                <span id="runState">idle</span>
-                <span>•</span>
-                <span id="lastReq">—</span>
-              </div>
-            </div>
-            <div class="log" id="log"></div>
-          </div>
 
           <div class="tiny" style="margin-top:10px;">
             If anything looks stuck: hit <span class="kbd">Unlock UI</span>.
@@ -718,7 +787,6 @@
 (function(){
   const $ = (id) => document.getElementById(id);
 
-  // --- UI helpers ---
   function setDot(elId, state){
     const el = $(elId);
     if (!el) return;
@@ -786,7 +854,7 @@
     return { step: 260, between: 320 };
   }
 
-  function updateRunState(s){ $("runState").textContent = s; }
+  function updateRunState(s){ const el = $("runState"); if (el) el.textContent = s; }
   function setStage(stage, meta=""){ $("stagePill").textContent = stage; $("stageMeta").textContent = meta || "—"; }
 
   function normalizeBaseUrl(url){
@@ -801,7 +869,6 @@
     return t.toLowerCase().startsWith("bearer ") ? t : ("Bearer " + t);
   }
 
-  // --- Key dots ---
   function keyHasValue(v){ return !!String(v || "").trim(); }
   function setKeyDot(which, state){
     const el = $(which);
@@ -830,7 +897,6 @@
     else { input.type = "password"; btn.textContent = "Show"; }
   }
 
-  // --- Persisted UI state ---
   function defaultState(){
     return {
       baseUrl: "https://off-backend.onrender.com",
@@ -908,7 +974,6 @@
     logLine("[ui] cleared state", "warn");
   }
 
-  // --- API ---
   async function apiFetch(path, { token, method="GET", body=null, idemKey=null, actorId=null, spoofActorId=null } = {}){
     const baseUrl = normalizeBaseUrl($("baseUrl").value);
     const url = baseUrl + path;
@@ -918,7 +983,6 @@
     if (auth) headers["Authorization"] = auth;
     if (idemKey) headers["Idempotency-Key"] = idemKey;
 
-    // Optional: real actor override (rare). Optional spoof to prove it’s ignored.
     if (actorId) headers["X-Actor-Id"] = actorId;
     if (spoofActorId) headers["X-Actor-Id"] = spoofActorId;
 
@@ -936,60 +1000,31 @@
     return { ok: res.ok, status: res.status, replay, reqId, data, url };
   }
 
-
-  // --- Marketplace (staged + real offers) ---
-  const MARKET = {
-    choice: null, // { kind: "real", offer } or { kind:"staged", template }
-    resolver: null
-  };
+  const MARKET = { choice: null, resolver: null };
 
   function stagedOfferTemplates({ guestId, conciergeId, intent, location }){
     const loc = String(location ?? "nearby").trim() || "nearby";
     const it = String(intent ?? "a moment").trim() || "a moment";
 
     return [
-      {
-        kind: "human",
-        title: "Human: Coffee walk + micro-reset",
-        description: `A calm 25–35 min walk in ${loc} with a concierge who keeps it simple. “Let’s get you back into the day.”`,
-        price: 0,
-        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Coffee walk + micro-reset" }
-      },
-      {
-        kind: "human",
-        title: "Human: Quiet museum loop",
-        description: `A low-stimulation loop: one room, one piece, one thought. Designed for rapid nervous-system downshift.`,
-        price: 12,
-        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Quiet museum loop" }
-      },
-      {
-        kind: "store",
-        title: "Store: Borrowed book + reading nook",
-        description: `A small “offline kit”: a library pickup + a mapped reading corner. Minimal friction, maximal calm.`,
-        price: 0,
-        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Borrowed book + reading nook" }
-      },
-      {
-        kind: "store",
-        title: "Store: Hot chocolate + window seat",
-        description: `A tiny ritual: hot drink + a “window seat” spot. Simple sensory reset.`,
-        price: 6,
-        payload: { guest_id: guestId, concierge_id: conciergeId, message: "Hot chocolate + window seat" }
-      },
-      {
-        kind: "ai",
-        title: "AI: OFF itinerary (2 steps)",
-        description: `An AI-crafted two-step micro-plan for “${it}” near ${loc}, with an optional human add-on.`,
-        price: 0,
-        payload: { guest_id: guestId, concierge_id: conciergeId, message: "AI itinerary (2 steps) + optional human add-on" }
-      },
-      {
-        kind: "ai",
-        title: "AI: 10-minute reset protocol",
-        description: `A compact script: breathe + walk + notice. Think of it as “offline guidance in your pocket.”`,
-        price: 0,
-        payload: { guest_id: guestId, concierge_id: conciergeId, message: "AI 10-minute reset protocol" }
-      }
+      { kind:"human", title:"Human: Coffee walk + micro-reset",
+        description:`A calm 25–35 min walk in ${loc} with a concierge who keeps it simple. “Let’s get you back into the day.”`,
+        price:0, payload:{ guest_id: guestId, concierge_id: conciergeId, message:"Coffee walk + micro-reset" } },
+      { kind:"human", title:"Human: Quiet museum loop",
+        description:`A low-stimulation loop: one room, one piece, one thought. Designed for rapid nervous-system downshift.`,
+        price:12, payload:{ guest_id: guestId, concierge_id: conciergeId, message:"Quiet museum loop" } },
+      { kind:"store", title:"Store: Borrowed book + reading nook",
+        description:`A small “offline kit”: a library pickup + a mapped reading corner. Minimal friction, maximal calm.`,
+        price:0, payload:{ guest_id: guestId, concierge_id: conciergeId, message:"Borrowed book + reading nook" } },
+      { kind:"store", title:"Store: Hot chocolate + window seat",
+        description:`A tiny ritual: hot drink + a “window seat” spot. Simple sensory reset.`,
+        price:6, payload:{ guest_id: guestId, concierge_id: conciergeId, message:"Hot chocolate + window seat" } },
+      { kind:"ai", title:"AI: OFF itinerary (2 steps)",
+        description:`An AI-crafted two-step micro-plan for “${it}” near ${loc}, with an optional human add-on.`,
+        price:0, payload:{ guest_id: guestId, concierge_id: conciergeId, message:"AI itinerary (2 steps) + optional human add-on" } },
+      { kind:"ai", title:"AI: 10-minute reset protocol",
+        description:`A compact script: breathe + walk + notice. Think of it as “offline guidance in your pocket.”`,
+        price:0, payload:{ guest_id: guestId, concierge_id: conciergeId, message:"AI 10-minute reset protocol" } }
     ];
   }
 
@@ -1062,11 +1097,7 @@
   async function fetchRealOffersForSignal(signalId, guestToken, actorId){
     if (!signalId) return [];
     const qs = encodeURIComponent(signalId);
-    const resp = await apiFetch(`/offers?signal_id=${qs}`, {
-      token: guestToken,
-      method: "GET",
-      actorId: actorId
-    });
+    const resp = await apiFetch(`/offers?signal_id=${qs}`, { token: guestToken, method:"GET", actorId });
     if (!resp.ok) return [];
     const items = resp.data?.items || [];
     return Array.isArray(items) ? items : [];
@@ -1102,7 +1133,6 @@
     });
   }
 
-  // --- Health ---
   async function checkHealth(){
     $("healthDetail").textContent = "Checking…";
     setDot("healthDot","warn");
@@ -1136,11 +1166,10 @@
     }
   }
 
-  // --- Run flow ---
   let uiLocked = false;
   function lockUi(lock){
     uiLocked = !!lock;
-    ["btnVictory","btnReset","btnHealth"].forEach(id => { $(id).disabled = uiLocked; });
+    ["btnVictory","btnReset","btnHealth"].forEach(id => { const el = $(id); if (el) el.disabled = uiLocked; });
   }
   function hardUnlock(){
     lockUi(false);
@@ -1168,7 +1197,6 @@
     updateRunState("running");
     lockUi(true);
 
-    // reset pillar lights
     setDot("pAuth","warn"); $("pAuthTxt").textContent = "Running check…";
     setDot("pIdem","warn"); $("pIdemTxt").textContent = "Running check…";
     setDot("pPersist","warn"); $("pPersistTxt").textContent = "Running check…";
@@ -1181,7 +1209,6 @@
     const conciergeId = (st.conciergeId || "concierge_seed").trim();
 
     try{
-      // 0) Health
       logLine("== 0) Health ==", "accent");
       const okHealth = await checkHealth();
       if (!okHealth){
@@ -1192,7 +1219,6 @@
       }
       await sleep(between);
 
-      // 1) Create signal (guest)
       setStage("signal","Creating signal…");
       logLine("", "muted");
       logLine("== 1) POST /signals (guest) ==", "accent");
@@ -1232,13 +1258,12 @@
 
       await sleep(between);
 
-      // 2) Offer marketplace (REAL if available; otherwise staged tiles)
       setStage("offer","Selecting offer…");
       logLine("", "muted");
       logLine("== 2) OFFER MARKETPLACE ==", "accent");
 
       const realOffers = await fetchRealOffersForSignal(signal.id, st.guestKey, actorOverride);
-      const staged = stagedOfferTemplates({ guestId, conciergeId, intent, location });
+      const staged = stagedOfferTemplates({ guestId, conciergeId, intent: st.intent, location: st.location });
 
       const choice = await awaitMarketplaceSelection({ realOffers, stagedOffers: staged, timeoutMs: 2500 });
 
@@ -1249,7 +1274,7 @@
         mkStoryCard("Offer selected", "pass", "good",
           kvHtml([
             ["mode", "<b>real (backend)</b>"],
-            ["offer_id", `<span class="kbd">${escapeHtml(String(offer.id))}</span>`],
+            ["offer_id", `<span class="kbd">${escapeHtml(fmtId(offer.id))}</span>`],
             ["status", `<b>${escapeHtml(offer.status || "proposed")}</b>`]
           ])
         );
@@ -1299,7 +1324,7 @@
         mkStoryCard("Offer created", "pass", "good",
           kvHtml([
             ["mode", "<b>staged (demo) → real POST</b>"],
-            ["offer_id", `<span class="kbd">${escapeHtml(String(offer?.id || ""))}</span>`],
+            ["offer_id", `<span class="kbd">${escapeHtml(fmtId(offer?.id || ""))}</span>`],
             ["signal_id", `<span class="kbd">${escapeHtml(String(signal.id))}</span>`]
           ])
         );
@@ -1311,16 +1336,12 @@
 
         await sleep(between);
 
-        // Refresh real offers list after seeding (nice for demo)
         const after = await fetchRealOffersForSignal(signal.id, st.guestKey, actorOverride);
         renderOfferTiles("realOffers", after, "real");
       }
 
       await sleep(between);
 
-      // 3) Accept offer (guest) — run twice with same idem key to verify replay
-
-      // 3) Accept offer (guest) — run twice with same idem key to verify replay
       setStage("accept","Accepting offer…");
       logLine("", "muted");
       logLine("== 3) POST /offers/:id/accept (guest) — FIRST ==", "accent");
@@ -1345,7 +1366,7 @@
       mkStoryCard("Offer accepted", "real", "good",
         kvHtml([
           ["idempotency", `<span class="kbd">${escapeHtml(acc1.replay ? "replayed" : "fresh")}</span>`],
-          ["status", `<b>${escapeHtml(acc1.data?.offer?.status || acc1.data?.offer?.status || "accepted")}</b>`]
+          ["status", `<b>${escapeHtml(acc1.data?.offer?.status || "accepted")}</b>`]
         ])
       );
 
@@ -1375,14 +1396,12 @@
         ])
       );
 
-      // Persistence can be re-confirmed here too
       if (acc1.data?.persisted === true || acc2.data?.persisted === true){
         setDot("pPersist","good"); $("pPersistTxt").textContent = "persisted=true observed";
       }
 
       await sleep(between);
 
-      // 5) Create vibe (guest)
       setStage("vibe","Creating vibe…");
       logLine("", "muted");
       logLine("== 5) POST /vibes (guest) ==", "accent");
@@ -1394,12 +1413,7 @@
         method: "POST",
         idemKey: vibeKey,
         actorId: actorOverride,
-        body: {
-          id: vibeId,
-          signal_id: signal.id,
-          guest_id: guestId,
-          concierge_id: conciergeId
-        }
+        body: { id: vibeId, signal_id: signal.id, guest_id: guestId, concierge_id: conciergeId }
       });
 
       $("lastReq").textContent = vibeResp.reqId || "—";
@@ -1422,7 +1436,6 @@
 
       await sleep(between);
 
-      // 6) POST message (guest) with spoof header to prove it’s ignored
       setStage("message","Posting message (spoof test)…");
       logLine("", "muted");
       logLine("== 6) POST /messages (guest — spoof header should be ignored) ==", "accent");
@@ -1449,9 +1462,7 @@
 
       const msg = msgResp.data?.message;
       const derivedActor = msg?.actor_id;
-      const spoofOk = actorOverride
-        ? true
-        : (derivedActor && derivedActor !== spoofActor);
+      const spoofOk = actorOverride ? true : (derivedActor && derivedActor !== spoofActor);
 
       if (spoofOk){
         setDot("pAuth","good");
@@ -1471,7 +1482,6 @@
 
       await sleep(between);
 
-      // 7) GET messages (guest)
       setStage("fetch","Fetching messages…");
       logLine("", "muted");
       logLine("== 7) GET /messages (guest) ==", "accent");
@@ -1491,7 +1501,6 @@
         return;
       }
 
-      // 8) GET messages (concierge)
       logLine("== 8) GET /messages (concierge) ==", "accent");
       const get2 = await apiFetch(`/messages?vibe_id=${encodeURIComponent(vibe?.external_id || vibeId)}&limit=${encodeURIComponent(String(Number.isFinite(limit) ? limit : 20))}&offset=0`, {
         token: st.concKey,
@@ -1501,16 +1510,12 @@
 
       $("lastReq").textContent = get2.reqId || "—";
 
-      // Render chat
       const msgs = Array.isArray(get1.data?.messages) ? get1.data.messages : [];
-      const chat = renderChat(msgs);
-
       mkStoryCard("Conversation", "real", "good",
         `<div class="tiny">guest sees ${escapeHtml(String(get1.data?.count ?? msgs.length))} • concierge sees ${escapeHtml(String(get2.data?.count ?? "—"))}</div>` +
-        chat
+        renderChat(msgs)
       );
 
-      // Persistence “still good” if messages include created_at and API is returning
       if (msgs.length >= 1) {
         setDot("pPersist","good"); $("pPersistTxt").textContent = "read-after-write OK";
       }
@@ -1547,7 +1552,16 @@
 
   function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-  // --- init ---
+  function initMobileCollapsibles(){
+    const isMobile = window.matchMedia && window.matchMedia("(max-width: 700px)").matches;
+    const market = $("marketDetails");
+    const logs = $("logDetails");
+    if (isMobile){
+      if (market) market.open = false;
+      if (logs) logs.open = false;
+    }
+  }
+
   function init(){
     applyInputs(defaultState());
     loadState();
@@ -1566,17 +1580,22 @@
     $("btnLoad").addEventListener("click", loadState);
     $("btnClear").addEventListener("click", clearState);
 
-    $("btnCopyLog").addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText($("log").innerText || ""); logLine("[ui] copied log", "good"); }
-      catch { logLine("[ui] clipboard blocked", "warn"); }
-    });
+    const copyBtn = $("btnCopyLog");
+    if (copyBtn){
+      copyBtn.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText($("log").innerText || ""); logLine("[ui] copied log", "good"); }
+        catch { logLine("[ui] clipboard blocked", "warn"); }
+      });
+    }
 
     $("btnHealth").addEventListener("click", checkHealth);
     $("btnVictory").addEventListener("click", grandVictoryRun);
     $("btnReset").addEventListener("click", resetUi);
     $("btnUnlock").addEventListener("click", hardUnlock);
 
-    // periodic health check
+    const btnUnlock2 = $("btnUnlock2");
+    if (btnUnlock2) btnUnlock2.addEventListener("click", hardUnlock);
+
     setInterval(() => { if (!document.hidden) checkHealth(); }, 30000);
 
     forceMaskKeys();
@@ -1584,6 +1603,7 @@
 
     resetUi();
     checkHealth();
+    initMobileCollapsibles();
     logLine("[ui] ready v0.453", "muted");
   }
 

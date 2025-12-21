@@ -26,6 +26,27 @@
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
 
+    body[data-theme="light"]{
+      --bg:#f7f9fc;
+      --panel:#ffffff;
+      --panel2:#f1f5fb;
+      --line:rgba(19,32,48,.10);
+      --text:#0b1220;
+      --muted:rgba(25,40,60,.70);
+      --glow:rgba(40,120,255,.14);
+      --good:#1b7a4a;
+      --warn:#a56a08;
+      --bad:#b42318;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    body[data-theme="light"] .log{
+      color: rgba(20,32,48,.88);
+    }
+    body[data-theme="light"] .log .muted{ color: rgba(40,60,90,.62); }
+    body[data-theme="light"] .dot{ box-shadow: none; }
+
+
+
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
@@ -506,7 +527,53 @@
     @media (max-width: 980px){
       .configHint{ display:none; }
     }
-  </style>
+  
+    .hero{ margin: 18px 0 10px; }
+    .heroInner{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+    .heroLeft{
+      background: linear-gradient(180deg, rgba(46,208,125,.10), rgba(46,208,125,0));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .heroKicker{
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .heroTitle{ margin: 10px 0 6px; font-size: 42px; line-height: 1.05; }
+    .heroSub{ margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 56ch; }
+    .heroCtas{ display:flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    .heroTiny{ margin-top: 10px; }
+    .heroRight{ display:flex; }
+    .heroCard{
+      flex:1;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display:grid;
+      gap: 12px;
+      align-content: start;
+    }
+    .heroStat{ display:flex; align-items:baseline; justify-content: space-between; gap: 10px; }
+    .heroStatN{ font-family: var(--mono); font-size: 13px; color: var(--text); }
+    .heroStatL{ font-size: 11px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: .10em; }
+    @media (max-width: 860px){
+      .heroInner{ grid-template-columns: 1fr; }
+      .heroTitle{ font-size: 36px; }
+    }
+
+</style>
 </head>
 
 <body>
@@ -514,8 +581,8 @@
     <header>
       <div class="brand">
         <div class="title">
-          OFF / Tangent — “Grand Victory Run” Demo
-          <span class="tag">v0.453</span>
+          OFF — Offline experience marketplace (demo)
+          <span class="tag">v0.455.2</span>
         </div>
         <div class="subtitle">
           Real API flow with pillar lights: Health • Auth Spoof-Proof • Idempotency • Persistence.
@@ -532,11 +599,46 @@
           <button id="btnHealth" class="primary" type="button">Check</button>
         </div>
 
+        <button id="themeToggle" class="ghost" type="button" aria-label="Toggle theme">Dark</button>
         <button id="btnVictory" class="primary" type="button">🏁 Grand Victory Run</button>
         <button id="btnReset" class="danger" type="button">Reset</button>
         <button id="btnUnlock" type="button">Unlock UI</button>
       </div>
     </header>
+
+    <section class="hero" id="hero">
+      <div class="heroInner">
+        <div class="heroLeft">
+          <div class="heroKicker">OFF (Project Tangent)</div>
+          <h1 class="heroTitle">Take me off.</h1>
+          <p class="heroSub">
+            A trust-first, offline experience marketplace: signals in, offers out — with guardrails, idempotency, and a small Admin AI helper.
+          </p>
+          <div class="heroCtas">
+            <button id="ctaRunDemo" class="primary" type="button">Run the demo</button>
+            <button id="ctaAi" class="ghost" type="button">Generate copy (Admin AI)</button>
+          </div>
+          <div class="tiny heroTiny">Tip: You can keep this page in dark mode, but there’s a toggle.</div>
+        </div>
+        <div class="heroRight">
+          <div class="heroCard">
+            <div class="heroStat">
+              <div class="heroStatN" id="statHealth">—</div>
+              <div class="heroStatL">backend health</div>
+            </div>
+            <div class="heroStat">
+              <div class="heroStatN" id="statAi">—</div>
+              <div class="heroStatL">admin AI ping</div>
+            </div>
+            <div class="heroStat">
+              <div class="heroStatN" id="statReq">—</div>
+              <div class="heroStatL">request id</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
 
     <div class="grid">
       <section class="card">
@@ -1608,7 +1710,134 @@
   }
 
   init();
+    initTheme();
+    initAiPanel();
+    initHeroCtas();
 })();
+
+
+  // -----------------------------
+  // Theme (dark/light)
+  // -----------------------------
+  const THEME_KEY = "off_theme";
+  function applyTheme(theme){
+    const t = (theme === "light") ? "light" : "dark";
+    document.body.dataset.theme = t;
+    const btn = document.getElementById("themeToggle");
+    if (btn) btn.textContent = (t === "light") ? "Light" : "Dark";
+  }
+
+  function initTheme(){
+    const saved = localStorage.getItem(THEME_KEY);
+    applyTheme(saved || "dark");
+    const btn = document.getElementById("themeToggle");
+    if (btn){
+      btn.addEventListener("click", () => {
+        const next = (document.body.dataset.theme === "light") ? "dark" : "light";
+        localStorage.setItem(THEME_KEY, next);
+        applyTheme(next);
+      });
+    }
+  }
+
+  // -----------------------------
+  // Admin AI panel
+  // -----------------------------
+  function setAiLog(lines){
+    const el = document.getElementById("aiLog");
+    if (!el) return;
+    el.textContent = Array.isArray(lines) ? lines.join("\n") : String(lines || "");
+  }
+
+  function getBaseUrl(){
+    const el = document.getElementById("baseUrl");
+    const val = el ? String(el.value || "").trim() : "";
+    return val || "https://off-backend.onrender.com";
+  }
+
+  async function aiPing(){
+    const adminKeyEl = document.getElementById("adminKey");
+    const token = adminKeyEl ? String(adminKeyEl.value || "").trim() : "";
+    const base = getBaseUrl();
+    setAiLog([`→ POST ${base}/admin/ai/ping`, "…"]);
+    const r = await apiCall({ method:"POST", base, path:"/admin/ai/ping", token, body:{}, actorId:"admin_demo" });
+    const lines = [
+      `ok=${r.ok} status=${r.status} req_id=${r.reqId || "—"} replay=${r.replay || "—"}`,
+      `url=${r.url}`,
+      "",
+      JSON.stringify(r.data, null, 2)
+    ];
+    setAiLog(lines);
+
+    // hero stats
+    const statAi = document.getElementById("statAi");
+    const statReq = document.getElementById("statReq");
+    if (statAi) statAi.textContent = r.ok ? "pong" : "error";
+    if (statReq) statReq.textContent = r.reqId || "—";
+  }
+
+  async function aiRun(){
+    const adminKeyEl = document.getElementById("adminKey");
+    const token = adminKeyEl ? String(adminKeyEl.value || "").trim() : "";
+    const base = getBaseUrl();
+
+    const purpose = String(document.getElementById("aiPurpose")?.value || "").trim();
+    const context = String(document.getElementById("aiContext")?.value || "").trim();
+    const variants = Number(document.getElementById("aiVariants")?.value || 2) || 2;
+
+    const payload = { purpose, context, variants };
+
+    setAiLog([
+      `→ POST ${base}/admin/ai/run`,
+      `task_type=draft_text variants=${variants}`,
+      "…"
+    ]);
+
+    const r = await apiCall({
+      method:"POST",
+      base,
+      path:"/admin/ai/run",
+      token,
+      body:{ task_type:"draft_text", payload },
+      actorId:"admin_demo"
+    });
+
+    const lines = [
+      `ok=${r.ok} status=${r.status} req_id=${r.reqId || "—"} replay=${r.replay || "—"}`,
+      `url=${r.url}`,
+      "",
+      JSON.stringify(r.data, null, 2)
+    ];
+    setAiLog(lines);
+
+    const statReq = document.getElementById("statReq");
+    if (statReq) statReq.textContent = r.reqId || "—";
+  }
+
+  function initAiPanel(){
+    const btnRun = document.getElementById("btnAiRun");
+    const btnPing = document.getElementById("btnAiPing");
+    if (btnRun) btnRun.addEventListener("click", () => aiRun().catch((e)=> setAiLog(`AI_RUN_CLIENT_ERROR: ${e?.message || e}`)));
+    if (btnPing) btnPing.addEventListener("click", () => aiPing().catch((e)=> setAiLog(`AI_PING_CLIENT_ERROR: ${e?.message || e}`)));
+
+    const ctaAi = document.getElementById("ctaAi");
+    if (ctaAi){
+      ctaAi.addEventListener("click", () => {
+        document.getElementById("marketDetails")?.scrollIntoView({ behavior:"smooth", block:"start" });
+        setTimeout(()=> document.getElementById("aiPurpose")?.focus(), 200);
+      });
+    }
+  }
+
+  function initHeroCtas(){
+    const btn = document.getElementById("ctaRunDemo");
+    if (btn){
+      btn.addEventListener("click", () => {
+        document.getElementById("btnVictory")?.scrollIntoView({ behavior:"smooth", block:"start" });
+      });
+    }
+  }
+
 </script>
 </body>
 </html>
